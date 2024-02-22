@@ -29,6 +29,7 @@ namespace Tewls.Windows
         [Flags]
         public enum ResourceUsage
         {
+            None = 0,
             Connectable = 0x00000001,
             Container = 0x00000002,
             NoLocalDevice = 0x00000004,
