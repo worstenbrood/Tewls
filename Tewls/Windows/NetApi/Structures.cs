@@ -1,0 +1,120 @@
+﻿using System;
+using System.Runtime.InteropServices;
+
+namespace Tewls.Windows.NetApi.Structures
+{
+    public enum PlatformId : uint
+    {
+        Dos = 300,
+        Os2 = 400,
+        Nt = 500,
+        Osf = 600,
+        Vms = 700
+    }
+
+    public enum Level : uint
+    {
+        Info100 = 100,
+        Info101 = 101,
+        Info102 = 102
+    };
+
+    public interface IServerInfo
+    {
+        Level GetLevel();
+    }
+
+    [StructLayout(LayoutKind.Sequential)]
+    public class ServerInfo100 : IServerInfo
+    {
+        public PlatformId PlatformId;
+        [MarshalAs(UnmanagedType.LPWStr)]
+        public string Name;
+
+        public Level GetLevel()
+        {
+            return Level.Info100;
+        }
+    };
+
+    [Flags]
+    public enum ServerType : uint
+    {
+        Workstation = 0x1,
+        Server = 0x2,
+        SQLServer = 0x4,
+        DomainController = 0x8,
+        DomainBackupController = 0x10,
+        TimeSource = 0x20,
+        Afp = 0x40,
+        Novell = 0x80,
+        DomainMember = 0x100,
+        PrintQueueServer = 0x200,
+        DialinServer = 0x400,
+        XenixServer = 0x800,
+        Nt = 0x1000,
+        Wfw = 0x2000,
+        ServerMfpn = 0x4000,
+        ServerNt = 0x8000,
+        PotentialBrowser = 0x10000,
+        BackupBrowser = 0x20000,
+        MasterBrowser = 0x40000,
+        DomainMaster = 0x80000,
+        ServerOsf = 0x100000,
+        ServerVms = 0x200000,
+        Windows = 0x400000,
+        Dfs = 0x800000,
+        ClusterNt = 0x1000000,
+        TerminalServer = 0x2000000,
+        ClusterVirtualServerNt = 0x4000000,
+        Dce = 0x10000000,
+        AlternateXport = 0x20000000,
+        LocalListOnly = 0x40000000,
+        DomainEnum = 0x80000000,
+        All = 0xFFFFFFFF
+    }
+
+    [StructLayout(LayoutKind.Sequential)]
+    public class ServerInfo101 : IServerInfo
+    {
+        public PlatformId PlatformId;
+        [MarshalAs(UnmanagedType.LPWStr)]
+        public string Name;
+        public uint VersionMajor;
+        public uint VersionMinor;
+        public ServerType Type;
+        [MarshalAs(UnmanagedType.LPWStr)]
+        public string Comment;
+
+        public Level GetLevel()
+        {
+            return Level.Info101;
+        }
+    }
+
+    [StructLayout(LayoutKind.Sequential)]
+    public class ServerInfo102 : IServerInfo
+    {
+        public PlatformId PlatformId;
+        [MarshalAs(UnmanagedType.LPWStr)]
+        public string Name;
+        public uint VersionMajor;
+        public uint VersionMinor;
+        public ServerType Type;
+        [MarshalAs(UnmanagedType.LPWStr)]
+        public string Comment;
+        public uint Users;
+        public long Disc;
+        public bool Hidden;
+        public uint Announce;
+        public uint Anndelta;
+        public uint Licenses;
+        [MarshalAs(UnmanagedType.LPWStr)]
+        public string Userpath;
+
+        public Level GetLevel()
+        {
+            return Level.Info102;
+        }
+    };
+}
