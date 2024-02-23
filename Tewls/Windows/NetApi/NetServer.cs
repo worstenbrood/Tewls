@@ -14,11 +14,20 @@ namespace Tewls.Windows.NetApi
         [DllImport("netapi32.dll", EntryPoint = "NetServerGetInfo", CallingConvention = CallingConvention.Winapi, CharSet = CharSet.Unicode, SetLastError = true)]
         private static extern Error NetServerGetInfo(string servername, InfoLevel level, ref IntPtr bufptr);
 
+        [DllImport("netapi32.dll", EntryPoint = "NetServerSetInfo", CallingConvention = CallingConvention.Winapi, CharSet = CharSet.Unicode, SetLastError = true)]
+        private static extern Error NetServerSetInfo(string servername, InfoLevel level, IntPtr buf,ref uint ParmError);
+
         [DllImport("netapi32.dll", EntryPoint = "NetServerDiskEnum", CallingConvention = CallingConvention.Winapi, CharSet = CharSet.Unicode, SetLastError = true)]
         private static extern Error NetServerDiskEnum(string servername,InfoLevel level,ref IntPtr bufptr, int prefmaxlen,ref uint entriesread, ref uint totalentries, IntPtr resume_handle);
 
         [DllImport("netapi32.dll", EntryPoint = "NetServerTransportEnum", CallingConvention = CallingConvention.Winapi, CharSet = CharSet.Unicode, SetLastError = true)]
         private static extern Error NetServerTransportEnum(string servername,TransportLevel level, ref IntPtr bufptr, int prefmaxlen,ref uint entriesread,ref uint totalentries, IntPtr resume_handle);
+
+        [DllImport("netapi32.dll", EntryPoint = "NetServerComputerNameAdd", CallingConvention = CallingConvention.Winapi, CharSet = CharSet.Unicode, SetLastError = true)]
+        private static extern Error NetServerComputerNameAdd(string ServerName, string EmulatedDomainName,string EmulatedServerName);
+
+        [DllImport("netapi32.dll", EntryPoint = "NetServerComputerNameDel", CallingConvention = CallingConvention.Winapi, CharSet = CharSet.Unicode, SetLastError = true)]
+        private static extern Error NetServerComputerNameDel(string ServerName,string EmulatedServerName);
 
         public static IEnumerable<T> ServerEnum<T>(ServerType type, string domainName = null)
              where T : IInfo<InfoLevel>, new()
@@ -59,6 +68,23 @@ namespace Tewls.Windows.NetApi
 
                 Marshal.PtrToStructure(buffer.Buffer, info);
                 return info;
+            }
+        }
+
+        public static void SetInfo<T>(string serverName, T info)
+            where T : IInfo<InfoLevel>, new()
+        {
+            using (var buffer = new NetBuffer())
+            {
+                uint paramIndex = 0;
+
+                Marshal.StructureToPtr(info, buffer, false);
+
+                var result = NetServerSetInfo(serverName, info.GetLevel(), buffer.Buffer, ref paramIndex);
+                if (result != Error.Success)
+                {
+                    throw new Win32Exception((int)result);
+                }
             }
         }
 
@@ -111,6 +137,24 @@ namespace Tewls.Windows.NetApi
                     yield return info;
                     index += Marshal.SizeOf(typeof(T));
                 }
+            }
+        }
+
+        public static void ComputerNameAdd(string serverName, string emulatedDomainName, string emulatedServerName)
+        {
+            var result = NetServerComputerNameAdd(serverName, emulatedDomainName, emulatedServerName);
+            if (result != Error.Success)
+            {
+                throw new Win32Exception((int)result);
+            }
+        }
+
+        public static void ComputerNameDel(string serverName, string emulatedServerName)
+        {
+            var result = NetServerComputerNameDel(serverName, emulatedServerName);
+            if (result != Error.Success)
+            {
+                throw new Win32Exception((int)result);
             }
         }
     }

@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 
 namespace Tewls.Windows.NetApi.Structures
@@ -122,6 +124,8 @@ namespace Tewls.Windows.NetApi.Structures
     {
         Transport0 = 0,
         Transport1,
+        Transport2,
+        Transport3,
     }
 
     [StructLayout(LayoutKind.Sequential)]
@@ -157,6 +161,49 @@ namespace Tewls.Windows.NetApi.Structures
         public TransportLevel GetLevel()
         {
             return TransportLevel.Transport1;
+        }
+    };
+
+    [StructLayout(LayoutKind.Sequential)]
+    public class ServerTransportInfo2 : IInfo<TransportLevel>
+    {
+        public uint NumberOfVcs;
+        [MarshalAs(UnmanagedType.LPWStr)]
+        public string TransportName;
+        public IntPtr TransportAddress;
+        public uint TransportAddressLength;
+        [MarshalAs(UnmanagedType.LPWStr)]
+        public string NetworkAddress;
+        [MarshalAs(UnmanagedType.LPWStr)]
+        public string Domain;
+        public ulong Flags;
+
+        public TransportLevel GetLevel()
+        {
+            return TransportLevel.Transport2;
+        }
+    };
+
+    [StructLayout(LayoutKind.Sequential)]
+    public class ServerTransportInfo3 : IInfo<TransportLevel>
+    {
+        public uint NumberOfVcs;
+        [MarshalAs(UnmanagedType.LPWStr)]
+        public string TransportName;
+        public IntPtr TransportAddress;
+        public uint TransportAddressLength;
+        [MarshalAs(UnmanagedType.LPWStr)]
+        public string NetworkAddress;
+        [MarshalAs(UnmanagedType.LPWStr)]
+        public string Domain;
+        public ulong Flags;
+        public uint PasswordLength;
+        [MarshalAs(UnmanagedType.LPWStr, SizeConst = 128)]
+        public string Password;
+
+        public TransportLevel GetLevel()
+        {
+            return TransportLevel.Transport3;
         }
     };
 }
