@@ -30,7 +30,7 @@ namespace Tewls.Windows.NetApi
         private static extern Error NetServerComputerNameDel(string ServerName,string EmulatedServerName);
 
         public static IEnumerable<T> ServerEnum<T>(ServerType type, string domainName = null)
-             where T : IInfo<InfoLevel>, new()
+             where T : class, IInfo<InfoLevel>, new()
         {
             using (var buffer = new NetBuffer())
             {
@@ -44,18 +44,15 @@ namespace Tewls.Windows.NetApi
                     throw new Win32Exception((int) result);
                 }
 
-                IntPtr index = buffer;
-                for (int i = 0; i < entriesRead; i++)
+                foreach (var entry in buffer.EnumStructure(buffer, entriesRead, info))
                 {
-                    Marshal.PtrToStructure(index, info);
-                    yield return info;
-                    index += Marshal.SizeOf(typeof(T));
+                    yield return entry;
                 }
             }
         }
 
         public static T GetInfo<T>(string serverName = null)
-            where T: IInfo<InfoLevel>, new()
+            where T: class, IInfo<InfoLevel>, new()
         {
             using (var buffer = new NetBuffer())
             {
@@ -72,7 +69,7 @@ namespace Tewls.Windows.NetApi
         }
 
         public static void SetInfo<T>(string serverName, T info)
-            where T : IInfo<InfoLevel>, new()
+            where T :class, IInfo<InfoLevel>, new()
         {
             using (var buffer = new NetBuffer())
             {
@@ -116,7 +113,7 @@ namespace Tewls.Windows.NetApi
         }
 
         public static IEnumerable<T> TransportEnum<T>(string serverName = null)
-             where T : IInfo<TransportLevel>, new()
+             where T : class, IInfo<TransportLevel>, new()
         {
             using (var buffer = new NetBuffer())
             {
@@ -130,12 +127,9 @@ namespace Tewls.Windows.NetApi
                     throw new Win32Exception((int)result);
                 }
 
-                IntPtr index = buffer;
-                for (int i = 0; i < entriesRead; i++) 
+                foreach(var entry in buffer.EnumStructure(buffer, entriesRead, info))
                 {
-                    Marshal.PtrToStructure(index, info);
-                    yield return info;
-                    index += Marshal.SizeOf(typeof(T));
+                    yield return entry;
                 }
             }
         }
