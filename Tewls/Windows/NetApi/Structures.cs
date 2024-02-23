@@ -127,7 +127,7 @@ namespace Tewls.Windows.NetApi.Structures
     [StructLayout(LayoutKind.Sequential)]
     public class ServerTransportInfo0 : IInfo<TransportLevel>
     {
-        public uint Numberofvcs;
+        public uint NumberOfVcs;
         [MarshalAs(UnmanagedType.LPWStr)]
         public string TransportName;
         public IntPtr TransportAddress;
@@ -144,7 +144,7 @@ namespace Tewls.Windows.NetApi.Structures
     [StructLayout(LayoutKind.Sequential)]
     public class ServerTransportInfo1 : IInfo<TransportLevel>
     {
-        public uint Numberofvcs;
+        public uint NumberOfVcs;
         [MarshalAs(UnmanagedType.LPWStr)]
         public string TransportName;
         public IntPtr TransportAddress;

@@ -89,7 +89,7 @@ namespace Tewls.Windows.NetApi
             }
         }
 
-        public static IEnumerable<T> TransportEnum<T>(string serverName)
+        public static IEnumerable<T> TransportEnum<T>(string serverName = null)
              where T : IInfo<TransportLevel>, new()
         {
             using (var buffer = new NetBuffer())
