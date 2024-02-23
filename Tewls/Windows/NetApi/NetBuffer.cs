@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.ComponentModel;
 using System.Runtime.InteropServices;
 
@@ -97,6 +98,23 @@ namespace Tewls.Windows.NetApi
             return BufferSize(Buffer);
         }
 
+        public IEnumerable<T> EnumStructure<T>(IntPtr buffer, uint entries, T structure = null)
+            where T : class, new()
+        {
+            if (structure == null)
+            {
+                structure = new T();
+            }
+
+            IntPtr index = buffer;
+            for (int i = 0; i < entries; i++)
+            {
+                Marshal.PtrToStructure(index, structure);
+                yield return structure;
+                index += Marshal.SizeOf(typeof(T));
+            }
+        }
+
         public void Free()
         {
             BufferFree(Buffer);
@@ -121,6 +139,7 @@ namespace Tewls.Windows.NetApi
 
             _disposed = true;
         }
+              
 
         ~NetBuffer()
         {
