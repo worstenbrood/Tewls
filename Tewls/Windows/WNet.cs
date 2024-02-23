@@ -52,33 +52,7 @@ namespace Tewls.Windows
             Directory,
             Tree,
             NdsContainer
-        };
-
-        public enum Error
-        {
-            NoError = 0,
-            AccessDenied = 5,
-            AlreadyAssigned = 85,
-            BadDeviceType = 66,
-            BadNetName = 67,
-            InvalidPassword = 86,
-            InvalidParameter = 87,
-            InsufficientBuffer = 122,
-            Busy = 170,
-            MoreData = 234,
-            NoMoreItems = 259,
-            InvalidAddress = 487,
-            BadDevice = 1200,
-            ConnectionUnavailable = 1201,
-            DeviceAlreadyRemembered = 1202,
-            NoNetworkOrBadPath = 1203,
-            CannotOpenProfile = 1205,
-            BadProfile = 1206,
-            BadProvider = 1207,
-            ExtendedError = 1208,
-            NoNetwork = 1222,
-            Cancelled = 1223
-        };
+        };        
 
         [Flags]
         public enum Connect
@@ -373,39 +347,42 @@ namespace Tewls.Windows
         {
             var resource = new NetResource();
             IntPtr handle = IntPtr.Zero;
-            IntPtr buffer = Marshal.AllocHGlobal(EnumBufferSize);
-            uint bufferSize = EnumBufferSize;
-
+           
             try
             {
-                var result = WNetOpenEnum(dwScope, dwType, dwUsage, resource, out handle);
-                var ex = GetLastException(result);
-                if (ex != null)
+                uint bufferSize = EnumBufferSize;
+                using (var buffer = new HGlobalBuffer((IntPtr) bufferSize))
                 {
-                    throw ex;
-                }
-                
-                uint count = 1;
 
-                do
-                {
-                    result = WNetEnumResource(handle, ref count, buffer, ref bufferSize);
-
-                    if (result == Error.NoError)
+                    var result = WNetOpenEnum(dwScope, dwType, dwUsage, resource, out handle);
+                    var ex = GetLastException(result);
+                    if (ex != null)
                     {
-                        yield return PtrToStructure(buffer, resource);
+                        throw ex;
                     }
 
-                    if (result != Error.NoMoreItems)
+                    uint count = 1;
+
+                    do
                     {
-                        ex = GetLastException(result);
-                        if (ex != null)
+                        result = WNetEnumResource(handle, ref count, buffer, ref bufferSize);
+
+                        if (result == Error.NoError)
                         {
-                            throw ex;
+                            yield return PtrToStructure(buffer, resource);
+                        }
+
+                        if (result != Error.NoMoreItems)
+                        {
+                            ex = GetLastException(result);
+                            if (ex != null)
+                            {
+                                throw ex;
+                            }
                         }
                     }
+                    while (result != Error.NoMoreItems);
                 }
-                while (result != Error.NoMoreItems);
             }
             finally
             {
@@ -413,12 +390,6 @@ namespace Tewls.Windows
                 if (handle != IntPtr.Zero)
                 {
                     WNetCloseEnum(handle);
-                }
-
-                // Free buffer
-                if (buffer != IntPtr.Zero)
-                {
-                    Marshal.FreeHGlobal(buffer);
                 }
             }
         }
@@ -478,15 +449,13 @@ namespace Tewls.Windows
         public static string GetConnection(string localName)
         {
             uint bufferSize = BufferSize;
-            IntPtr buffer = Marshal.AllocHGlobal((IntPtr) bufferSize);
-            
-            try
+            using (var buffer = new HGlobalBuffer((IntPtr) bufferSize))
             {
                 // Get buffer size
                 var result = WNetGetConnection(localName, buffer, ref bufferSize);
                 if (result == Error.MoreData)
                 {
-                    buffer = Marshal.ReAllocHGlobal(buffer, (IntPtr)bufferSize);
+                    buffer.ReAlloc((IntPtr) bufferSize);
                     result = WNetGetConnection(localName, buffer, ref bufferSize);
                 }
 
@@ -503,13 +472,6 @@ namespace Tewls.Windows
                 }
 
                 return Marshal.PtrToStringUni(buffer);
-            }
-            finally
-            {
-                if (buffer != IntPtr.Zero)
-                {
-                    Marshal.FreeHGlobal(buffer);
-                }
             }
         }
 
@@ -528,15 +490,13 @@ namespace Tewls.Windows
         public static string GetUser(string localOrRemoteName)
         {
             uint bufferSize = BufferSize;
-            IntPtr buffer = Marshal.AllocHGlobal((IntPtr) bufferSize);
-
-            try
+            using (var buffer = new HGlobalBuffer((IntPtr) bufferSize))
             {
                 // Get buffer size
                 var result = WNetGetUser(localOrRemoteName, buffer, ref bufferSize);
                 if (result == Error.MoreData)
                 {
-                    buffer = Marshal.ReAllocHGlobal(buffer, (IntPtr)(bufferSize * sizeof(char)));
+                    buffer.ReAlloc((IntPtr)(bufferSize * sizeof(char)));
                     result = WNetGetUser(localOrRemoteName, buffer, ref bufferSize);
                 }
 
@@ -548,27 +508,18 @@ namespace Tewls.Windows
 
                 return Marshal.PtrToStringUni(buffer);
             }
-            finally
-            {
-                if (buffer != IntPtr.Zero)
-                {
-                    Marshal.FreeHGlobal(buffer);
-                }
-            }
         }
 
         public static UniversalNameInfo GetUniversalNameInfo(string localPath)
         {
             uint bufferSize = BufferSize;
-            IntPtr buffer = Marshal.AllocHGlobal((IntPtr)bufferSize);
-
-            try
+            using (var buffer = new HGlobalBuffer((IntPtr) bufferSize))
             {
                 // Get buffer size
                 var result = WNetGetUniversalName(localPath, (uint)InfoLevel.UniversalName, buffer, ref bufferSize);
                 if (result == Error.MoreData)
                 {
-                    buffer = Marshal.ReAllocHGlobal(buffer, (IntPtr)bufferSize);
+                    buffer.ReAlloc((IntPtr) bufferSize);
                     result = WNetGetUniversalName(localPath, (uint)InfoLevel.UniversalName, buffer, ref bufferSize);
                 }
 
@@ -580,27 +531,18 @@ namespace Tewls.Windows
 
                 return PtrToStructure<UniversalNameInfo>(buffer);
             }
-            finally
-            {
-                if (buffer != IntPtr.Zero)
-                {
-                    Marshal.FreeHGlobal(buffer);
-                }
-            }
         }
 
         public static RemoteNameInfo GetRemoteNameInfo(string localPath)
         {
             uint bufferSize = BufferSize;
-            IntPtr buffer = Marshal.AllocHGlobal((IntPtr)bufferSize);
-
-            try
+            using (var buffer = new HGlobalBuffer((IntPtr) bufferSize))
             {
                 // Get buffer size
                 var result = WNetGetUniversalName(localPath, (uint)InfoLevel.RemoteName, buffer, ref bufferSize);
                 if (result == Error.MoreData)
                 {
-                    buffer = Marshal.ReAllocHGlobal(buffer, (IntPtr)bufferSize);
+                    buffer.ReAlloc((IntPtr)bufferSize);
                     result = WNetGetUniversalName(localPath, (uint)InfoLevel.RemoteName, buffer, ref bufferSize);
                 }
 
@@ -612,27 +554,18 @@ namespace Tewls.Windows
 
                 return PtrToStructure<RemoteNameInfo>(buffer);
             }
-            finally
-            {
-                if (buffer != IntPtr.Zero)
-                {
-                    Marshal.FreeHGlobal(buffer);
-                }
-            }
         }
 
         public static NetResource GetResourceParent(NetResource netResource)
         {
             uint bufferSize = BufferSize;
-            IntPtr buffer = Marshal.AllocHGlobal((IntPtr)bufferSize);
-
-            try
+            using (var buffer = new HGlobalBuffer((IntPtr) bufferSize))
             {
                 // Get buffer size
                 var result = WNetGetResourceParent(netResource, buffer, ref bufferSize);
                 if (result == Error.MoreData)
                 {
-                    buffer = Marshal.ReAllocHGlobal(buffer, (IntPtr)bufferSize);
+                    buffer.ReAlloc((IntPtr) bufferSize);
                     result = WNetGetResourceParent(netResource, buffer, ref bufferSize);
                 }
 
@@ -644,27 +577,18 @@ namespace Tewls.Windows
 
                 return PtrToStructure<NetResource>(buffer);
             }
-            finally
-            {
-                if (buffer != IntPtr.Zero)
-                {
-                    Marshal.FreeHGlobal(buffer);
-                }
-            }
         }
 
         public string GetProviderName(uint type)
         {
             uint bufferSize = BufferSize;
-            IntPtr buffer = Marshal.AllocHGlobal((IntPtr)bufferSize);
-
-            try
+            using (var buffer = new HGlobalBuffer((IntPtr) bufferSize))
             {
                 // Get buffer size
                 var result = WNetGetProviderName(type, buffer, ref bufferSize);
                 if (result == Error.MoreData)
                 {
-                    buffer = Marshal.ReAllocHGlobal(buffer, (IntPtr)(bufferSize * sizeof(char)));
+                    buffer.ReAlloc((IntPtr)(bufferSize * sizeof(char)));
                     result = WNetGetProviderName(type, buffer, ref bufferSize);
                 }
 
@@ -676,28 +600,20 @@ namespace Tewls.Windows
 
                 return Marshal.PtrToStringUni(buffer);
             }
-            finally
-            {
-                if (buffer != IntPtr.Zero)
-                {
-                    Marshal.FreeHGlobal(buffer);
-                }
-            }
         }
 
         public static NetResource GetResourceInformation(NetResource netResource)
         {
             uint bufferSize = BufferSize;
-            IntPtr buffer = Marshal.AllocHGlobal((IntPtr)bufferSize);
             IntPtr pointer = IntPtr.Zero;
 
-            try
+            using (var buffer = new HGlobalBuffer((IntPtr) bufferSize))
             {
                 // Get buffer size
                 var result = WNetGetResourceInformation(netResource, buffer, ref bufferSize, ref pointer);
                 if (result == Error.MoreData)
                 {
-                    buffer = Marshal.ReAllocHGlobal(buffer, (IntPtr)bufferSize);
+                    buffer.ReAlloc((IntPtr)bufferSize);
                     result = WNetGetResourceInformation(netResource, buffer, ref bufferSize, ref pointer);
                 }
 
@@ -708,13 +624,6 @@ namespace Tewls.Windows
                 }
 
                 return PtrToStructure<NetResource>(buffer);
-            }
-            finally
-            {
-                if (buffer != IntPtr.Zero)
-                {
-                    Marshal.FreeHGlobal(buffer);
-                }
             }
         }
     }
