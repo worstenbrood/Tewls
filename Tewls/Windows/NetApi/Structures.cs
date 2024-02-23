@@ -12,28 +12,28 @@ namespace Tewls.Windows.NetApi.Structures
         Vms = 700
     }
 
-    public enum Level : uint
+    public enum InfoLevel : uint
     {
         Info100 = 100,
         Info101 = 101,
         Info102 = 102
     };
 
-    public interface IServerInfo
+    public interface IInfo<T>
     {
-        Level GetLevel();
+        T GetLevel();
     }
 
     [StructLayout(LayoutKind.Sequential)]
-    public class ServerInfo100 : IServerInfo
+    public class ServerInfo100 : IInfo<InfoLevel>
     {
         public PlatformId PlatformId;
         [MarshalAs(UnmanagedType.LPWStr)]
         public string Name;
 
-        public Level GetLevel()
+        public InfoLevel GetLevel()
         {
-            return Level.Info100;
+            return InfoLevel.Info100;
         }
     };
 
@@ -75,7 +75,7 @@ namespace Tewls.Windows.NetApi.Structures
     }
 
     [StructLayout(LayoutKind.Sequential)]
-    public class ServerInfo101 : IServerInfo
+    public class ServerInfo101 : IInfo<InfoLevel>
     {
         public PlatformId PlatformId;
         [MarshalAs(UnmanagedType.LPWStr)]
@@ -86,14 +86,14 @@ namespace Tewls.Windows.NetApi.Structures
         [MarshalAs(UnmanagedType.LPWStr)]
         public string Comment;
 
-        public Level GetLevel()
+        public InfoLevel GetLevel()
         {
-            return Level.Info101;
+            return InfoLevel.Info101;
         }
     }
 
     [StructLayout(LayoutKind.Sequential)]
-    public class ServerInfo102 : IServerInfo
+    public class ServerInfo102 : IInfo<InfoLevel>
     {
         public PlatformId PlatformId;
         [MarshalAs(UnmanagedType.LPWStr)]
@@ -112,9 +112,51 @@ namespace Tewls.Windows.NetApi.Structures
         [MarshalAs(UnmanagedType.LPWStr)]
         public string Userpath;
 
-        public Level GetLevel()
+        public InfoLevel GetLevel()
         {
-            return Level.Info102;
+            return InfoLevel.Info102;
+        }
+    };
+
+    public enum TransportLevel: uint
+    {
+        Transport0 = 0,
+        Transport1,
+    }
+
+    [StructLayout(LayoutKind.Sequential)]
+    public class ServerTransportInfo0 : IInfo<TransportLevel>
+    {
+        public uint Numberofvcs;
+        [MarshalAs(UnmanagedType.LPWStr)]
+        public string TransportName;
+        public IntPtr TransportAddress;
+        public uint TransportAddressLength;
+        [MarshalAs(UnmanagedType.LPWStr)]
+        public string NetworkAddress;
+
+        public TransportLevel GetLevel()
+        {
+            return TransportLevel.Transport0;
+        }
+    };
+
+    [StructLayout(LayoutKind.Sequential)]
+    public class ServerTransportInfo1 : IInfo<TransportLevel>
+    {
+        public uint Numberofvcs;
+        [MarshalAs(UnmanagedType.LPWStr)]
+        public string TransportName;
+        public IntPtr TransportAddress;
+        public uint TransportAddressLength;
+        [MarshalAs(UnmanagedType.LPWStr)]
+        public string NetworkAddress;
+        [MarshalAs(UnmanagedType.LPWStr)]
+        public string Domain;
+
+        public TransportLevel GetLevel()
+        {
+            return TransportLevel.Transport1;
         }
     };
 }

@@ -1,7 +1,6 @@
 ﻿using System;
-using System.Text;
-using System.Collections.Generic;
 using System.ComponentModel;
+using System.Collections.Generic;
 using System.Runtime.InteropServices;
 using Tewls.Windows.NetApi.Structures;
 
@@ -10,16 +9,19 @@ namespace Tewls.Windows.NetApi
     public class NetServer
     {
         [DllImport("netapi32.dll", EntryPoint = "NetServerEnum", CallingConvention = CallingConvention.Winapi, CharSet = CharSet.Unicode, SetLastError = true)]
-        private static extern Error NetServerEnum(string servername, Level level, ref IntPtr bufptr, int prefmaxlen, ref uint entriesread, ref uint totalentries, uint servertype, string domain, IntPtr resume_handle);
+        private static extern Error NetServerEnum(string servername, InfoLevel level, ref IntPtr bufptr, int prefmaxlen, ref uint entriesread, ref uint totalentries, uint servertype, string domain, IntPtr resume_handle);
 
         [DllImport("netapi32.dll", EntryPoint = "NetServerGetInfo", CallingConvention = CallingConvention.Winapi, CharSet = CharSet.Unicode, SetLastError = true)]
-        private static extern Error NetServerGetInfo(string servername, Level level, ref IntPtr bufptr);
+        private static extern Error NetServerGetInfo(string servername, InfoLevel level, ref IntPtr bufptr);
 
         [DllImport("netapi32.dll", EntryPoint = "NetServerDiskEnum", CallingConvention = CallingConvention.Winapi, CharSet = CharSet.Unicode, SetLastError = true)]
-        private static extern Error NetServerDiskEnum(string servername,Level level,ref IntPtr bufptr, int prefmaxlen,ref uint entriesread, ref uint totalentries, IntPtr resume_handle);
+        private static extern Error NetServerDiskEnum(string servername,InfoLevel level,ref IntPtr bufptr, int prefmaxlen,ref uint entriesread, ref uint totalentries, IntPtr resume_handle);
 
-        public static IEnumerable<T> Enum<T>(ServerType type, string domainName = null)
-             where T : IServerInfo, new()
+        [DllImport("netapi32.dll", EntryPoint = "NetServerTransportEnum", CallingConvention = CallingConvention.Winapi, CharSet = CharSet.Unicode, SetLastError = true)]
+        private static extern Error NetServerTransportEnum(string servername,TransportLevel level, ref IntPtr bufptr, int prefmaxlen,ref uint entriesread,ref uint totalentries, IntPtr resume_handle);
+
+        public static IEnumerable<T> ServerEnum<T>(ServerType type, string domainName = null)
+             where T : IInfo<InfoLevel>, new()
         {
             using (var buffer = new NetBuffer())
             {
@@ -33,15 +35,18 @@ namespace Tewls.Windows.NetApi
                     throw new Win32Exception((int) result);
                 }
 
-                //var t = Marshal.PtrToStructure<ServerInfo100[]>(buffer);
-                // TODO
-
-                return null;
+                IntPtr index = buffer;
+                for (int i = 0; i < entriesRead; i++)
+                {
+                    Marshal.PtrToStructure(index, info);
+                    yield return info;
+                    index += Marshal.SizeOf(typeof(T));
+                }
             }
         }
 
         public static T GetInfo<T>(string serverName = null)
-            where T: IServerInfo, new()
+            where T: IInfo<InfoLevel>, new()
         {
             using (var buffer = new NetBuffer())
             {
@@ -81,6 +86,31 @@ namespace Tewls.Windows.NetApi
                 }
                 
                 return drives;
+            }
+        }
+
+        public static IEnumerable<T> TransportEnum<T>(string serverName)
+             where T : IInfo<TransportLevel>, new()
+        {
+            using (var buffer = new NetBuffer())
+            {
+                uint entriesRead = 0;
+                uint totalEntries = 0;
+
+                var info = new T();
+                var result = NetServerTransportEnum(serverName, info.GetLevel(), ref buffer.Buffer, -1, ref entriesRead, ref totalEntries, IntPtr.Zero);
+                if (result != Error.Success)
+                {
+                    throw new Win32Exception((int)result);
+                }
+
+                IntPtr index = buffer;
+                for (int i = 0; i < entriesRead; i++) 
+                {
+                    Marshal.PtrToStructure(index, info);
+                    yield return info;
+                    index += Marshal.SizeOf(typeof(T));
+                }
             }
         }
     }
