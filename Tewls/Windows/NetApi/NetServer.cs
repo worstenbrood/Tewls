@@ -20,6 +20,15 @@ namespace Tewls.Windows.NetApi
         [DllImport("netapi32.dll", EntryPoint = "NetServerDiskEnum", CallingConvention = CallingConvention.Winapi, CharSet = CharSet.Unicode, SetLastError = true)]
         private static extern Error NetServerDiskEnum(string servername,InfoLevel level,ref IntPtr bufptr, int prefmaxlen,ref uint entriesread, ref uint totalentries, IntPtr resume_handle);
 
+        [DllImport("netapi32.dll", EntryPoint = "NetServerTransportAdd", CallingConvention = CallingConvention.Winapi, CharSet = CharSet.Unicode, SetLastError = true)]
+        private static extern Error NetServerTransportAdd(string servername, TransportLevel level, IntPtr bufptr);
+
+        [DllImport("netapi32.dll", EntryPoint = "NetServerTransportAddEx", CallingConvention = CallingConvention.Winapi, CharSet = CharSet.Unicode, SetLastError = true)]
+        private static extern Error NetServerTransportAddEx(string servername, TransportLevel level, IntPtr bufptr);
+
+        [DllImport("netapi32.dll", EntryPoint = "NetServerTransportDel", CallingConvention = CallingConvention.Winapi, CharSet = CharSet.Unicode, SetLastError = true)]
+        private static extern Error NetServerTransportDel(string servername, TransportLevel level, IntPtr bufptr);
+
         [DllImport("netapi32.dll", EntryPoint = "NetServerTransportEnum", CallingConvention = CallingConvention.Winapi, CharSet = CharSet.Unicode, SetLastError = true)]
         private static extern Error NetServerTransportEnum(string servername,TransportLevel level, ref IntPtr bufptr, int prefmaxlen,ref uint entriesread,ref uint totalentries, IntPtr resume_handle);
 
@@ -28,6 +37,51 @@ namespace Tewls.Windows.NetApi
 
         [DllImport("netapi32.dll", EntryPoint = "NetServerComputerNameDel", CallingConvention = CallingConvention.Winapi, CharSet = CharSet.Unicode, SetLastError = true)]
         private static extern Error NetServerComputerNameDel(string ServerName,string EmulatedServerName);
+
+        private const int EntrySize = 3;
+
+        public static string[] GetDiskEnum(string serverName = null)
+        {
+            using (var buffer = new NetBuffer())
+            {
+                uint entriesRead = 0;
+                uint totalEntries = 0;
+
+                var result = NetServerDiskEnum(serverName, 0, ref buffer.Buffer, -1, ref entriesRead, ref totalEntries, IntPtr.Zero);
+                if (result != Error.Success)
+                {
+                    throw new Win32Exception((int)result);
+                }
+
+                var drives = new string[entriesRead];
+                for (var i = 0; i < entriesRead; i++)
+                {
+                    var charArray = new char[EntrySize];
+                    Marshal.Copy(buffer.Buffer, charArray, 0, EntrySize);
+                    drives[i] = new string(charArray, 0, 2);
+                }
+
+                return drives;
+            }
+        }
+
+        public static void ComputerNameAdd(string serverName, string emulatedDomainName, string emulatedServerName)
+        {
+            var result = NetServerComputerNameAdd(serverName, emulatedDomainName, emulatedServerName);
+            if (result != Error.Success)
+            {
+                throw new Win32Exception((int)result);
+            }
+        }
+
+        public static void ComputerNameDel(string serverName, string emulatedServerName)
+        {
+            var result = NetServerComputerNameDel(serverName, emulatedServerName);
+            if (result != Error.Success)
+            {
+                throw new Win32Exception((int)result);
+            }
+        }
 
         public static IEnumerable<T> ServerEnum<T>(ServerType type, string domainName = null)
              where T : class, IInfo<InfoLevel>, new()
@@ -71,13 +125,13 @@ namespace Tewls.Windows.NetApi
         public static void SetInfo<T>(string serverName, T info)
             where T :class, IInfo<InfoLevel>, new()
         {
-            using (var buffer = new NetBuffer())
+            using (var buffer = new NetBuffer((uint)Marshal.SizeOf(info)))
             {
                 uint paramIndex = 0;
 
                 Marshal.StructureToPtr(info, buffer, false);
 
-                var result = NetServerSetInfo(serverName, info.GetLevel(), buffer.Buffer, ref paramIndex);
+                var result = NetServerSetInfo(serverName, info.GetLevel(), buffer, ref paramIndex);
                 if (result != Error.Success)
                 {
                     throw new Win32Exception((int)result);
@@ -85,35 +139,55 @@ namespace Tewls.Windows.NetApi
             }
         }
 
-        private const int EntrySize = 3;
+        
 
-        public static string[] GetDiskEnum(string serverName = null)
+        public static void TransportAdd<T>(string serverName, T info)
+           where T : class, IInfo<TransportLevel>, new()
         {
-            using (var buffer = new NetBuffer())
+            using (var buffer = new NetBuffer((uint) Marshal.SizeOf(info)))
             {
-                uint entriesRead = 0;
-                uint totalEntries = 0;
+                Marshal.StructureToPtr(info, buffer, false);
 
-                var result = NetServerDiskEnum(serverName, 0, ref buffer.Buffer, -1, ref entriesRead, ref totalEntries, IntPtr.Zero);
+                var result = NetServerTransportAdd(serverName, info.GetLevel(), buffer);
                 if (result != Error.Success)
                 {
                     throw new Win32Exception((int)result);
                 }
+            }
+        }
 
-                var drives = new string[entriesRead];
-                for (var i = 0; i < entriesRead; i++)
+        public static void TransportAddEx<T>(string serverName, T info)
+           where T : class, IInfo<TransportLevel>, new()
+        {
+            using (var buffer = new NetBuffer((uint)Marshal.SizeOf(info)))
+            {
+                Marshal.StructureToPtr(info, buffer, false);
+
+                var result = NetServerTransportAddEx(serverName, info.GetLevel(), buffer);
+                if (result != Error.Success)
                 {
-                    var charArray = new char[EntrySize];
-                    Marshal.Copy(buffer.Buffer, charArray, 0, EntrySize);
-                    drives[i] = new string(charArray, 0, 2);
+                    throw new Win32Exception((int)result);
                 }
-                
-                return drives;
+            }
+        }
+
+        public static void TransportDel<T>(string serverName, T info)
+            where T : class, IInfo<TransportLevel>, new ()
+        {
+            using (var buffer = new NetBuffer((uint)Marshal.SizeOf(info)))
+            {
+                Marshal.StructureToPtr(info, buffer, false);
+
+                var result = NetServerTransportDel(serverName, info.GetLevel(), buffer);
+                if (result != Error.Success)
+                {
+                    throw new Win32Exception((int)result);
+                }
             }
         }
 
         public static IEnumerable<T> TransportEnum<T>(string serverName = null)
-             where T : class, IInfo<TransportLevel>, new()
+            where T : class, IInfo<TransportLevel>, new()
         {
             using (var buffer = new NetBuffer())
             {
@@ -127,28 +201,10 @@ namespace Tewls.Windows.NetApi
                     throw new Win32Exception((int)result);
                 }
 
-                foreach(var entry in buffer.EnumStructure(buffer, entriesRead, info))
+                foreach (var entry in buffer.EnumStructure(buffer, entriesRead, info))
                 {
                     yield return entry;
                 }
-            }
-        }
-
-        public static void ComputerNameAdd(string serverName, string emulatedDomainName, string emulatedServerName)
-        {
-            var result = NetServerComputerNameAdd(serverName, emulatedDomainName, emulatedServerName);
-            if (result != Error.Success)
-            {
-                throw new Win32Exception((int)result);
-            }
-        }
-
-        public static void ComputerNameDel(string serverName, string emulatedServerName)
-        {
-            var result = NetServerComputerNameDel(serverName, emulatedServerName);
-            if (result != Error.Success)
-            {
-                throw new Win32Exception((int)result);
             }
         }
     }
