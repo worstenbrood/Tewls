@@ -137,9 +137,7 @@ namespace Tewls.Windows.NetApi
                     throw new Win32Exception((int)result);
                 }
             }
-        }
-
-        
+        }       
 
         public static void TransportAdd<T>(string serverName, T info)
            where T : class, IInfo<TransportLevel>, new()
