@@ -6,6 +6,8 @@
         AccessDenied = 5,
         NotEnoughMemory = 8,
         NotSupported = 50,
+        RemoteComputerUnavailable = 51,
+        NetworkPathNotFound = 53,
         AlreadyAssigned = 85,
         BadDeviceType = 66,
         BadNetName = 67,
