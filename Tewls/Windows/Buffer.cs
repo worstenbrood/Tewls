@@ -31,7 +31,7 @@ namespace Tewls.Windows
             Size = size;
         }
 
-        public IEnumerable<T> EnumStructure<T>(IntPtr buffer, uint entries, T structure = null)
+        public IEnumerable<T> EnumStructure<T>(uint entries, T structure = null)
             where T : class, new()
         {
             if (structure == null)
@@ -39,12 +39,10 @@ namespace Tewls.Windows
                 structure = new T();
             }
 
-            IntPtr index = buffer;
             for (int i = 0; i < entries; i++)
             {
-                Marshal.PtrToStructure(index, structure);
+                Marshal.PtrToStructure(Buffer + (Marshal.SizeOf(typeof(T)) * i), structure);
                 yield return structure;
-                index += Marshal.SizeOf(typeof(T));
             }
         }
 

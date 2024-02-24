@@ -98,7 +98,7 @@ namespace Tewls.Windows.NetApi
                     throw new Win32Exception((int) result);
                 }
 
-                foreach (var entry in buffer.EnumStructure(buffer, entriesRead, info))
+                foreach (var entry in buffer.EnumStructure(entriesRead, info))
                 {
                     yield return entry;
                 }
@@ -199,7 +199,7 @@ namespace Tewls.Windows.NetApi
                     throw new Win32Exception((int)result);
                 }
 
-                foreach (var entry in buffer.EnumStructure(buffer, entriesRead, info))
+                foreach (var entry in buffer.EnumStructure(entriesRead, info))
                 {
                     yield return entry;
                 }
