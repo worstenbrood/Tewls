@@ -130,6 +130,11 @@ namespace Tewls.Windows
                 return WNet.GetResourceParent(this);
             }
 
+            public string GetUser()
+            {
+                return WNet.GetUser(LocalName);
+            }
+
             public NetResource CancelConnection(bool force = false)
             {
                 WNet.CancelConnection(LocalName, force);
