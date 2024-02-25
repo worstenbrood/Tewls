@@ -39,6 +39,7 @@ namespace Tewls.Windows.NetApi
         private static extern Error NetServerComputerNameDel(string ServerName,string EmulatedServerName);
 
         private const int EntrySize = 3;
+        private const int PrefMaxLength = -1;
 
         public static string[] GetDiskEnum(string serverName = null)
         {
@@ -47,7 +48,7 @@ namespace Tewls.Windows.NetApi
                 uint entriesRead = 0;
                 uint totalEntries = 0;
 
-                var result = NetServerDiskEnum(serverName, 0, ref buffer.Buffer, -1, ref entriesRead, ref totalEntries, IntPtr.Zero);
+                var result = NetServerDiskEnum(serverName, 0, ref buffer.Buffer, PrefMaxLength, ref entriesRead, ref totalEntries, IntPtr.Zero);
                 if (result != Error.Success)
                 {
                     throw new Win32Exception((int)result);
@@ -92,7 +93,7 @@ namespace Tewls.Windows.NetApi
                 uint totalEntries = 0;
 
                 var info = new T();
-                var result = NetServerEnum(null, info.GetLevel(), ref buffer.Buffer, -1, ref entriesRead, ref totalEntries, (uint) type, domainName, IntPtr.Zero);
+                var result = NetServerEnum(null, info.GetLevel(), ref buffer.Buffer, PrefMaxLength, ref entriesRead, ref totalEntries, (uint) type, domainName, IntPtr.Zero);
                 if (result != Error.Success)
                 {
                     throw new Win32Exception((int) result);
@@ -193,7 +194,7 @@ namespace Tewls.Windows.NetApi
                 uint totalEntries = 0;
 
                 var info = new T();
-                var result = NetServerTransportEnum(serverName, info.GetLevel(), ref buffer.Buffer, -1, ref entriesRead, ref totalEntries, IntPtr.Zero);
+                var result = NetServerTransportEnum(serverName, info.GetLevel(), ref buffer.Buffer, PrefMaxLength, ref entriesRead, ref totalEntries, IntPtr.Zero);
                 if (result != Error.Success)
                 {
                     throw new Win32Exception((int)result);
