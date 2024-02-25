@@ -27,9 +27,9 @@ namespace Tewls.Windows.Utils
               
         public void ReAlloc(IntPtr size)
         {
-            if (Buffer != null)
+            if (Buffer == null)
             {
-                Buffer = allocator.Alloc(Buffer);
+                Buffer = allocator.Alloc(size);
             }
             else
             {
