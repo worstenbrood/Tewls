@@ -58,7 +58,7 @@ namespace Tewls.Windows.NetApi
                 for (var i = 0; i < entriesRead; i++)
                 {
                     var charArray = new char[EntrySize];
-                    Marshal.Copy(buffer, charArray, 0, EntrySize);
+                    Marshal.Copy(buffer.Buffer + i * EntrySize, charArray, 0, EntrySize);
                     drives[i] = new string(charArray, 0, 2);
                 }
 
