@@ -7,11 +7,12 @@ namespace Tewls.Windows.Utils
     public abstract class BufferBase<TAlloc> : IDisposable
         where TAlloc : class, IAllocator, new()
     {
-        public bool _disposed = false;
-        public IntPtr Size = IntPtr.Zero;
-        public IntPtr Buffer = IntPtr.Zero;
+        private bool _disposed = false;
         private static readonly TAlloc allocator = new TAlloc();
 
+        public IntPtr Size = IntPtr.Zero;
+        public IntPtr Buffer = IntPtr.Zero;
+        
         public static implicit operator IntPtr(BufferBase<TAlloc> b) => b.Buffer;
         public static implicit operator uint(BufferBase<TAlloc> b) => (uint)b.Size;
 
