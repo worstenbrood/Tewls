@@ -6,7 +6,7 @@ namespace Tewls.Windows
 {
     public class HGlobalBuffer : BufferBase<HGlobalBuffer.Allocator>, IDisposable
     {
-        public HGlobalBuffer(IntPtr size): base(size) 
+        public HGlobalBuffer(IntPtr size) : base(size)
         { 
         }
             
