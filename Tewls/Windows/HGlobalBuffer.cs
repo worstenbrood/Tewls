@@ -14,9 +14,6 @@ namespace Tewls.Windows
             
         public class Allocator : IAllocator
         {
-            public IntPtr Buffer { get; set; }
-            public IntPtr Size { get; set; }
-
             public IntPtr Alloc(IntPtr size)
             {
                 return Marshal.AllocHGlobal(size);
