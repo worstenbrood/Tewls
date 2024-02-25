@@ -43,7 +43,7 @@ namespace Tewls.Windows.NetApi
             throw new Win32Exception((int)result);
         }
 
-        public static uint BufferSize(IntPtr buffer) 
+        public static uint BufferSize(IntPtr buffer)
         {
             uint size = 0;
 
@@ -73,9 +73,9 @@ namespace Tewls.Windows.NetApi
         {
         }
 
-        public NetBuffer(uint size) : base((IntPtr) size)
+        public NetBuffer(uint size) : base((IntPtr)size)
         {
-        }     
+        }
 
         public uint GetSize()
         {
@@ -98,6 +98,22 @@ namespace Tewls.Windows.NetApi
             {
                 return BufferReAllocate(buffer, (uint)size);
             }
+        }
+    }
+
+    public class NetBuffer<TStruct> : BufferBase<NetBuffer.Allocator, TStruct>
+            where TStruct : class
+    {
+        public NetBuffer()
+        {
+        }
+
+        public NetBuffer(IntPtr size) : base(size)
+        {
+        }
+
+        public NetBuffer(uint size) : base((IntPtr) size)
+        {
         }
     }
 }

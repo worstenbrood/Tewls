@@ -8,7 +8,7 @@ namespace Tewls.Windows.Utils
         where TAlloc : class, IAllocator, new()
     {
         private bool _disposed = false;
-        private static readonly TAlloc allocator = new TAlloc();
+        protected static readonly TAlloc allocator = new TAlloc();
 
         public IntPtr Size = IntPtr.Zero;
         public IntPtr Buffer = IntPtr.Zero;
@@ -22,11 +22,16 @@ namespace Tewls.Windows.Utils
 
         protected BufferBase(IntPtr size)
         {
-            Buffer = allocator.Alloc(size);
+            Buffer = Alloc(size);
             Size = size;
         }
+
+        public virtual IntPtr Alloc(IntPtr size)
+        {
+            return allocator.Alloc(size);
+        }
               
-        public void ReAlloc(IntPtr size)
+        public virtual void ReAlloc(IntPtr size)
         {
             if (Buffer == null)
             {
@@ -37,6 +42,16 @@ namespace Tewls.Windows.Utils
                 Buffer = allocator.ReAlloc(Buffer, size);
             }
             Size = size;
+        }
+
+        public virtual void Free()
+        {
+            if (Buffer != IntPtr.Zero)
+            {
+                allocator.Free(Buffer);
+                Buffer = IntPtr.Zero;
+                Size = IntPtr.Zero;
+            }
         }
 
         public IEnumerable<TStruct> EnumStructure<TStruct>(uint entries, TStruct structure = null)
@@ -52,17 +67,7 @@ namespace Tewls.Windows.Utils
                 Marshal.PtrToStructure(Buffer + (Marshal.SizeOf(typeof(TStruct)) * i), structure);
                 yield return structure;
             }
-        }
-
-        public void Free()
-        {
-            if (Buffer != IntPtr.Zero)
-            {
-                allocator.Free(Buffer);
-                Buffer = IntPtr.Zero;
-                Size = IntPtr.Zero;
-            }
-        }
+        }     
 
         public void Dispose()
         {
@@ -83,6 +88,33 @@ namespace Tewls.Windows.Utils
         ~BufferBase()
         {
             Dispose(false);
+        }
+    }
+
+    public abstract class BufferBase<TAlloc, TStruct> : BufferBase<TAlloc>
+        where TAlloc : class, IAllocator, new()
+        where TStruct : class
+    {
+        public override void Free()
+        {
+            Marshal.DestroyStructure(Buffer, typeof(TStruct));
+            base.Free();
+        }
+
+        public override void ReAlloc(IntPtr size)
+        {
+            Marshal.DestroyStructure(Buffer, typeof(TStruct));
+            base.ReAlloc(size);
+        }
+
+        protected BufferBase()
+        {
+        }
+
+        protected BufferBase(IntPtr size)
+        {
+            Buffer = Alloc(size);
+            Size = size;
         }
     }
 }
