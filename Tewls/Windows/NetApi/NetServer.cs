@@ -124,7 +124,7 @@ namespace Tewls.Windows.NetApi
         }
 
         public static void SetInfo<T>(string serverName, T info)
-            where T : class, IInfo<InfoLevel>, new()
+            where T : class, IInfo<InfoLevel>
         {
             using (var buffer = new NetBuffer<T>((uint)Marshal.SizeOf(info)))
             {
@@ -141,7 +141,7 @@ namespace Tewls.Windows.NetApi
         }       
 
         public static void TransportAdd<T>(string serverName, T info)
-           where T : class, IInfo<TransportLevel>, new()
+           where T : class, IInfo<TransportLevel>
         {
             using (var buffer = new NetBuffer<T>((uint) Marshal.SizeOf(info)))
             {
@@ -156,7 +156,7 @@ namespace Tewls.Windows.NetApi
         }
 
         public static void TransportAddEx<T>(string serverName, T info)
-           where T : class, IInfo<TransportLevel>, new()
+           where T : class, IInfo<TransportLevel>
         {
             using (var buffer = new NetBuffer<T>((uint)Marshal.SizeOf(info)))
             {
@@ -171,7 +171,7 @@ namespace Tewls.Windows.NetApi
         }
 
         public static void TransportDel<T>(string serverName, T info)
-            where T : class, IInfo<TransportLevel>, new ()
+            where T : class, IInfo<TransportLevel>
         {
             using (var buffer = new NetBuffer<T>((uint)Marshal.SizeOf(info)))
             {
