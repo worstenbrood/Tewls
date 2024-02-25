@@ -15,11 +15,11 @@ namespace Tewls.Windows.Utils
         public static implicit operator IntPtr(BufferBase<TAlloc> b) => b.Buffer;
         public static implicit operator uint(BufferBase<TAlloc> b) => (uint)b.Size;
 
-        public BufferBase()
+        protected BufferBase()
         {
         }
 
-        public BufferBase(IntPtr size)
+        protected BufferBase(IntPtr size)
         {
             Buffer = allocator.Alloc(size);
             Size = size;
