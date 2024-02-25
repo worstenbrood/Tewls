@@ -24,13 +24,7 @@ namespace Tewls.Windows.Utils
             Buffer = allocator.Alloc(size);
             Size = size;
         }
-
-        public BufferBase(int size)
-        {
-            Buffer = allocator.Alloc((IntPtr) size);
-            Size = (IntPtr)size;
-        }
-
+              
         public void ReAlloc(IntPtr size)
         {
             if (Buffer != null)

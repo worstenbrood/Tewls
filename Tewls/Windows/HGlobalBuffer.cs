@@ -11,11 +11,7 @@ namespace Tewls.Windows
         public HGlobalBuffer(IntPtr size): base(size) 
         { 
         }
-        
-        public HGlobalBuffer(int size) : base(size)
-        {
-        }
-
+            
         public class Allocator : IAllocator
         {
             public IntPtr Buffer { get; set; }
