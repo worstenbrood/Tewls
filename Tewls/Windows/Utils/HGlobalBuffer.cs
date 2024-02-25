@@ -1,15 +1,14 @@
 ﻿using System;
 using System.Runtime.InteropServices;
-using Tewls.Windows.Utils;
 
-namespace Tewls.Windows
+namespace Tewls.Windows.Utils
 {
     public class HGlobalBuffer : BufferBase<HGlobalBuffer.Allocator>, IDisposable
     {
         public HGlobalBuffer(IntPtr size) : base(size)
-        { 
+        {
         }
-            
+
         public class Allocator : IAllocator
         {
             public IntPtr Alloc(IntPtr size)
