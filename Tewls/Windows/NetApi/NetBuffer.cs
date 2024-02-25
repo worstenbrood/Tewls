@@ -5,28 +5,7 @@ using Tewls.Windows.Utils;
 
 namespace Tewls.Windows.NetApi
 {
-    public class NetBufferAllocator : IAllocator
-    {
-        public IntPtr Buffer { get; set; }
-        public IntPtr Size { get; set; }
-
-        public IntPtr Alloc(IntPtr size)
-        {
-            return NetBuffer.BufferAllocate((uint) size);
-        }
-
-        public void Free(IntPtr buffer)
-        {
-            NetBuffer.BufferFree(buffer);
-        }
-
-        public IntPtr ReAlloc(IntPtr buffer, IntPtr size)
-        {
-            return NetBuffer.BufferReAllocate(buffer, (uint)size);
-        }
-    }
-
-    public class NetBuffer : BufferBase<NetBufferAllocator>
+    public class NetBuffer : BufferBase<NetBuffer.Allocator>
     {
         [DllImport("netapi32.dll", EntryPoint = "NetApiBufferAllocate", CallingConvention = CallingConvention.Winapi, SetLastError = true)]
         private static extern Error NetApiBufferAllocate(uint ByteCount, ref IntPtr Buffer);
@@ -101,6 +80,27 @@ namespace Tewls.Windows.NetApi
         public uint GetSize()
         {
             return BufferSize(Buffer);
+        }
+
+        public class Allocator : IAllocator
+        {
+            public IntPtr Buffer { get; set; }
+            public IntPtr Size { get; set; }
+
+            public IntPtr Alloc(IntPtr size)
+            {
+                return BufferAllocate((uint)size);
+            }
+
+            public void Free(IntPtr buffer)
+            {
+                BufferFree(buffer);
+            }
+
+            public IntPtr ReAlloc(IntPtr buffer, IntPtr size)
+            {
+                return BufferReAllocate(buffer, (uint)size);
+            }
         }
     }
 }
