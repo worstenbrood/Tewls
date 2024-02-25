@@ -111,10 +111,8 @@ namespace Tewls.Windows.Utils
         {
         }
 
-        protected BufferBase(IntPtr size)
+        protected BufferBase(IntPtr size) : base(size)
         {
-            Buffer = Alloc(size);
-            Size = size;
         }
     }
 }
