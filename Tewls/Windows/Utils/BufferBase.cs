@@ -10,7 +10,7 @@ namespace Tewls.Windows.Utils
         public bool _disposed = false;
         public IntPtr Size = IntPtr.Zero;
         public IntPtr Buffer = IntPtr.Zero;
-        private readonly TAlloc allocator = new TAlloc();
+        private static readonly TAlloc allocator = new TAlloc();
 
         public static implicit operator IntPtr(BufferBase<TAlloc> b) => b.Buffer;
         public static implicit operator uint(BufferBase<TAlloc> b) => (uint)b.Size;
