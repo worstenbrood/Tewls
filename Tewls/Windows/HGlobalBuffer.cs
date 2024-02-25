@@ -1,80 +1,38 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Runtime.InteropServices;
+using Tewls.Windows.Utils;
 
 namespace Tewls.Windows
 {
-    public class HGlobalBuffer : IDisposable
+    public class HGlobalAllocator : IAllocator
     {
-        public bool _disposed = false;
-        public IntPtr Size = IntPtr.Zero;
-        public IntPtr Buffer = IntPtr.Zero;
+        public IntPtr Buffer { get; set ; }
+        public IntPtr Size { get ; set; }
 
-        public static implicit operator IntPtr(HGlobalBuffer b) => b.Buffer;
-        public static implicit operator uint(HGlobalBuffer b) => (uint) b.Size;
-
-        public HGlobalBuffer(IntPtr size)
+        public IntPtr Alloc(IntPtr size)
         {
-            Buffer = Marshal.AllocHGlobal(size);
-            Size = size;
+            return Marshal.AllocHGlobal(size);
         }
 
-        public HGlobalBuffer(int size)
+        public void Free(IntPtr buffer)
         {
-            Buffer = Marshal.AllocHGlobal(size);
-            Size = (IntPtr) size;
+            Marshal.FreeHGlobal(buffer);
         }
 
-        public void ReAlloc(IntPtr size)
+        public IntPtr ReAlloc(IntPtr buffer, IntPtr size)
         {
-            Buffer = Marshal.ReAllocHGlobal(Buffer, size);
-            Size = size;
+            return Marshal.ReAllocHGlobal(buffer, size);
         }
+    }
 
-        public IEnumerable<T> EnumStructure<T>(uint entries, T structure = null)
-            where T : class, new()
-        {
-            if (structure == null)
-            {
-                structure = new T();
-            }
-
-            for (int i = 0; i < entries; i++)
-            {
-                Marshal.PtrToStructure(Buffer + (Marshal.SizeOf(typeof(T)) * i), structure);
-                yield return structure;
-            }
+    public class HGlobalBuffer : BufferBase<HGlobalAllocator>, IDisposable
+    {
+        public HGlobalBuffer(IntPtr size): base(size) 
+        { 
         }
-
-        public void Free()
+        
+        public HGlobalBuffer(int size) : base(size)
         {
-            Marshal.FreeHGlobal(Buffer);
-            Buffer = IntPtr.Zero;
-            Size = IntPtr.Zero;
-        }
-
-        public void Dispose()
-        {
-            Dispose(true);
-            GC.SuppressFinalize(this);
-        }
-
-        private void Dispose(bool disposing)
-        {
-            if (!_disposed)
-            {
-                if (Buffer != IntPtr.Zero)
-                {
-                    Free();
-                }
-            }
-
-            _disposed = true;
-        }
-
-        ~HGlobalBuffer()
-        {
-            Dispose(false);
         }
     }
 }

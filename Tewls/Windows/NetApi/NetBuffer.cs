@@ -2,10 +2,32 @@
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Runtime.InteropServices;
+using Tewls.Windows.Utils;
 
 namespace Tewls.Windows.NetApi
 {
-    public class NetBuffer : IDisposable
+    public class NetBufferAllocator : IAllocator
+    {
+        public IntPtr Buffer { get; set; }
+        public IntPtr Size { get; set; }
+
+        public IntPtr Alloc(IntPtr size)
+        {
+            return NetBuffer.BufferAllocate((uint) size);
+        }
+
+        public void Free(IntPtr buffer)
+        {
+            NetBuffer.BufferFree(buffer);
+        }
+
+        public IntPtr ReAlloc(IntPtr buffer, IntPtr size)
+        {
+            return NetBuffer.BufferReAllocate(buffer, (uint)size);
+        }
+    }
+
+    public class NetBuffer : BufferBase<NetBufferAllocator>
     {
         [DllImport("netapi32.dll", EntryPoint = "NetApiBufferAllocate", CallingConvention = CallingConvention.Winapi, SetLastError = true)]
         private static extern Error NetApiBufferAllocate(uint ByteCount, ref IntPtr Buffer);
@@ -18,8 +40,6 @@ namespace Tewls.Windows.NetApi
 
         [DllImport("netapi32.dll", EntryPoint = "NetApiBufferFree", CallingConvention = CallingConvention.Winapi, SetLastError = true)]
         private static extern Error NetApiBufferFree(IntPtr Buffer);
-
-        private bool _disposed = false;
 
         public static IntPtr BufferAllocate(uint byteCount)
         {
@@ -67,81 +87,21 @@ namespace Tewls.Windows.NetApi
             }
         }
 
-        public IntPtr Buffer = IntPtr.Zero;
-
-        public static implicit operator IntPtr(NetBuffer b) => b.Buffer;
-        public static implicit operator uint(NetBuffer b) => b.GetSize();
-
         public NetBuffer()
         {
         }
 
-        public NetBuffer(uint size)
+        public NetBuffer(IntPtr size) : base(size)
         {
-            Buffer = BufferAllocate(size);
         }
 
-        public void ReAlloc(uint size)
+        public NetBuffer(uint size) : base((IntPtr) size)
         {
-            if (Buffer == IntPtr.Zero)
-            {
-                Buffer = BufferAllocate(size);
-            }
-            else
-            {
-                Buffer = BufferReAllocate(Buffer, size);
-            }
-        }
+        }     
 
         public uint GetSize()
         {
             return BufferSize(Buffer);
-        }
-
-        public IEnumerable<T> EnumStructure<T>(uint entries, T structure = null)
-            where T : class, new()
-        {
-            if (structure == null)
-            {
-                structure = new T();
-            }
-                       
-            for (int i = 0; i < entries; i++)
-            {
-                Marshal.PtrToStructure(Buffer + (Marshal.SizeOf(typeof(T)) * i), structure);
-                yield return structure;
-            }
-        }
-
-        public void Free()
-        {
-            BufferFree(Buffer);
-            Buffer = IntPtr.Zero;
-        }
-
-        public void Dispose()
-        {
-            Dispose(true);
-            GC.SuppressFinalize(this);
-        }
-
-        private void Dispose(bool disposing)
-        {
-            if (!_disposed)
-            {
-                if (Buffer != IntPtr.Zero)
-                {
-                    Free();
-                }
-            }
-
-            _disposed = true;
-        }
-              
-
-        ~NetBuffer()
-        {
-            Dispose(false);
         }
     }
 }
