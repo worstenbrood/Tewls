@@ -55,9 +55,12 @@ namespace Tewls.Windows.Utils
 
         public void Free()
         {
-            allocator.Free(Buffer);
-            Buffer = IntPtr.Zero;
-            Size = IntPtr.Zero;
+            if (Buffer != IntPtr.Zero)
+            {
+                allocator.Free(Buffer);
+                Buffer = IntPtr.Zero;
+                Size = IntPtr.Zero;
+            }
         }
 
         public void Dispose()
@@ -70,10 +73,7 @@ namespace Tewls.Windows.Utils
         {
             if (!_disposed)
             {
-                if (Buffer != IntPtr.Zero)
-                {
-                    allocator.Free(Buffer);
-                }
+               Free();
             }
 
             _disposed = true;
