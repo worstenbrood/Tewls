@@ -318,10 +318,10 @@ namespace Tewls.Windows.NetApi.Structures
         public uint Secs;
         public uint Hunds;
         public long Timezone;
-        public uint Tinterval;
         public uint Day;
         public uint Month;
         public uint Year;
+        public uint Tinterval;
         public uint WeekDay;
     };
 }
