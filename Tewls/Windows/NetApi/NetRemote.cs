@@ -26,7 +26,7 @@ namespace Tewls.Windows.NetApi
             return optionsSupported;
         }
 
-        public static TimeOfDayInfo TimeOfDay(string serverName)
+        public static TimeOfDayInfo TimeOfDay(string serverName = null)
         {
             using (var buffer = new NetBuffer())
             {
