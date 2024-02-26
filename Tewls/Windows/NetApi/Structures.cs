@@ -273,4 +273,11 @@ namespace Tewls.Windows.NetApi.Structures
             return UseLevel.Use2;
         }
     }
+
+    public enum ForceLevel : uint
+    { 
+        NoForce = 0,
+        Force,
+        LotsOfForce
+    }
 }
