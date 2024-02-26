@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using System.Runtime.InteropServices.ComTypes;
 
@@ -57,4 +58,32 @@ namespace Tewls.Windows.Advapi
         [MarshalAs(UnmanagedType.LPWStr)]
         public string UserName;
     };
+
+    [StructLayout(LayoutKind.Sequential)]
+    public class CredentialTargetInformation
+    {
+        [MarshalAs(UnmanagedType.LPWStr)]
+        public string TargetName;
+        [MarshalAs(UnmanagedType.LPWStr)]
+        public string NetbiosServerName;
+        [MarshalAs(UnmanagedType.LPWStr)]
+        public string DnsServerName;
+        [MarshalAs(UnmanagedType.LPWStr)]
+        public string NetbiosDomainName;
+        [MarshalAs(UnmanagedType.LPWStr)]
+        public string DnsDomainName;
+        [MarshalAs(UnmanagedType.LPWStr)]
+        public string DnsTreeName;
+        [MarshalAs(UnmanagedType.LPWStr)]
+        public string PackageName;
+        public uint Flags;
+        public uint CredTypeCount;
+        public IntPtr CredTypes;
+    };
+
+    public enum TargetFlags: uint
+    {
+        None = 0,
+        AllowNameResolution 
+    }
 }
