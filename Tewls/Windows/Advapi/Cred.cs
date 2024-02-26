@@ -29,6 +29,7 @@ namespace Tewls.Windows.Advapi
 
         public static IEnumerable<Credential> Enum(string filter = null)
         {
+            // CredFree is needed to free the allocated buffer
             using (var buffer = new CredBuffer())
             {
                 uint count = 0;
@@ -39,6 +40,8 @@ namespace Tewls.Windows.Advapi
                 }
 
                 var array = new IntPtr[count];
+
+                // Result buffer contains an array of pointers to Credential records
                 Marshal.Copy(buffer.Buffer, array, 0, (int) count);
 
                 for(var i = 0; i < count; i++)
