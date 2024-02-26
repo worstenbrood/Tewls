@@ -282,7 +282,7 @@ namespace Tewls.Windows
 
         private const int ErrorBufferSize = 1024;
         private const int EnumBufferSize = 16384;
-        private const int BufferSize = 32;
+        private const int BufferSize = 0;
 
         private static T PtrToStructure<T>(IntPtr buffer, T resource = null)
           where T : class, new()
