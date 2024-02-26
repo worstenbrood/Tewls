@@ -84,15 +84,15 @@ namespace Tewls.Windows.NetApi
             }
         }
 
-        public static IEnumerable<T> ServerEnum<T>(ServerType type, string domainName = null)
-             where T : class, IInfo<InfoLevel>, new()
+        public static IEnumerable<TStruct> ServerEnum<TStruct>(ServerType type, string domainName = null)
+             where TStruct : class, IInfo<InfoLevel>, new()
         {
             using (var buffer = new NetBuffer())
             {
                 uint entriesRead = 0;
                 uint totalEntries = 0;
 
-                var info = new T();
+                var info = new TStruct();
                 var result = NetServerEnum(null, info.GetLevel(), ref buffer.Buffer, PrefMaxLength, ref entriesRead, ref totalEntries, (uint) type, domainName, IntPtr.Zero);
                 if (result != Error.Success)
                 {
@@ -106,12 +106,12 @@ namespace Tewls.Windows.NetApi
             }
         }
 
-        public static T GetInfo<T>(string serverName = null)
-            where T: class, IInfo<InfoLevel>, new()
+        public static TStruct GetInfo<TStruct>(string serverName = null)
+            where TStruct : class, IInfo<InfoLevel>, new()
         {
             using (var buffer = new NetBuffer())
             {
-                var info = new T();
+                var info = new TStruct();
                 var result = NetServerGetInfo(serverName, info.GetLevel(), ref buffer.Buffer);
                 if (result != Error.Success)
                 {
@@ -123,10 +123,10 @@ namespace Tewls.Windows.NetApi
             }
         }
 
-        public static void SetInfo<T>(string serverName, T info)
-            where T : class, IInfo<InfoLevel>
+        public static void SetInfo<TStruct>(string serverName, TStruct info)
+            where TStruct : class, IInfo<InfoLevel>
         {
-            using (var buffer = new NetBuffer<T>(info))
+            using (var buffer = new NetBuffer<TStruct>(info))
             {
                 uint paramIndex = 0;
 
@@ -138,10 +138,10 @@ namespace Tewls.Windows.NetApi
             }
         }       
 
-        public static void TransportAdd<T>(string serverName, T info)
-           where T : class, IInfo<TransportLevel>
+        public static void TransportAdd<TStruct>(string serverName, TStruct info)
+           where TStruct : class, IInfo<TransportLevel>
         {
-            using (var buffer = new NetBuffer<T>(info))
+            using (var buffer = new NetBuffer<TStruct>(info))
             {
                 var result = NetServerTransportAdd(serverName, info.GetLevel(), buffer);
                 if (result != Error.Success)
@@ -151,10 +151,10 @@ namespace Tewls.Windows.NetApi
             }
         }
 
-        public static void TransportAddEx<T>(string serverName, T info)
-           where T : class, IInfo<TransportLevel>
+        public static void TransportAddEx<TStruct>(string serverName, TStruct info)
+           where TStruct : class, IInfo<TransportLevel>
         {
-            using (var buffer = new NetBuffer<T>(info))
+            using (var buffer = new NetBuffer<TStruct>(info))
             {
                 var result = NetServerTransportAddEx(serverName, info.GetLevel(), buffer);
                 if (result != Error.Success)
@@ -164,10 +164,10 @@ namespace Tewls.Windows.NetApi
             }
         }
 
-        public static void TransportDel<T>(string serverName, T info)
-            where T : class, IInfo<TransportLevel>
+        public static void TransportDel<TStruct>(string serverName, TStruct info)
+            where TStruct : class, IInfo<TransportLevel>
         {
-            using (var buffer = new NetBuffer<T>(info))
+            using (var buffer = new NetBuffer<TStruct>(info))
             {
                 var result = NetServerTransportDel(serverName, info.GetLevel(), buffer);
                 if (result != Error.Success)
@@ -177,15 +177,15 @@ namespace Tewls.Windows.NetApi
             }
         }
 
-        public static IEnumerable<T> TransportEnum<T>(string serverName = null)
-            where T : class, IInfo<TransportLevel>, new()
+        public static IEnumerable<TStruct> TransportEnum<TStruct>(string serverName = null)
+            where TStruct : class, IInfo<TransportLevel>, new()
         {
             using (var buffer = new NetBuffer())
             {
                 uint entriesRead = 0;
                 uint totalEntries = 0;
 
-                var info = new T();
+                var info = new TStruct();
                 var result = NetServerTransportEnum(serverName, info.GetLevel(), ref buffer.Buffer, PrefMaxLength, ref entriesRead, ref totalEntries, IntPtr.Zero);
                 if (result != Error.Success)
                 {
