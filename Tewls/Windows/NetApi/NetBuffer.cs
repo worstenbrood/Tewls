@@ -115,9 +115,5 @@ namespace Tewls.Windows.NetApi
         public NetBuffer(TStruct s) : base(s)
         {
         }
-
-        public NetBuffer(uint size) : base((IntPtr) size)
-        {
-        }
     }
 }
