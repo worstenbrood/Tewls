@@ -232,6 +232,7 @@ namespace Tewls.Windows.NetApi.Structures
         Ipc
     }
 
+    [StructLayout(LayoutKind.Sequential)]
     public class UseInfo0 : IInfo<UseLevel>
     {
         [MarshalAs(UnmanagedType.LPWStr)]
@@ -245,6 +246,7 @@ namespace Tewls.Windows.NetApi.Structures
         }
     }
 
+    [StructLayout(LayoutKind.Sequential)]
     public class UseInfo1 : IInfo<UseLevel>
     {
         [MarshalAs(UnmanagedType.LPWStr)]
@@ -264,6 +266,7 @@ namespace Tewls.Windows.NetApi.Structures
         }
     }
 
+    [StructLayout(LayoutKind.Sequential)]
     public class UseInfo2 : IInfo<UseLevel>
     {
         [MarshalAs(UnmanagedType.LPWStr)]
@@ -293,4 +296,32 @@ namespace Tewls.Windows.NetApi.Structures
         Force,
         LotsOfForce
     }
+
+    [Flags]
+    public enum Supports : uint
+    {
+        RemoteAdminProtocol = 2,
+        Rpc = 4,
+        SamProtocol = 8,
+        Unicode = 16,
+        Local = 32,
+        Any = uint.MaxValue,
+    }
+
+    [StructLayout(LayoutKind.Sequential)]
+    public class TimeOfDayInfo
+    {
+        public uint ElapsedT;
+        public uint Msecs;
+        public uint Hours;
+        public uint Mins;
+        public uint Secs;
+        public uint Hunds;
+        public long Timezone;
+        public uint Tinterval;
+        public uint Day;
+        public uint Month;
+        public uint Year;
+        public uint WeekDay;
+    };
 }
