@@ -79,8 +79,7 @@ namespace Tewls.Windows.NetApi
                     throw new Win32Exception((int)result);
                 }
 
-                buffer.PtrToStructure(info);
-                return info;
+                return buffer.PtrToStructure(info);
             }
         }
     }
