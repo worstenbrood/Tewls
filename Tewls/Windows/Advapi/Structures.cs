@@ -1,8 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Runtime.InteropServices;
 using System.Runtime.InteropServices.ComTypes;
-using System.Text;
 
 namespace Tewls.Windows.Advapi
 {
@@ -24,11 +22,26 @@ namespace Tewls.Windows.Advapi
         AllCredentials = 1
     }
 
+    [Flags]
+    public enum CredFlags : uint
+    {
+        None = 0,
+        PromptNow = 2,
+        UsernameTarget = 4,
+    }
+
+    public enum CredPersist : uint
+    {
+        Session = 1,
+        LocalMachine,
+        Entreprise
+    }
+
     [StructLayout(LayoutKind.Sequential)]
     public class Credential
     {
-        public uint Flags;
-        public uint Type;
+        public CredFlags Flags;
+        public CredType Type;
         [MarshalAs(UnmanagedType.LPWStr)]
         public string TargetName;
         [MarshalAs(UnmanagedType.LPWStr)]
