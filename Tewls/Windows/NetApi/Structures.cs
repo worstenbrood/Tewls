@@ -308,7 +308,7 @@ namespace Tewls.Windows.NetApi.Structures
         Any = uint.MaxValue,
     }
 
-    [StructLayout(LayoutKind.Sequential)]
+    [StructLayout(LayoutKind.Sequential, Pack = 1)]
     public class TimeOfDayInfo
     {
         public uint ElapsedT;
@@ -321,7 +321,7 @@ namespace Tewls.Windows.NetApi.Structures
         public uint Day;
         public uint Month;
         public uint Year;
+        public DayOfWeek WeekDay;
         public uint Tinterval;
-        public uint WeekDay;
     };
 }
