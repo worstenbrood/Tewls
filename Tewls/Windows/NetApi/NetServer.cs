@@ -118,7 +118,7 @@ namespace Tewls.Windows.NetApi
                     throw new Win32Exception((int) result);
                 }
 
-                Marshal.PtrToStructure(buffer, info);
+                buffer.PtrToStructure(info);
                 return info;
             }
         }

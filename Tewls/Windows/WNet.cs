@@ -284,18 +284,7 @@ namespace Tewls.Windows
         private const int EnumBufferSize = 16384;
         private const int BufferSize = 32;
 
-        private static T PtrToStructure<T>(IntPtr buffer, T resource = null)
-          where T : class, new()
-        {
-            if (resource == null)
-            {
-                resource = new T();
-            }
-
-            Marshal.PtrToStructure(buffer, resource);
-
-            return resource;
-        }
+        
 
         public static Exception GetLastException(Error code)
         {
@@ -375,7 +364,7 @@ namespace Tewls.Windows
 
                         if (result == Error.NoError)
                         {
-                            yield return PtrToStructure(buffer, resource);
+                            yield return buffer.PtrToStructure(resource);
                         }
 
                         if (result != Error.NoMoreItems)
@@ -535,7 +524,7 @@ namespace Tewls.Windows
                     throw ex;
                 }
 
-                return PtrToStructure<UniversalNameInfo>(buffer);
+                return buffer.PtrToStructure<UniversalNameInfo>();
             }
         }
 
@@ -558,7 +547,7 @@ namespace Tewls.Windows
                     throw ex;
                 }
 
-                return PtrToStructure<RemoteNameInfo>(buffer);
+                return buffer.PtrToStructure<RemoteNameInfo>();
             }
         }
 
@@ -581,7 +570,7 @@ namespace Tewls.Windows
                     throw ex;
                 }
 
-                return PtrToStructure<NetResource>(buffer);
+                return buffer.PtrToStructure<NetResource>();
             }
         }
 
@@ -629,7 +618,7 @@ namespace Tewls.Windows
                     throw ex;
                 }
 
-                return PtrToStructure<NetResource>(buffer);
+                return buffer.PtrToStructure<NetResource>();
             }
         }
     }
