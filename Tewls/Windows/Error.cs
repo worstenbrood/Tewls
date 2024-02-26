@@ -32,6 +32,7 @@
         RemoteError = 2127,
         ServiceNotInstalled = 2184,
         WkstaNotStarted = 2138,
+        UnexistingNetworkConnection = 2250,
         NoBrowserServersFound = 6118,
     };
 }
