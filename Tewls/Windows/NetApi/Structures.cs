@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Runtime.InteropServices;
 
 namespace Tewls.Windows.NetApi.Structures
@@ -204,4 +205,72 @@ namespace Tewls.Windows.NetApi.Structures
             return TransportLevel.Transport3;
         }
     };
+
+    public enum UseLevel : uint
+    {
+        Use0 = 0,
+        Use1,
+        Use2,
+    }
+
+    public enum UseStatus : uint
+    {
+        Ok,
+        Paused,
+        SessionLost,
+        Disconnected,
+        NetworkError,
+        Connecting,
+        ReConnecting
+    }
+
+    public enum AsgType : uint
+    {
+        Wildcard,
+        DiskDevice,
+        SpoolDevice,
+        Ipc
+    }
+
+    public class UseInfo1 : IInfo<UseLevel>
+    {
+        [MarshalAs(UnmanagedType.LPWStr)]
+        public string Local;
+        [MarshalAs(UnmanagedType.LPWStr)]
+        public string Remote;
+        [MarshalAs(UnmanagedType.LPWStr)]
+        public string Password;
+        public UseStatus Status;
+        public AsgType AsgType;
+        public uint RefCount;
+        public uint UseCount;
+
+        public UseLevel GetLevel()
+        {
+            return UseLevel.Use1;
+        }
+    }
+
+    public class UseInfo2 : IInfo<UseLevel>
+    {
+        [MarshalAs(UnmanagedType.LPWStr)]
+        public string Local;
+        [MarshalAs(UnmanagedType.LPWStr)]
+        public string Remote;
+        [MarshalAs(UnmanagedType.LPWStr)]
+        public string Password;
+        public UseStatus Status;
+        public AsgType AsgType;
+        public uint RefCount;
+        public uint UseCount;
+        [MarshalAs(UnmanagedType.LPWStr)]
+        public string Username;
+        [MarshalAs(UnmanagedType.LPWStr)]
+        public string Domainname;
+
+        public UseLevel GetLevel()
+        {
+            return UseLevel.Use2;
+        }
+    }
 }
