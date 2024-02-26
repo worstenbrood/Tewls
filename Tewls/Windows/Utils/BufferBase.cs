@@ -58,7 +58,7 @@ namespace Tewls.Windows.Utils
             }
         }
 
-        public T PtrToStructure<T>(T resource = null)
+        public static T PtrToStructure<T>(IntPtr buffer, T resource = null)
           where T : class, new()
         {
             if (resource == null)
@@ -66,9 +66,15 @@ namespace Tewls.Windows.Utils
                 resource = new T();
             }
 
-            Marshal.PtrToStructure(Buffer, resource);
+            Marshal.PtrToStructure(buffer, resource);
 
             return resource;
+        }
+
+        public T PtrToStructure<T>(T resource = null)
+          where T : class, new()
+        {
+            return PtrToStructure(Buffer, resource);
         }
 
         public IEnumerable<TStruct> EnumStructure<TStruct>(uint entries, TStruct structure = null)
