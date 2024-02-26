@@ -130,8 +130,6 @@ namespace Tewls.Windows.NetApi
             {
                 uint paramIndex = 0;
 
-                Marshal.StructureToPtr(info, buffer, false);
-
                 var result = NetServerSetInfo(serverName, info.GetLevel(), buffer, ref paramIndex);
                 if (result != Error.Success)
                 {
@@ -145,8 +143,6 @@ namespace Tewls.Windows.NetApi
         {
             using (var buffer = new NetBuffer<T>(info))
             {
-                Marshal.StructureToPtr(info, buffer, false);
-
                 var result = NetServerTransportAdd(serverName, info.GetLevel(), buffer);
                 if (result != Error.Success)
                 {
@@ -160,8 +156,6 @@ namespace Tewls.Windows.NetApi
         {
             using (var buffer = new NetBuffer<T>(info))
             {
-                Marshal.StructureToPtr(info, buffer, false);
-
                 var result = NetServerTransportAddEx(serverName, info.GetLevel(), buffer);
                 if (result != Error.Success)
                 {
@@ -175,8 +169,6 @@ namespace Tewls.Windows.NetApi
         {
             using (var buffer = new NetBuffer<T>(info))
             {
-                Marshal.StructureToPtr(info, buffer, false);
-
                 var result = NetServerTransportDel(serverName, info.GetLevel(), buffer);
                 if (result != Error.Success)
                 {

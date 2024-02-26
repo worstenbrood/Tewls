@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Runtime.InteropServices;
+using Tewls.Windows.NetApi.Structures;
 
 namespace Tewls.Windows.Utils
 {
@@ -113,6 +114,7 @@ namespace Tewls.Windows.Utils
 
         protected BufferBase(TStruct s) : base((IntPtr) Marshal.SizeOf(s))
         {
+            Marshal.StructureToPtr(s, Buffer, false);
         }
 
         protected BufferBase(IntPtr size) : base(size)
