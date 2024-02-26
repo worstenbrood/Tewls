@@ -24,6 +24,9 @@ namespace Tewls.Windows.Advapi
         [DllImport("advapi32.dll", EntryPoint = "CredGetTargetInfoW", CharSet = CharSet.Unicode, CallingConvention = CallingConvention.Winapi, SetLastError = true)]
         private static extern bool CredGetTargetInfo(string TargetName, TargetFlags Flags, ref IntPtr TargetInfo);
 
+        [DllImport("advapi32.dll", EntryPoint = "CredRenameW", CharSet = CharSet.Unicode, CallingConvention = CallingConvention.Winapi, SetLastError = true)]
+        private static extern bool CredRename(string OldTargetName, string NewTargetName, CredType Type, uint Flags = 0);
+
         public static Credential Read(string targetName, CredType type)
         {
             using (var buffer = new CredBuffer())
@@ -35,6 +38,15 @@ namespace Tewls.Windows.Advapi
                 }
 
                 return buffer.PtrToStructure<Credential>();
+            }
+        }
+
+        public static void Rename(string oldTargetName, string newTargetName, CredType type)
+        {
+            var result = CredRename(oldTargetName, newTargetName, type);
+            if (!result)
+            {
+                throw new Win32Exception();
             }
         }
 
