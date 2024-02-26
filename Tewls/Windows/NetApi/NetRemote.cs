@@ -13,7 +13,7 @@ namespace Tewls.Windows.NetApi
         [DllImport("netapi32.dll", EntryPoint = "NetRemoteTOD", CallingConvention = CallingConvention.Winapi, CharSet = CharSet.Unicode, SetLastError = true)]
         private static extern Error NetRemoteTOD(string UncServerName,ref IntPtr BufferPtr);
 
-        public static Supports ComputerSupports(string serverName, Supports optionsRequested = Supports.Any)
+        public static Supports ComputerSupports(string serverName = null, Supports optionsRequested = Supports.Any)
         {
             Supports optionsSupported = 0;
 
