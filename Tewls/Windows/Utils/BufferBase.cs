@@ -22,7 +22,11 @@ namespace Tewls.Windows.Utils
 
         protected BufferBase(IntPtr size)
         {
-            Buffer = Alloc(size);
+            if (size != IntPtr.Zero) 
+            {
+                Buffer = Alloc(size);
+            }
+            
             Size = size;
         }
 
