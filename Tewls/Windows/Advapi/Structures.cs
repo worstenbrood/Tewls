@@ -50,7 +50,7 @@ namespace Tewls.Windows.Advapi
         public FILETIME LastWritten;
         public uint CredentialBlobSize;
         public IntPtr CredentialBlob;
-        public uint Persist;
+        public CredPersist Persist;
         public uint AttributeCount;
         public IntPtr Attributes;
         [MarshalAs(UnmanagedType.LPWStr)]

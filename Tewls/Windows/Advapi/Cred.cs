@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Net;
 using System.Runtime.InteropServices;
+using Tewls.Windows.Utils;
 
 namespace Tewls.Windows.Advapi
 {
@@ -26,7 +27,7 @@ namespace Tewls.Windows.Advapi
 
         [DllImport("advapi32.dll", EntryPoint = "CredRenameW", CharSet = CharSet.Unicode, CallingConvention = CallingConvention.Winapi, SetLastError = true)]
         private static extern bool CredRename(string OldTargetName, string NewTargetName, CredType Type, uint Flags = 0);
-
+               
         public static Credential Read(string targetName, CredType type)
         {
             using (var buffer = new CredBuffer())
