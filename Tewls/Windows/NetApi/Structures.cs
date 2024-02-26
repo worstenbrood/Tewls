@@ -232,6 +232,19 @@ namespace Tewls.Windows.NetApi.Structures
         Ipc
     }
 
+    public class UseInfo0 : IInfo<UseLevel>
+    {
+        [MarshalAs(UnmanagedType.LPWStr)]
+        public string Local;
+        [MarshalAs(UnmanagedType.LPWStr)]
+        public string Remote;
+
+        public UseLevel GetLevel()
+        {
+            return UseLevel.Use0;
+        }
+    }
+
     public class UseInfo1 : IInfo<UseLevel>
     {
         [MarshalAs(UnmanagedType.LPWStr)]
