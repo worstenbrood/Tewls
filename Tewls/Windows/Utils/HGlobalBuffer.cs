@@ -3,7 +3,7 @@ using System.Runtime.InteropServices;
 
 namespace Tewls.Windows.Utils
 {
-    public class HGlobalBuffer : BufferBase<HGlobalBuffer.Allocator>, IDisposable
+    public class HGlobalBuffer : BufferBase<HGlobalBuffer.Allocator>
     {
         public HGlobalBuffer(IntPtr size) : base(size)
         {
@@ -36,6 +36,10 @@ namespace Tewls.Windows.Utils
         }
 
         public HGlobalBuffer(IntPtr size) : base(size)
+        {
+        }
+
+        public HGlobalBuffer(TStruct s) : base(s)
         {
         }
 

@@ -126,7 +126,7 @@ namespace Tewls.Windows.NetApi
         public static void SetInfo<T>(string serverName, T info)
             where T : class, IInfo<InfoLevel>
         {
-            using (var buffer = new NetBuffer<T>((uint)Marshal.SizeOf(info)))
+            using (var buffer = new NetBuffer<T>(info))
             {
                 uint paramIndex = 0;
 
@@ -143,7 +143,7 @@ namespace Tewls.Windows.NetApi
         public static void TransportAdd<T>(string serverName, T info)
            where T : class, IInfo<TransportLevel>
         {
-            using (var buffer = new NetBuffer<T>((uint) Marshal.SizeOf(info)))
+            using (var buffer = new NetBuffer<T>(info))
             {
                 Marshal.StructureToPtr(info, buffer, false);
 
@@ -158,7 +158,7 @@ namespace Tewls.Windows.NetApi
         public static void TransportAddEx<T>(string serverName, T info)
            where T : class, IInfo<TransportLevel>
         {
-            using (var buffer = new NetBuffer<T>((uint)Marshal.SizeOf(info)))
+            using (var buffer = new NetBuffer<T>(info))
             {
                 Marshal.StructureToPtr(info, buffer, false);
 
@@ -173,7 +173,7 @@ namespace Tewls.Windows.NetApi
         public static void TransportDel<T>(string serverName, T info)
             where T : class, IInfo<TransportLevel>
         {
-            using (var buffer = new NetBuffer<T>((uint)Marshal.SizeOf(info)))
+            using (var buffer = new NetBuffer<T>(info))
             {
                 Marshal.StructureToPtr(info, buffer, false);
 
