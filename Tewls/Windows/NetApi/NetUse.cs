@@ -18,7 +18,7 @@ namespace Tewls.Windows.NetApi
         private static extern Error NetUseEnum(string UncServerName, UseLevel LevelFlags,ref IntPtr BufPtr, int PreferedMaximumSize, ref uint EntriesRead, ref uint TotalEntries, IntPtr ResumeHandle);
 
         [DllImport("netapi32.dll", EntryPoint = "NetUseGetInfo", CallingConvention = CallingConvention.Winapi, CharSet = CharSet.Unicode, SetLastError = true)]
-        private static extern Error NetUseGetInfo(string UncServerName, string UseName, UseLevel LevelFlags,ref IntPtr bufptr);
+        private static extern Error NetUseGetInfo(string UncServerName, string UseName, UseLevel LevelFlags, ref IntPtr bufptr);
 
         public void Add<TStruct>(string serverName, TStruct info)
             where TStruct : class, IInfo<UseLevel>
