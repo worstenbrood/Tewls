@@ -1,9 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
-using System.Net;
 using System.Runtime.InteropServices;
-using Tewls.Windows.Utils;
 
 namespace Tewls.Windows.Advapi
 {
