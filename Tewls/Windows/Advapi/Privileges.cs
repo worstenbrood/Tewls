@@ -18,6 +18,8 @@ namespace Tewls.Windows.Advapi
 
         public const string SeTcbPrivilege = "SeTcbPrivilege";
 
+        // Static
+
         public static Luid LookupPrivilege(string name, string systemName = null)
         {
             var luid = new Luid();
