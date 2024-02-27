@@ -152,4 +152,24 @@ namespace Tewls.Windows.Advapi
         AdjustDefault = 128,
         AdjustSessionId = 256,
     }
+
+    public enum LogonType : uint
+    {
+        Batch = 1,
+        Interactive = 2,
+        Network = 3,
+        Service = 5,
+        Unlock =  7,
+        NetworkClearText = 8,
+        NewCredentials = 9
+    }
+
+    public enum LogonProvider : uint
+    {
+        Default = 0,
+        WinNT35,
+        WinNT40,
+        WinNT50,
+        Virtual
+    }
 }

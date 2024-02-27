@@ -12,7 +12,10 @@ namespace Tewls.Windows.Advapi
 
         [DllImport("advapi32.dll", CharSet = CharSet.Auto, SetLastError = true)] 
         private static extern bool AdjustTokenPrivileges(IntPtr TokenHandle, bool DisableAllPrivileges, ref TokenPrivileges NewState, uint BufferLength, IntPtr PreviousState, ref uint ReturnLength);
-                
+
+        [DllImport("advapi32.dll", CharSet = CharSet.Auto, SetLastError = true)]
+        private static extern bool LogonUser(string lpszUsername, string lpszDomain, string lpszPassword, LogonType dwLogonType, LogonProvider dwLogonProvider,ref IntPtr phToken);
+
         public const string SeTcbPrivilege = "SeTcbPrivilege";
 
         public static Luid LookupPrivilege(string name, string systemName = null)
@@ -35,6 +38,18 @@ namespace Tewls.Windows.Advapi
             {
                 throw new Win32Exception();
             }
+        }
+
+        public static IntPtr LogonUser(string username, string domain, string password, LogonType logonType, LogonProvider logonProvider)
+        {
+            IntPtr token = IntPtr.Zero;
+            var result = LogonUser(username, domain, password, logonType, logonProvider, ref token);
+            if (!result)
+            {
+                throw new Win32Exception();
+            }
+
+            return token;
         }
 
         public static void GetDebugPrivilege(IntPtr processHandle = default)
