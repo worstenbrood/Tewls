@@ -51,9 +51,9 @@ namespace Tewls.Windows.Advapi
             return tokenHandle;
         }
 
-        public void GetDebugPrivilege()
+        public static void GetDebugPrivilege(IntPtr processHandle = default)
         {
-            var token = OpenProcessToken(Process.GetCurrentProcess().Handle, TokenAccess.AdjustPrivileges);
+            var token = OpenProcessToken(processHandle != IntPtr.Zero ? processHandle : Process.GetCurrentProcess().Handle, TokenAccess.AdjustPrivileges);
             var debugPrivilege = LookupPrivilege(SeTcbPrivilege);
             
             var privilege = new TokenPrivileges { Privileges = new LuidAndAttributes[1] };
