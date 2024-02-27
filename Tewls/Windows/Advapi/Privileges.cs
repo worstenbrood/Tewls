@@ -40,7 +40,7 @@ namespace Tewls.Windows.Advapi
             }
         }
 
-        public static IntPtr LogonUser(string username, string domain, string password, LogonType logonType, LogonProvider logonProvider)
+        public static NativeToken LogonUser(string username, string domain, string password, LogonType logonType, LogonProvider logonProvider)
         {
             IntPtr token = IntPtr.Zero;
             var result = LogonUser(username, domain, password, logonType, logonProvider, ref token);
@@ -49,7 +49,7 @@ namespace Tewls.Windows.Advapi
                 throw new Win32Exception();
             }
 
-            return token;
+            return new NativeToken(token);
         }
 
         public static void GetDebugPrivilege(IntPtr processHandle = default)
