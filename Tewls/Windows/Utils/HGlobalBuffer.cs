@@ -5,6 +5,10 @@ namespace Tewls.Windows.Utils
 {
     public class HGlobalBuffer : BufferBase<HGlobalBuffer.Allocator>
     {
+        public HGlobalBuffer()
+        {
+        }
+
         public HGlobalBuffer(IntPtr size) : base(size)
         {
         }
