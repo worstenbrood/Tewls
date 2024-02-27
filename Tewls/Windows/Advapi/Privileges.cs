@@ -57,11 +57,9 @@ namespace Tewls.Windows.Advapi
         public static void GetDebugPrivilege(IntPtr processHandle = default)
         {
             var debugPrivilege = LookupPrivilege(SeTcbPrivilege);
-
             var handle = processHandle != IntPtr.Zero ? processHandle : Process.GetCurrentProcess().Handle;
-            var dispose = processHandle != IntPtr.Zero;
-
-            using (var process = new NativeProcess(handle, dispose))
+            
+            using (var process = new NativeProcess(handle, processHandle != IntPtr.Zero))
             {
                 using (var token = process.OpenProcessToken(TokenAccess.AdjustPrivileges))
                 {
