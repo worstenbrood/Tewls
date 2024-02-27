@@ -188,4 +188,12 @@ namespace Tewls.Windows.Advapi
         TokenPrimary = 1,
         TokenImpersonation
     };
+
+    [StructLayout(LayoutKind.Sequential)]
+    public class SecurityAttributes
+    {
+        public uint Length;
+        public IntPtr SecurityDescriptor;
+        public bool InheritHandle;
+    };
 }
