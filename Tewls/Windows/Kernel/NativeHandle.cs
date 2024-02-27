@@ -2,7 +2,7 @@
 using System.ComponentModel;
 using System.Runtime.InteropServices;
 
-namespace Tewls.Windows.Advapi
+namespace Tewls.Windows.Kernel
 {
     public class NativeHandle : IDisposable
     {

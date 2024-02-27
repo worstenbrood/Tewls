@@ -1,6 +1,7 @@
 ﻿using System;
 using System.ComponentModel;
 using System.Runtime.InteropServices;
+using Tewls.Windows.Kernel;
 
 namespace Tewls.Windows.Advapi
 {
