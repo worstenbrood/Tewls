@@ -99,4 +99,11 @@ namespace Tewls.Windows.Advapi
         None = 0,
         AllowNameResolution 
     }
+
+    [Flags]
+    public enum CredWriteFlags: uint
+    {
+        None = 0,
+        PreserveCredentialBlob = 1
+    }
 }

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Net;
 using System.Runtime.InteropServices;
 
 namespace Tewls.Windows.Advapi
@@ -10,6 +11,9 @@ namespace Tewls.Windows.Advapi
     {
         [DllImport("advapi32.dll", EntryPoint = "CredReadW", CharSet = CharSet.Unicode, CallingConvention = CallingConvention.Winapi, SetLastError = true)]
         private static extern bool CredRead(string TargetName, CredType Type, uint Flags,ref IntPtr Credential);
+
+        [DllImport("advapi32.dll", EntryPoint = "CredWriteW", CharSet = CharSet.Unicode, CallingConvention = CallingConvention.Winapi, SetLastError = true)]
+        private static extern bool CredWrite(ref Credential Credential, CredWriteFlags Flags);
 
         [DllImport("advapi32.dll", EntryPoint = "CredDeleteW", CharSet = CharSet.Unicode, CallingConvention = CallingConvention.Winapi, SetLastError = true)]
         private static extern bool CredDelete(string TargetName, CredType Type, uint Flags = 0);
@@ -37,6 +41,15 @@ namespace Tewls.Windows.Advapi
                 }
 
                 return buffer.PtrToStructure<Credential>();
+            }
+        }
+
+        public static void Write(Credential credential, CredWriteFlags flags = CredWriteFlags.None)
+        {
+            var result = CredWrite(ref credential, flags);
+            if (!result)
+            {
+                throw new Win32Exception();
             }
         }
 
