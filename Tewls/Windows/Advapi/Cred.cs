@@ -1,12 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
-using System.Net;
 using System.Runtime.InteropServices;
 
 namespace Tewls.Windows.Advapi
 {
-    
     public class Cred
     {
         [DllImport("advapi32.dll", CharSet = CharSet.Auto, CallingConvention = CallingConvention.Winapi, SetLastError = true)]
@@ -86,7 +84,7 @@ namespace Tewls.Windows.Advapi
                 var array = new IntPtr[count];
 
                 // Result buffer contains an array of pointers to Credential records
-                Marshal.Copy(buffer.Buffer, array, 0, (int) count);
+                Marshal.Copy(buffer, array, 0, (int) count);
 
                 var credential = new Credential();
                 for(var i = 0; i < count; i++)

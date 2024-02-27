@@ -99,8 +99,6 @@ namespace Tewls.Windows.NetApi
         {
             return BufferSize(Buffer);
         }
-
-        
     }
 
     public class NetBuffer<TStruct> : BufferBase<NetBuffer.Allocator, TStruct>

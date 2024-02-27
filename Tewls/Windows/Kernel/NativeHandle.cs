@@ -10,6 +10,7 @@ namespace Tewls.Windows.Kernel
         private static extern bool CloseHandle(IntPtr hObject);
 
         public static implicit operator IntPtr(NativeHandle b) => b.Handle;
+        public static implicit operator NativeHandle(IntPtr b) => new NativeHandle(b);
 
         public static void Close(IntPtr handle)
         {

@@ -36,7 +36,7 @@ namespace Tewls.Windows
             NoLocalDevice = 0x00000004,
             Sibling = 0x00000008,
             Attached = 0x00000010,
-            All = (Connectable | Container | Attached),
+            All = Connectable | Container | Attached,
         };
 
         public enum ResourceDisplayType
