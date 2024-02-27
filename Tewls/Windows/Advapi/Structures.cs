@@ -151,6 +151,8 @@ namespace Tewls.Windows.Advapi
         AdjustGroups = 64,
         AdjustDefault = 128,
         AdjustSessionId = 256,
+        StandardRightsRequired = 0x000F0000,
+        AccessAll = StandardRightsRequired | AssignPrimary | Duplicate | Impersonate | Query | QuerySource | AdjustPrivileges | AdjustGroups | AdjustDefault,
     }
 
     public enum LogonType : uint
@@ -181,7 +183,7 @@ namespace Tewls.Windows.Advapi
         SecurityDelegation
     };
 
-    public enum TokenType
+    public enum TokenType : uint
     {
         TokenPrimary = 1,
         TokenImpersonation
