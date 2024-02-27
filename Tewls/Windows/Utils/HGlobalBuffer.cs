@@ -5,14 +5,6 @@ namespace Tewls.Windows.Utils
 {
     public class HGlobalBuffer : BufferBase<HGlobalBuffer.Allocator>
     {
-        public HGlobalBuffer()
-        {
-        }
-
-        public HGlobalBuffer(IntPtr size) : base(size)
-        {
-        }
-
         public class Allocator : IAllocator
         {
             public IntPtr Alloc(IntPtr size)
@@ -30,6 +22,14 @@ namespace Tewls.Windows.Utils
                 return Marshal.ReAllocHGlobal(buffer, size);
             }
         }
+
+        public HGlobalBuffer()
+        {
+        }
+
+        public HGlobalBuffer(IntPtr size) : base(size)
+        {
+        }        
     }
 
     public class HGlobalBuffer<TStruct> : BufferBase<HGlobalBuffer.Allocator, TStruct>

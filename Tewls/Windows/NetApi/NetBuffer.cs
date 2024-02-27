@@ -19,6 +19,24 @@ namespace Tewls.Windows.NetApi
         [DllImport("netapi32.dll", EntryPoint = "NetApiBufferFree", CallingConvention = CallingConvention.Winapi, SetLastError = true)]
         private static extern Error NetApiBufferFree(IntPtr Buffer);
 
+        public class Allocator : IAllocator
+        {
+            public IntPtr Alloc(IntPtr size)
+            {
+                return BufferAllocate((uint)size);
+            }
+
+            public void Free(IntPtr buffer)
+            {
+                BufferFree(buffer);
+            }
+
+            public IntPtr ReAlloc(IntPtr buffer, IntPtr size)
+            {
+                return BufferReAllocate(buffer, (uint)size);
+            }
+        }
+
         public static IntPtr BufferAllocate(uint byteCount)
         {
             IntPtr buffer = IntPtr.Zero;
@@ -82,23 +100,7 @@ namespace Tewls.Windows.NetApi
             return BufferSize(Buffer);
         }
 
-        public class Allocator : IAllocator
-        {
-            public IntPtr Alloc(IntPtr size)
-            {
-                return BufferAllocate((uint)size);
-            }
-
-            public void Free(IntPtr buffer)
-            {
-                BufferFree(buffer);
-            }
-
-            public IntPtr ReAlloc(IntPtr buffer, IntPtr size)
-            {
-                return BufferReAllocate(buffer, (uint)size);
-            }
-        }
+        
     }
 
     public class NetBuffer<TStruct> : BufferBase<NetBuffer.Allocator, TStruct>
