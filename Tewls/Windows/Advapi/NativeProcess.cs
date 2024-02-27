@@ -4,7 +4,7 @@ using System.Runtime.InteropServices;
 
 namespace Tewls.Windows.Advapi
 {
-    public class NativeProcess 
+    public class NativeProcess : NativeHandle
     {
         [DllImport("advapi32.dll", CharSet = CharSet.Auto, SetLastError = true)]
         private static extern bool OpenProcessToken(IntPtr ProcessHandle, TokenAccess DesiredAccess, ref IntPtr TokenHandle);
@@ -20,11 +20,8 @@ namespace Tewls.Windows.Advapi
             return tokenHandle;
         }
 
-        public IntPtr Handle;
-
-        public NativeProcess(IntPtr processHandle) 
+        public NativeProcess(IntPtr processHandle, bool dispose = false) : base(processHandle, dispose)
         { 
-            Handle = processHandle;
         }
 
         public IntPtr OpenProcessToken(TokenAccess desiredAccess)

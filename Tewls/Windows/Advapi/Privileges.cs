@@ -36,19 +36,25 @@ namespace Tewls.Windows.Advapi
                 throw new Win32Exception();
             }
         }
-        
+
         public static void GetDebugPrivilege(IntPtr processHandle = default)
         {
-            var process = new NativeProcess(processHandle != IntPtr.Zero ? processHandle : Process.GetCurrentProcess().Handle);
-            var token = process.OpenProcessToken(TokenAccess.AdjustPrivileges);
             var debugPrivilege = LookupPrivilege(SeTcbPrivilege);
-            
-            var privilege = new TokenPrivileges { Privileges = new LuidAndAttributes[1] };
-            privilege.Privileges[0].Attributes = PrivilegeAttributes.Enabled;
-            privilege.Privileges[0].Luid = debugPrivilege;
-            privilege.PrivilegeSize = 1;
 
-            AdjustTokenPrivileges(token, privilege);
+            var handle = processHandle != IntPtr.Zero ? processHandle : Process.GetCurrentProcess().Handle;
+            var dispose = processHandle != IntPtr.Zero;
+
+            using (var process = new NativeProcess(handle, dispose))
+            {
+                var token = process.OpenProcessToken(TokenAccess.AdjustPrivileges);
+
+                var privilege = new TokenPrivileges { Privileges = new LuidAndAttributes[1] };
+                privilege.Privileges[0].Attributes = PrivilegeAttributes.Enabled;
+                privilege.Privileges[0].Luid = debugPrivilege;
+                privilege.PrivilegeSize = 1;
+
+                AdjustTokenPrivileges(token, privilege);
+            }
         }
     }
 }
