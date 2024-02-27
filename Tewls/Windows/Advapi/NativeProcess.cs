@@ -10,6 +10,8 @@ namespace Tewls.Windows.Advapi
         [DllImport("advapi32.dll", CharSet = CharSet.Auto, SetLastError = true)]
         private static extern bool OpenProcessToken(IntPtr ProcessHandle, TokenAccess DesiredAccess, ref IntPtr TokenHandle);
 
+        // Static
+
         public static IntPtr OpenProcessToken(IntPtr processHandle, TokenAccess desiredAccess)
         {
             IntPtr tokenHandle = IntPtr.Zero;
@@ -20,6 +22,8 @@ namespace Tewls.Windows.Advapi
             }
             return tokenHandle;
         }
+
+        // Class
 
         public NativeProcess(IntPtr processHandle, bool dispose = false) : base(processHandle, dispose)
         { 

@@ -172,4 +172,12 @@ namespace Tewls.Windows.Advapi
         WinNT50,
         Virtual
     }
+
+    public enum SecurityImpersonationLevel : uint
+    {
+        SecurityAnonymous,
+        SecurityIdentification,
+        SecurityImpersonation,
+        SecurityDelegation
+    };
 }
