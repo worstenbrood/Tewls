@@ -105,13 +105,13 @@ namespace Tewls.Windows
             public ResourceType Type;
             public ResourceDisplayType DisplayType;
             public ResourceUsage Usage;
-            [MarshalAs(UnmanagedType.LPWStr)]
+            [MarshalAs(UnmanagedType.LPTStr)]
             public string LocalName;
-            [MarshalAs(UnmanagedType.LPWStr)]
+            [MarshalAs(UnmanagedType.LPTStr)]
             public string RemoteName;
-            [MarshalAs(UnmanagedType.LPWStr)]
+            [MarshalAs(UnmanagedType.LPTStr)]
             public string Comment;
-            [MarshalAs(UnmanagedType.LPWStr)]
+            [MarshalAs(UnmanagedType.LPTStr)]
             public string Provider;
 
             public NetResource AddConnection(string password = null)
@@ -215,69 +215,69 @@ namespace Tewls.Windows
         [StructLayout(LayoutKind.Sequential)]
         public class UniversalNameInfo
         {
-            [MarshalAs(UnmanagedType.LPWStr)]
+            [MarshalAs(UnmanagedType.LPTStr)]
             public string UniversalName;
         };
 
         [StructLayout(LayoutKind.Sequential)]
         public class RemoteNameInfo
         {
-            [MarshalAs(UnmanagedType.LPWStr)]
+            [MarshalAs(UnmanagedType.LPTStr)]
             public string UniversalName;
 
-            [MarshalAs(UnmanagedType.LPWStr)]
+            [MarshalAs(UnmanagedType.LPTStr)]
             public string ConnectionName;
 
-            [MarshalAs(UnmanagedType.LPWStr)]
+            [MarshalAs(UnmanagedType.LPTStr)]
             public string RemainingPath;
         };
 
-        [DllImport("Mpr.dll", EntryPoint = "WNetOpenEnumW", CallingConvention = CallingConvention.Winapi, CharSet = CharSet.Unicode, SetLastError = true)]
+        [DllImport("Mpr.dll", CallingConvention = CallingConvention.Winapi, CharSet = CharSet.Auto, SetLastError = true)]
         private static extern Error WNetOpenEnum(ResourceScope dwScope, ResourceType dwType, ResourceUsage dwUsage, NetResource p, out IntPtr lphEnum);
 
-        [DllImport("Mpr.dll", EntryPoint = "WNetCloseEnum", CallingConvention = CallingConvention.Winapi, SetLastError = true)]
+        [DllImport("Mpr.dll", CallingConvention = CallingConvention.Winapi, SetLastError = true)]
         private static extern Error WNetCloseEnum(IntPtr hEnum);
 
-        [DllImport("Mpr.dll", EntryPoint = "WNetEnumResourceW", CallingConvention = CallingConvention.Winapi, CharSet = CharSet.Unicode, SetLastError = true)]
+        [DllImport("Mpr.dll", CallingConvention = CallingConvention.Winapi, CharSet = CharSet.Auto, SetLastError = true)]
         private static extern Error WNetEnumResource(IntPtr hEnum, ref uint lpcCount, IntPtr buffer, ref uint lpBufferSize);
 
-        [DllImport("Mpr.dll", EntryPoint = "WNetAddConnectionW", CallingConvention = CallingConvention.Winapi, CharSet = CharSet.Unicode, SetLastError = true)]
+        [DllImport("Mpr.dll", CallingConvention = CallingConvention.Winapi, CharSet = CharSet.Auto, SetLastError = true)]
         private static extern Error WNetAddConnection(string lpRemoteName, string lpPassword, string lpLocalName);
 
-        [DllImport("Mpr.dll", EntryPoint = "WNetGetLastErrorW", CallingConvention = CallingConvention.Winapi, CharSet = CharSet.Unicode, SetLastError = true)]
+        [DllImport("Mpr.dll", CallingConvention = CallingConvention.Winapi, CharSet = CharSet.Auto, SetLastError = true)]
         private static extern Error WNetGetLastError(ref uint lpError, IntPtr lpErrorBuf, uint nErrorBufSize, IntPtr lpNameBuf, uint nNameBufSize);
 
-        [DllImport("Mpr.dll", EntryPoint = "WNetAddConnection2W", CallingConvention = CallingConvention.Winapi, CharSet = CharSet.Unicode, SetLastError = true)]
+        [DllImport("Mpr.dll", CallingConvention = CallingConvention.Winapi, CharSet = CharSet.Auto, SetLastError = true)]
         private static extern Error WNetAddConnection2(NetResource lpNetResource, string lpPassword, string lpUserName, uint dwFlags);
 
-        [DllImport("Mpr.dll", EntryPoint = "WNetGetNetworkInformationW", CallingConvention = CallingConvention.Winapi, CharSet = CharSet.Unicode, SetLastError = true)]
+        [DllImport("Mpr.dll", CallingConvention = CallingConvention.Winapi, CharSet = CharSet.Auto, SetLastError = true)]
         private static extern Error WNetGetNetworkInformation(string lpProvider, NetInfoStruct lpNetInfoStruct);
 
-        [DllImport("Mpr.dll", EntryPoint = "WNetCancelConnectionW", CallingConvention = CallingConvention.Winapi, CharSet = CharSet.Unicode, SetLastError = true)]
+        [DllImport("Mpr.dll", CallingConvention = CallingConvention.Winapi, CharSet = CharSet.Auto, SetLastError = true)]
         private static extern Error WNetCancelConnection(string lpName, bool fForce);
 
-        [DllImport("Mpr.dll", EntryPoint = "WNetCancelConnection2W", CallingConvention = CallingConvention.Winapi, CharSet = CharSet.Unicode, SetLastError = true)]
+        [DllImport("Mpr.dll", CallingConvention = CallingConvention.Winapi, CharSet = CharSet.Auto, SetLastError = true)]
         private static extern Error WNetCancelConnection2(string lpName, uint dwFlags, bool fForce);
 
-        [DllImport("Mpr.dll", EntryPoint = "WNetGetConnectionW", CallingConvention = CallingConvention.Winapi, CharSet = CharSet.Unicode, SetLastError = true)]
+        [DllImport("Mpr.dll", CallingConvention = CallingConvention.Winapi, CharSet = CharSet.Auto, SetLastError = true)]
         private static extern Error WNetGetConnection(string lpLocalName, IntPtr lpRemoteName, ref uint lpnLength);
 
-        [DllImport("Mpr.dll", EntryPoint = "MultinetGetConnectionPerformanceW", CallingConvention = CallingConvention.Winapi, CharSet = CharSet.Unicode, SetLastError = true)]
+        [DllImport("Mpr.dll", CallingConvention = CallingConvention.Winapi, CharSet = CharSet.Auto, SetLastError = true)]
         private static extern Error MultinetGetConnectionPerformance(NetResource lpNetResource, NetConnectionInfoStruct lpNetConnectInfoStruct);
 
-        [DllImport("Mpr.dll", EntryPoint = "WNetGetUserW", CallingConvention = CallingConvention.Winapi, CharSet = CharSet.Unicode, SetLastError = true)]
+        [DllImport("Mpr.dll", CallingConvention = CallingConvention.Winapi, CharSet = CharSet.Auto, SetLastError = true)]
         private static extern Error WNetGetUser(string lpName, IntPtr lpUserName, ref uint lpnLength);
 
-        [DllImport("Mpr.dll", EntryPoint = "WNetGetUniversalNameW", CallingConvention = CallingConvention.Winapi, CharSet = CharSet.Unicode, SetLastError = true)]
+        [DllImport("Mpr.dll", CallingConvention = CallingConvention.Winapi, CharSet = CharSet.Auto, SetLastError = true)]
         private static extern Error WNetGetUniversalName(string lpLocalPath, uint dwInfoLevel, IntPtr lpBuffer, ref uint lpBufferSize);
 
-        [DllImport("Mpr.dll", EntryPoint = "WNetGetResourceParentW", CallingConvention = CallingConvention.Winapi, CharSet = CharSet.Unicode, SetLastError = true)]
+        [DllImport("Mpr.dll", CallingConvention = CallingConvention.Winapi, CharSet = CharSet.Auto, SetLastError = true)]
         private static extern Error WNetGetResourceParent(NetResource lpNetResource, IntPtr lpBuffer, ref uint lpcbBuffer);
 
-        [DllImport("Mpr.dll", EntryPoint = "WNetGetProviderNameW", CallingConvention = CallingConvention.Winapi, CharSet = CharSet.Unicode, SetLastError = true)]
+        [DllImport("Mpr.dll", CallingConvention = CallingConvention.Winapi, CharSet = CharSet.Auto, SetLastError = true)]
         private static extern Error WNetGetProviderName(uint dwNetType, IntPtr lpProviderName, ref uint lpBufferSize);
 
-        [DllImport("Mpr.dll", EntryPoint = "WNetGetResourceInformationW", CallingConvention = CallingConvention.Winapi, CharSet = CharSet.Unicode, SetLastError = true)]
+        [DllImport("Mpr.dll", CallingConvention = CallingConvention.Winapi, CharSet = CharSet.Auto, SetLastError = true)]
         private static extern Error WNetGetResourceInformation(NetResource lpNetResource, IntPtr lpBuffer, ref uint lpcbBuffer, ref IntPtr lplpSystem);
 
         private const int ErrorBufferSize = 1024;

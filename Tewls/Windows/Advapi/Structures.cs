@@ -42,9 +42,9 @@ namespace Tewls.Windows.Advapi
     {
         public CredFlags Flags;
         public CredType Type;
-        [MarshalAs(UnmanagedType.LPWStr)]
+        [MarshalAs(UnmanagedType.LPTStr)]
         public string TargetName;
-        [MarshalAs(UnmanagedType.LPWStr)]
+        [MarshalAs(UnmanagedType.LPTStr)]
         public string Comment;
         public FILETIME LastWritten;
         public uint CredentialBlobSize;
@@ -52,9 +52,9 @@ namespace Tewls.Windows.Advapi
         public CredPersist Persist;
         public uint AttributeCount;
         public IntPtr Attributes;
-        [MarshalAs(UnmanagedType.LPWStr)]
+        [MarshalAs(UnmanagedType.LPTStr)]
         public string TargetAlias;
-        [MarshalAs(UnmanagedType.LPWStr)]
+        [MarshalAs(UnmanagedType.LPTStr)]
         public string UserName;
 
         public string GetPassword()
@@ -75,19 +75,19 @@ namespace Tewls.Windows.Advapi
     [StructLayout(LayoutKind.Sequential)]
     public class CredentialTargetInformation
     {
-        [MarshalAs(UnmanagedType.LPWStr)]
+        [MarshalAs(UnmanagedType.LPTStr)]
         public string TargetName;
-        [MarshalAs(UnmanagedType.LPWStr)]
+        [MarshalAs(UnmanagedType.LPTStr)]
         public string NetbiosServerName;
-        [MarshalAs(UnmanagedType.LPWStr)]
+        [MarshalAs(UnmanagedType.LPTStr)]
         public string DnsServerName;
         [MarshalAs(UnmanagedType.LPWStr)]
         public string NetbiosDomainName;
-        [MarshalAs(UnmanagedType.LPWStr)]
+        [MarshalAs(UnmanagedType.LPTStr)]
         public string DnsDomainName;
         [MarshalAs(UnmanagedType.LPWStr)]
         public string DnsTreeName;
-        [MarshalAs(UnmanagedType.LPWStr)]
+        [MarshalAs(UnmanagedType.LPTStr)]
         public string PackageName;
         public uint Flags;
         public uint CredTypeCount;
@@ -105,5 +105,19 @@ namespace Tewls.Windows.Advapi
     {
         None = 0,
         PreserveCredentialBlob = 1
+    }
+
+    [StructLayout(LayoutKind.Sequential)]
+    public struct Luid
+    {
+        public int LowPart;
+        public int HighPart;
+    }
+
+    [StructLayout(LayoutKind.Sequential)]
+    public class LuidAndAttributes
+    {
+        public Luid Luid;
+        public int Attributes;
     }
 }
