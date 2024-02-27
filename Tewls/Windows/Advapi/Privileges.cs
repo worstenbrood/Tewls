@@ -46,14 +46,15 @@ namespace Tewls.Windows.Advapi
 
             using (var process = new NativeProcess(handle, dispose))
             {
-                var token = process.OpenProcessToken(TokenAccess.AdjustPrivileges);
+                using (var token = process.OpenProcessToken(TokenAccess.AdjustPrivileges))
+                {
+                    var privilege = new TokenPrivileges { Privileges = new LuidAndAttributes[1] };
+                    privilege.Privileges[0].Attributes = PrivilegeAttributes.Enabled;
+                    privilege.Privileges[0].Luid = debugPrivilege;
+                    privilege.PrivilegeSize = 1;
 
-                var privilege = new TokenPrivileges { Privileges = new LuidAndAttributes[1] };
-                privilege.Privileges[0].Attributes = PrivilegeAttributes.Enabled;
-                privilege.Privileges[0].Luid = debugPrivilege;
-                privilege.PrivilegeSize = 1;
-
-                AdjustTokenPrivileges(token, privilege);
+                    AdjustTokenPrivileges(token, privilege);
+                }
             }
         }
     }

@@ -9,6 +9,8 @@ namespace Tewls.Windows.Advapi
         [DllImport("kernel32.dll", CharSet = CharSet.Auto, SetLastError = true)]
         private static extern bool CloseHandle(IntPtr hObject);
 
+        public static implicit operator IntPtr(NativeHandle b) => b.Handle;
+
         public static void Close(IntPtr handle)
         {
             var result = CloseHandle(handle);
