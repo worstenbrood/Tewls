@@ -7,16 +7,16 @@ namespace Tewls.Windows.NetApi
 {
     public class NetBuffer : BufferBase<NetBuffer.Allocator>
     {
-        [DllImport("netapi32.dll", EntryPoint = "NetApiBufferAllocate", CallingConvention = CallingConvention.Winapi, SetLastError = true)]
+        [DllImport("netapi32.dll", CallingConvention = CallingConvention.Winapi, SetLastError = true)]
         private static extern Error NetApiBufferAllocate(uint ByteCount, ref IntPtr Buffer);
 
-        [DllImport("netapi32.dll", EntryPoint = "NetApiBufferReallocate", CallingConvention = CallingConvention.Winapi, SetLastError = true)]
+        [DllImport("netapi32.dll", CallingConvention = CallingConvention.Winapi, SetLastError = true)]
         private static extern Error NetApiBufferReallocate(IntPtr OldBuffer, uint NewByteCount, ref IntPtr NewBuffer);
 
-        [DllImport("netapi32.dll", EntryPoint = "NetApiBufferSize", CallingConvention = CallingConvention.Winapi, SetLastError = true)]
+        [DllImport("netapi32.dll", CallingConvention = CallingConvention.Winapi, SetLastError = true)]
         private static extern Error NetApiBufferSize(IntPtr Buffer, ref uint ByteCount);
 
-        [DllImport("netapi32.dll", EntryPoint = "NetApiBufferFree", CallingConvention = CallingConvention.Winapi, SetLastError = true)]
+        [DllImport("netapi32.dll", CallingConvention = CallingConvention.Winapi, SetLastError = true)]
         private static extern Error NetApiBufferFree(IntPtr Buffer);
 
         public class Allocator : IAllocator

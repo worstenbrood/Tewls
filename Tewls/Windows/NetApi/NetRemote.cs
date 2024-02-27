@@ -7,10 +7,10 @@ namespace Tewls.Windows.NetApi
 {
     public class NetRemote
     {
-        [DllImport("netapi32.dll", EntryPoint = "NetRemoteComputerSupports", CallingConvention = CallingConvention.Winapi, CharSet = CharSet.Unicode, SetLastError = true)]
+        [DllImport("netapi32.dll", CallingConvention = CallingConvention.Winapi, CharSet = CharSet.Unicode, SetLastError = true)]
         private static extern Error NetRemoteComputerSupports(string UncServerName, Supports OptionsWanted, ref Supports OptionsSupported);
 
-        [DllImport("netapi32.dll", EntryPoint = "NetRemoteTOD", CallingConvention = CallingConvention.Winapi, CharSet = CharSet.Unicode, SetLastError = true)]
+        [DllImport("netapi32.dll", CallingConvention = CallingConvention.Winapi, CharSet = CharSet.Unicode, SetLastError = true)]
         private static extern Error NetRemoteTOD(string UncServerName,ref IntPtr BufferPtr);
 
         public static Supports ComputerSupports(string serverName = null, Supports optionsRequested = Supports.Any)

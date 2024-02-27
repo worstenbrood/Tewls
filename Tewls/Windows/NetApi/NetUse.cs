@@ -8,16 +8,16 @@ namespace Tewls.Windows.NetApi
 {
     public class NetUse
     {
-        [DllImport("netapi32.dll", EntryPoint = "NetUseAdd", CallingConvention = CallingConvention.Winapi, CharSet = CharSet.Unicode, SetLastError = true)]
+        [DllImport("netapi32.dll", CallingConvention = CallingConvention.Winapi, CharSet = CharSet.Unicode, SetLastError = true)]
         private static extern Error NetUseAdd(string servername, UseLevel LevelFlags, IntPtr buf, ref uint parm_err);
 
-        [DllImport("netapi32.dll", EntryPoint = "NetUseDel", CallingConvention = CallingConvention.Winapi, CharSet = CharSet.Unicode, SetLastError = true)]
+        [DllImport("netapi32.dll", CallingConvention = CallingConvention.Winapi, CharSet = CharSet.Unicode, SetLastError = true)]
         private static extern Error NetUseDel(string UncServerName, string UseName, ForceLevel ForceLevelFlags);
 
-        [DllImport("netapi32.dll", EntryPoint = "NetUseEnum", CallingConvention = CallingConvention.Winapi, CharSet = CharSet.Unicode, SetLastError = true)]
+        [DllImport("netapi32.dll", CallingConvention = CallingConvention.Winapi, CharSet = CharSet.Unicode, SetLastError = true)]
         private static extern Error NetUseEnum(string UncServerName, UseLevel LevelFlags,ref IntPtr BufPtr, int PreferedMaximumSize, ref uint EntriesRead, ref uint TotalEntries, IntPtr ResumeHandle);
 
-        [DllImport("netapi32.dll", EntryPoint = "NetUseGetInfo", CallingConvention = CallingConvention.Winapi, CharSet = CharSet.Unicode, SetLastError = true)]
+        [DllImport("netapi32.dll", CallingConvention = CallingConvention.Winapi, CharSet = CharSet.Unicode, SetLastError = true)]
         private static extern Error NetUseGetInfo(string UncServerName, string UseName, UseLevel LevelFlags, ref IntPtr bufptr);
 
         public void Add<TStruct>(string serverName, TStruct info)

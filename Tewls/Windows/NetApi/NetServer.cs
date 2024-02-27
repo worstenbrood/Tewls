@@ -8,34 +8,34 @@ namespace Tewls.Windows.NetApi
 {
     public class NetServer
     {
-        [DllImport("netapi32.dll", EntryPoint = "NetServerEnum", CallingConvention = CallingConvention.Winapi, CharSet = CharSet.Unicode, SetLastError = true)]
+        [DllImport("netapi32.dll", CallingConvention = CallingConvention.Winapi, CharSet = CharSet.Unicode, SetLastError = true)]
         private static extern Error NetServerEnum(string servername, InfoLevel level, ref IntPtr bufptr, int prefmaxlen, ref uint entriesread, ref uint totalentries, uint servertype, string domain, IntPtr resume_handle);
 
-        [DllImport("netapi32.dll", EntryPoint = "NetServerGetInfo", CallingConvention = CallingConvention.Winapi, CharSet = CharSet.Unicode, SetLastError = true)]
+        [DllImport("netapi32.dll", CallingConvention = CallingConvention.Winapi, CharSet = CharSet.Unicode, SetLastError = true)]
         private static extern Error NetServerGetInfo(string servername, InfoLevel level, ref IntPtr bufptr);
 
-        [DllImport("netapi32.dll", EntryPoint = "NetServerSetInfo", CallingConvention = CallingConvention.Winapi, CharSet = CharSet.Unicode, SetLastError = true)]
+        [DllImport("netapi32.dll", CallingConvention = CallingConvention.Winapi, CharSet = CharSet.Unicode, SetLastError = true)]
         private static extern Error NetServerSetInfo(string servername, InfoLevel level, IntPtr buf,ref uint ParmError);
 
-        [DllImport("netapi32.dll", EntryPoint = "NetServerDiskEnum", CallingConvention = CallingConvention.Winapi, CharSet = CharSet.Unicode, SetLastError = true)]
+        [DllImport("netapi32.dll", CallingConvention = CallingConvention.Winapi, CharSet = CharSet.Unicode, SetLastError = true)]
         private static extern Error NetServerDiskEnum(string servername,InfoLevel level,ref IntPtr bufptr, int prefmaxlen,ref uint entriesread, ref uint totalentries, IntPtr resume_handle);
 
-        [DllImport("netapi32.dll", EntryPoint = "NetServerTransportAdd", CallingConvention = CallingConvention.Winapi, CharSet = CharSet.Unicode, SetLastError = true)]
+        [DllImport("netapi32.dll", CallingConvention = CallingConvention.Winapi, CharSet = CharSet.Unicode, SetLastError = true)]
         private static extern Error NetServerTransportAdd(string servername, TransportLevel level, IntPtr bufptr);
 
-        [DllImport("netapi32.dll", EntryPoint = "NetServerTransportAddEx", CallingConvention = CallingConvention.Winapi, CharSet = CharSet.Unicode, SetLastError = true)]
+        [DllImport("netapi32.dll", CallingConvention = CallingConvention.Winapi, CharSet = CharSet.Unicode, SetLastError = true)]
         private static extern Error NetServerTransportAddEx(string servername, TransportLevel level, IntPtr bufptr);
 
-        [DllImport("netapi32.dll", EntryPoint = "NetServerTransportDel", CallingConvention = CallingConvention.Winapi, CharSet = CharSet.Unicode, SetLastError = true)]
+        [DllImport("netapi32.dll", CallingConvention = CallingConvention.Winapi, CharSet = CharSet.Unicode, SetLastError = true)]
         private static extern Error NetServerTransportDel(string servername, TransportLevel level, IntPtr bufptr);
 
-        [DllImport("netapi32.dll", EntryPoint = "NetServerTransportEnum", CallingConvention = CallingConvention.Winapi, CharSet = CharSet.Unicode, SetLastError = true)]
+        [DllImport("netapi32.dll", CallingConvention = CallingConvention.Winapi, CharSet = CharSet.Unicode, SetLastError = true)]
         private static extern Error NetServerTransportEnum(string servername,TransportLevel level, ref IntPtr bufptr, int prefmaxlen,ref uint entriesread,ref uint totalentries, IntPtr resume_handle);
 
-        [DllImport("netapi32.dll", EntryPoint = "NetServerComputerNameAdd", CallingConvention = CallingConvention.Winapi, CharSet = CharSet.Unicode, SetLastError = true)]
+        [DllImport("netapi32.dll", CallingConvention = CallingConvention.Winapi, CharSet = CharSet.Unicode, SetLastError = true)]
         private static extern Error NetServerComputerNameAdd(string ServerName, string EmulatedDomainName,string EmulatedServerName);
 
-        [DllImport("netapi32.dll", EntryPoint = "NetServerComputerNameDel", CallingConvention = CallingConvention.Winapi, CharSet = CharSet.Unicode, SetLastError = true)]
+        [DllImport("netapi32.dll", CallingConvention = CallingConvention.Winapi, CharSet = CharSet.Unicode, SetLastError = true)]
         private static extern Error NetServerComputerNameDel(string ServerName,string EmulatedServerName);
 
         private const int EntrySize = 3;
