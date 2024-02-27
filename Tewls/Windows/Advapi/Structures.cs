@@ -56,6 +56,20 @@ namespace Tewls.Windows.Advapi
         public string TargetAlias;
         [MarshalAs(UnmanagedType.LPWStr)]
         public string UserName;
+
+        public string GetPassword()
+        {
+            if (CredentialBlob == IntPtr.Zero)
+            {
+                return null;
+            }
+
+            switch(Type)
+            {
+                default:
+                    return Marshal.PtrToStringUni(CredentialBlob, (int) CredentialBlobSize / sizeof(char));
+            }
+        }
     };
 
     [StructLayout(LayoutKind.Sequential)]
