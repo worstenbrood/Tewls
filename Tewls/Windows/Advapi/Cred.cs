@@ -58,7 +58,7 @@ namespace Tewls.Windows.Advapi
             }
         }
 
-        public static IEnumerable<Credential> Enum(string filter = null)
+        public static IEnumerable<Credential> Enumerate(string filter = null)
         {
             // CredFree is needed to free the allocated buffer
             using (var buffer = new CredBuffer())
