@@ -49,7 +49,7 @@ namespace Tewls.Windows.Advapi
 
         public NativeToken DuplicateToken(SecurityImpersonationLevel impersonationLevel)
         {
-            return new NativeToken(DuplicateToken(Handle, impersonationLevel);
+            return new NativeToken(DuplicateToken(Handle, impersonationLevel));
         }
     }
 }

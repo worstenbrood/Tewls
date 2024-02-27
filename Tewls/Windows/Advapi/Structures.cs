@@ -180,4 +180,10 @@ namespace Tewls.Windows.Advapi
         SecurityImpersonation,
         SecurityDelegation
     };
+
+    public enum TokenType
+    {
+        TokenPrimary = 1,
+        TokenImpersonation
+    };
 }
