@@ -114,10 +114,42 @@ namespace Tewls.Windows.Advapi
         public int HighPart;
     }
 
+    [Flags]
+    public enum PrivilegeAttributes : uint
+    {
+        Disabled = 0,
+        EnabledByDefault = 1,
+        Enabled = 2,
+        Removed = 4,
+        UseForAccess = 8
+    }
+
     [StructLayout(LayoutKind.Sequential)]
-    public class LuidAndAttributes
+    public struct LuidAndAttributes
     {
         public Luid Luid;
-        public int Attributes;
+        public PrivilegeAttributes Attributes;
+    }
+
+    [StructLayout(LayoutKind.Sequential)]
+    public struct TokenPrivileges
+    {
+        public uint PrivilegeSize;
+        [MarshalAs(UnmanagedType.ByValArray, SizeConst = 1)]   
+        public LuidAndAttributes []Privileges;
+    }
+
+    [Flags]
+    public enum TokenAccess : uint
+    {
+        AssignPrimary = 1,
+        Duplicate = 2,
+        Impersonate = 4,
+        Query = 8,
+        QuerySource = 16,
+        AdjustPrivileges = 32,
+        AdjustGroups = 64,
+        AdjustDefault = 128,
+        AdjustSessionId = 256,
     }
 }
