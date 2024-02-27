@@ -5,7 +5,7 @@ using System.Runtime.InteropServices;
 
 namespace Tewls.Windows.Advapi
 {
-    public class Winbase
+    public class Privileges
     {
         [DllImport("advapi32.dll", CharSet = CharSet.Auto, SetLastError = true)]
         private static extern bool LookupPrivilegeValue(string lpSystemName, string lpName, ref Luid lpLuid);
@@ -39,7 +39,8 @@ namespace Tewls.Windows.Advapi
         
         public static void GetDebugPrivilege(IntPtr processHandle = default)
         {
-            var token = NativeProcess.OpenProcessToken(processHandle != IntPtr.Zero ? processHandle : Process.GetCurrentProcess().Handle, TokenAccess.AdjustPrivileges);
+            var process = new NativeProcess(processHandle != IntPtr.Zero ? processHandle : Process.GetCurrentProcess().Handle);
+            var token = process.OpenProcessToken(TokenAccess.AdjustPrivileges);
             var debugPrivilege = LookupPrivilege(SeTcbPrivilege);
             
             var privilege = new TokenPrivileges { Privileges = new LuidAndAttributes[1] };

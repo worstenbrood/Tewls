@@ -19,5 +19,17 @@ namespace Tewls.Windows.Advapi
             }
             return tokenHandle;
         }
+
+        public IntPtr Handle;
+
+        public NativeProcess(IntPtr processHandle) 
+        { 
+            Handle = processHandle;
+        }
+
+        public IntPtr OpenProcessToken(TokenAccess desiredAccess)
+        {
+            return OpenProcessToken(Handle, desiredAccess);
+        }
     }
 }
