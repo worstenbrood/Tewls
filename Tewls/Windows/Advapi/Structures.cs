@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Runtime.InteropServices;
 using System.Runtime.InteropServices.ComTypes;
+using System.Security.Cryptography;
 
 namespace Tewls.Windows.Advapi
 {
@@ -196,4 +197,66 @@ namespace Tewls.Windows.Advapi
         public IntPtr SecurityDescriptor;
         public bool InheritHandle;
     };
+
+    [Flags]
+    public enum AllocationTypes : uint
+    {
+        None = 0,
+        Commit = 0x00001000,
+        Reserve = 0x00002000,
+        Reset = 0x00080000,
+        Free = 0x000010000,
+        ResetUndo = 0x1000000,
+        LargePages = 0x20000000,
+        Physical = 0x00400000,
+        TopDown = 0x00100000
+    }
+
+    [Flags]
+    public enum Pages : uint
+    {
+        NoAccess = 0x1,
+        ReadOnly = 0x2,
+        ReadWrite = 0x4,
+        WriteCopy = 0x8,
+        Execute = 0x10,
+        ExecuteRead = 0x20,
+        ExecuteReadWrite = 0x40,
+        ExecuteWriteCopy = 0x80,
+        Guard = 0x100,
+        NoCache = 0x200,
+        WriteCombine = 0x400,
+        TargetsInvalid = 0x40000000,
+    }
+
+    [Flags]
+    public enum MemType: uint
+    {
+        None = 0,
+        Image = 0x1000000,
+        Mapped = 0x40000,
+        Private = 0x20000,
+    }
+
+    [StructLayout(LayoutKind.Sequential)]
+    public class MemoryBasicInformation
+    {
+        public IntPtr BaseAddress;
+        public IntPtr AllocationBase;
+        public Pages AllocationProtect;
+        public short PartitionId;
+        public IntPtr RegionSize;
+        public AllocationTypes State;
+        public AllocationTypes Protect;
+        public MemType Type;
+    };
+
+    public enum MemFreeType : uint
+    {
+        Decommit = 0x00004000,
+        Release = 0x00008000,
+        CoalescePlaceholder = 0x00000001,
+        PreserverPlaceHolder = 0x00000002
+    }
+
 }

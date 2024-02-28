@@ -130,7 +130,7 @@ namespace Tewls.Windows.Utils
             base.ReAlloc(size);
         }
 
-        protected BufferBase()
+        protected BufferBase() 
         {
         }
 
