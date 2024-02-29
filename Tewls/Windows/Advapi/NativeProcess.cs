@@ -124,72 +124,72 @@ namespace Tewls.Windows.Advapi
             return VirtualAllocEx((IntPtr) size, allocationType, protect, address);
         }
 
-        public MemoryBasicInformation VirtualQueryEx(IntPtr baseAddress)
+        public MemoryBasicInformation VirtualQueryEx(IntPtr remoteBuffer)
         {
             var info = new MemoryBasicInformation();
-            VirtualQueryEx(Handle, baseAddress, info);
+            VirtualQueryEx(Handle, remoteBuffer, info);
             return info;
         }
 
-        public IntPtr ReadProcessMemory(IntPtr baseAddress, IntPtr buffer, IntPtr size)
+        public IntPtr ReadProcessMemory(IntPtr remoteBuffer, IntPtr localBuffer, IntPtr size)
         {
-            return ReadProcessMemory(Handle, baseAddress, buffer, size);
+            return ReadProcessMemory(Handle, remoteBuffer, localBuffer, size);
         }
 
-        public IntPtr ReadProcessMemory(IntPtr baseAddress, IntPtr buffer, uint size)
+        public IntPtr ReadProcessMemory(IntPtr remoteBuffer, IntPtr localBuffer, uint size)
         {
-            return ReadProcessMemory(baseAddress, buffer, (IntPtr) size);
+            return ReadProcessMemory(remoteBuffer, localBuffer, (IntPtr) size);
         }
                 
-        public TStruct ReadProcessMemory<TStruct>(IntPtr baseAddress)
+        public TStruct ReadProcessMemory<TStruct>(IntPtr remoteBuffer)
             where TStruct : class, new()
         {
-            var query = VirtualQueryEx(baseAddress);
-            using (var buffer = new NativeBuffer<TStruct>(query.RegionSize))
+            var query = VirtualQueryEx(remoteBuffer);
+            using (var localBuffer = new NativeBuffer<TStruct>(query.RegionSize))
             {
-                ReadProcessMemory(baseAddress, buffer, (uint) buffer.Size);
-                buffer.Rebase(baseAddress, buffer.Buffer);
-                return NativeBuffer<TStruct>.PtrToStructure<TStruct>(buffer);
+                ReadProcessMemory(remoteBuffer, localBuffer, (uint)localBuffer.Size);
+                localBuffer.Rebase(remoteBuffer, localBuffer.Buffer);
+                return NativeBuffer<TStruct>.PtrToStructure<TStruct>(localBuffer);
             }
         }
         
-        public IntPtr WriteProcessMemory(IntPtr baseAddress, IntPtr buffer, IntPtr size)
+        public IntPtr WriteProcessMemory(IntPtr remoteBuffer, IntPtr localBuffer, IntPtr size)
         {
-            return WriteProcessMemory(Handle, baseAddress, buffer, size);
+            return WriteProcessMemory(Handle, remoteBuffer, localBuffer, size);
         }
 
-        public IntPtr WriteProcessMemory(IntPtr baseAddress, IntPtr buffer, uint size)
+        public IntPtr WriteProcessMemory(IntPtr remoteBuffer, IntPtr localBuffer, uint size)
         {
-            return WriteProcessMemory(baseAddress, buffer, (IntPtr) size);
+            return WriteProcessMemory(remoteBuffer, localBuffer, (IntPtr) size);
         }
                
         public IntPtr WriteProcessMemory<TStruct>(TStruct structure)
             where TStruct : class
         {
-            using (var buffer = new NativeBuffer<TStruct>(structure))
+            using (var localBuffer = new NativeBuffer<TStruct>(structure))
             {
-                var baseAddress = VirtualAllocEx(buffer.Size, MemAllocations.Commit, MemProtections.ReadWrite);
-                buffer.Rebase(buffer, baseAddress);
-                WriteProcessMemory(baseAddress, buffer, (uint) buffer.Size);
+                var remoteBuffer = VirtualAllocEx(localBuffer.Size, MemAllocations.Commit, MemProtections.ReadWrite);
+                localBuffer.Rebase(localBuffer, remoteBuffer);
+                WriteProcessMemory(remoteBuffer, localBuffer, (uint) localBuffer.Size);
                 
-                return baseAddress;
+                return remoteBuffer;
             }
         }
 
-        public MemProtections VirtualProtectEx(IntPtr address, IntPtr size, MemProtections protection)
+        public MemProtections VirtualProtectEx(IntPtr remoteBuffer, IntPtr size, MemProtections protection)
         {
-            return VirtualProtectEx(Handle, address, size, protection);
+            return VirtualProtectEx(Handle, remoteBuffer, size, protection);
         }
 
-        public MemProtections VirtualProtectEx(IntPtr address, MemProtections protection)
+        public MemProtections VirtualProtectEx(IntPtr remoteBuffer, MemProtections protection)
         {
-            var query = VirtualQueryEx(address);    
-            return VirtualProtectEx(Handle, address, query.RegionSize, protection);
+            var query = VirtualQueryEx(remoteBuffer);    
+            return VirtualProtectEx(remoteBuffer, query.RegionSize, protection);
         }
 
-        public void VirtualFreeEx(IntPtr address, MemFreeType freeType = MemFreeType.Release, IntPtr size = default)
+        public void VirtualFreeEx(IntPtr remoteBuffer, MemFreeType freeType = MemFreeType.Release, IntPtr size = default)
         {
-            var result = VirtualFreeEx(Handle, address, size, freeType);
+            var result = VirtualFreeEx(Handle, remoteBuffer, size, freeType);
             if (!result)
             {
                 throw new Win32Exception();
