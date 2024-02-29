@@ -94,7 +94,7 @@ namespace Tewls.Windows.Kernel
             }
         }
 
-        public static int ToBuffer(object @object, IntPtr buffer, int offset = 0)
+        public static int CopyToBuffer(object @object, IntPtr buffer, int offset = 0)
         {
             // Copy marshalled structure to our own buffer
             using (var temp = new HGlobalBuffer<object>(@object))
@@ -136,7 +136,7 @@ namespace Tewls.Windows.Kernel
                 else
                 {
                     // Recursive
-                    fieldSize = ToBuffer(@object, buffer, offset);
+                    fieldSize = CopyToBuffer(@object, buffer, offset);
                     destination = IntPtr.Add(buffer, offset);
                 }
 
@@ -154,13 +154,13 @@ namespace Tewls.Windows.Kernel
     public class NativeBuffer<TStruct> : BufferBase<HGlobalBuffer.Allocator>
         where TStruct: class
     {                              
-        private int ToBuffer(TStruct structure)
+        private int AllocAndCopyToBuffer(TStruct structure)
         {
             Size = (IntPtr) NativeBuffer.GetObjectSize(structure);
             Buffer = Marshal.AllocHGlobal(Size);
 
             // Build buffer
-            return NativeBuffer.ToBuffer(structure, Buffer);
+            return NativeBuffer.CopyToBuffer(structure, Buffer);
         }
 
         public void Rebase(IntPtr from, IntPtr to)
@@ -174,7 +174,7 @@ namespace Tewls.Windows.Kernel
 
         public NativeBuffer(TStruct structure) 
         {
-            ToBuffer(structure);
+            AllocAndCopyToBuffer(structure);
         }
     }
 }
