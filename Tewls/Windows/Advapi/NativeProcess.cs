@@ -2,7 +2,6 @@
 using System.ComponentModel;
 using System.Runtime.InteropServices;
 using Tewls.Windows.Kernel;
-using Tewls.Windows.Utils;
 
 namespace Tewls.Windows.Advapi
 {
@@ -74,7 +73,7 @@ namespace Tewls.Windows.Advapi
                 throw new Win32Exception();
             }
             return previous;
-        }
+        }      
 
         public static UIntPtr VirtualQueryEx(IntPtr process, IntPtr address, MemoryBasicInformation buffer)
         {
@@ -169,6 +168,12 @@ namespace Tewls.Windows.Advapi
         public MemProtections VirtualProtectEx(IntPtr address, IntPtr size, MemProtections protection)
         {
             return VirtualProtectEx(Handle, address, size, protection);
+        }
+
+        public MemProtections VirtualProtectEx(IntPtr address, MemProtections protection)
+        {
+            var query = VirtualQueryEx(address);    
+            return VirtualProtectEx(Handle, address, query.RegionSize, protection);
         }
 
         public void VirtualFreeEx(IntPtr address, MemFreeType freeType = MemFreeType.Release, IntPtr size = default)
