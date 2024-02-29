@@ -1,9 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Runtime.InteropServices;
-using Tewls.Windows.Advapi;
-using Tewls.Windows.Kernel;
 
 namespace Tewls.Windows.Utils
 {
