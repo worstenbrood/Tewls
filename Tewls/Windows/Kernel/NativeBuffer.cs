@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Drawing;
 using System.Reflection;
 using System.Runtime.InteropServices;
 using Tewls.Windows.Utils;
@@ -66,8 +65,12 @@ namespace Tewls.Windows.Kernel
 
                 // Offset of field in Buffer
                 var fieldOffset = Marshal.OffsetOf(type, field.Name);
+
+                // Pointer to reference in buffer
+                var fieldPtr = IntPtr.Add(buffer, fieldOffset.ToInt32());
+
                 // Pointer to ref type
-                var ptr = Marshal.ReadIntPtr(IntPtr.Add(buffer, fieldOffset.ToInt32()));
+                var ptr = Marshal.ReadIntPtr(fieldPtr);
 
                 // null
                 if (ptr == IntPtr.Zero)
@@ -82,7 +85,7 @@ namespace Tewls.Windows.Kernel
                 var destination = IntPtr.Add(to, offset);
 
                 // Write new value
-                Marshal.WriteIntPtr(IntPtr.Add(buffer, fieldOffset.ToInt32()), destination);
+                Marshal.WriteIntPtr(fieldPtr, destination);
 
                 if (field.FieldType != typeof(string))
                 {
