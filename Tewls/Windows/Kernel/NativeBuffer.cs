@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Reflection;
 using System.Runtime.InteropServices;
 using Tewls.Windows.Utils;
 
@@ -17,12 +18,14 @@ namespace Tewls.Windows.Kernel
             return lstrcpyn(lpString1, lpString2, lpString2.Length + 1);
         }
 
+        private static readonly Cache<Type, FieldInfo[]> FieldCache = new Cache<Type, FieldInfo[]>(t => t.GetFields());
+
         public static int GetObjectSize(object @object)
         {
             var type = @object.GetType();
             var size = Marshal.SizeOf(type);
 
-            foreach (var field in type.GetFields())
+            foreach (var field in FieldCache[type])
             {
                 // Ref types, value types are included in Marshal.SizeOf
                 if (field.FieldType.IsValueType)
@@ -54,7 +57,7 @@ namespace Tewls.Windows.Kernel
 
         public static void Rebase(Type type, IntPtr buffer, IntPtr from, IntPtr to)
         {
-            foreach (var field in type.GetFields())
+            foreach (var field in FieldCache[type])
             {
                 // Ref types
                 if (field.FieldType.IsValueType)
@@ -107,7 +110,7 @@ namespace Tewls.Windows.Kernel
 
             var type = @object.GetType();
 
-            foreach (var field in type.GetFields())
+            foreach (var field in FieldCache[type])
             {
                 // Ref types
                 if (field.FieldType.IsValueType)
