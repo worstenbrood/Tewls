@@ -28,7 +28,10 @@ namespace Tewls.Windows.Advapi
 
         [DllImport("kernel32.dll", CharSet = CharSet.Auto, SetLastError = true)]
         public static extern bool VirtualFreeEx(IntPtr hProcess, IntPtr lpAddress, IntPtr dwSize, MemFreeType dwFreeType);
-        
+
+        [DllImport("kernel32.dll", CharSet = CharSet.Auto, SetLastError = true)]
+        private static extern IntPtr CreateRemoteThread(IntPtr hProcess, ref SecurityAttributes lpThreadAttributes, IntPtr dwStackSize, IntPtr lpStartAddress, IntPtr lpParameter, CreationFlags dwCreationFlags, ref uint lpThreadId);
+
         // Static
 
         public static IntPtr OpenProcessToken(IntPtr processHandle, TokenAccess desiredAccess)
@@ -83,6 +86,20 @@ namespace Tewls.Windows.Advapi
             {
                 throw new Win32Exception();
             }
+            return result;
+        }
+
+        public static IntPtr CreateRemoteThread(IntPtr process, IntPtr stackSize, IntPtr startAddress, IntPtr parameter, CreationFlags creationFlags)
+        {
+            var securityAttributes = new SecurityAttributes { InheritHandle = true };
+            uint threadId = 0;
+
+            var result = CreateRemoteThread(process, ref securityAttributes, stackSize, startAddress, parameter, creationFlags, ref threadId);
+            if (result == IntPtr.Zero)
+            {
+                throw new Win32Exception();
+            }
+
             return result;
         }
 

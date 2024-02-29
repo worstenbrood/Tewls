@@ -259,4 +259,11 @@ namespace Tewls.Windows.Advapi
         PreserverPlaceHolder = 0x00000002
     }
 
+    [Flags]
+    public enum CreationFlags : uint
+    {
+        None = 0,
+        Suspended = 4,
+        StackSizeParamIsAReservation = 0x00010000
+    }
 }
