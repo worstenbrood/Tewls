@@ -24,6 +24,10 @@ namespace Tewls.Windows.Kernel
         private bool _disposed = false;
         public IntPtr Handle;
 
+        protected NativeHandle() 
+        { 
+        }
+
         public NativeHandle(IntPtr handle, bool dispose = true)
         {
             Handle = handle;

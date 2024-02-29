@@ -1,5 +1,6 @@
 ﻿using System;
 using System.ComponentModel;
+using System.Diagnostics;
 using System.Runtime.InteropServices;
 using Tewls.Windows.Kernel;
 
@@ -86,6 +87,17 @@ namespace Tewls.Windows.Advapi
         }
 
         // Class
+
+        public NativeProcess(string name)
+        {
+            var processes = Process.GetProcessesByName(name);
+            if (processes.Length == 0)
+            { 
+                throw new Exception();
+            }
+
+            Handle = processes[0].Handle;
+        }
 
         public NativeProcess(IntPtr processHandle, bool dispose = false) : base(processHandle, dispose)
         { 
