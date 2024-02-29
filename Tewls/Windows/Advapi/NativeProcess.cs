@@ -30,7 +30,7 @@ namespace Tewls.Windows.Advapi
         public static extern bool VirtualFreeEx(IntPtr hProcess, IntPtr lpAddress, IntPtr dwSize, MemFreeType dwFreeType);
 
         [DllImport("kernel32.dll", CharSet = CharSet.Auto, SetLastError = true)]
-        private static extern IntPtr CreateRemoteThread(IntPtr hProcess, ref SecurityAttributes lpThreadAttributes, IntPtr dwStackSize, IntPtr lpStartAddress, IntPtr lpParameter, CreationFlags dwCreationFlags, ref uint lpThreadId);
+        private static extern IntPtr CreateRemoteThread(IntPtr hProcess, SecurityAttributes lpThreadAttributes, IntPtr dwStackSize, IntPtr lpStartAddress, IntPtr lpParameter, CreationFlags dwCreationFlags, ref uint lpThreadId);
 
         // Static
 
@@ -77,11 +77,11 @@ namespace Tewls.Windows.Advapi
                 throw new Win32Exception();
             }
             return previous;
-        }      
+        }
 
         public static UIntPtr VirtualQueryEx(IntPtr process, IntPtr address, MemoryBasicInformation buffer)
         {
-            var result = VirtualQueryEx(process, address, buffer, (IntPtr) Marshal.SizeOf(buffer));
+            var result = VirtualQueryEx(process, address, buffer, (IntPtr)Marshal.SizeOf(buffer));
             if (result == UIntPtr.Zero)
             {
                 throw new Win32Exception();
@@ -89,12 +89,12 @@ namespace Tewls.Windows.Advapi
             return result;
         }
 
-        public static IntPtr CreateRemoteThread(IntPtr process, IntPtr stackSize, IntPtr startAddress, IntPtr parameter, CreationFlags creationFlags)
+        public static IntPtr CreateRemoteThread(IntPtr process, IntPtr stackSize, IntPtr startAddress, IntPtr parameter, CreationFlags creationFlags = 0)
         {
             var securityAttributes = new SecurityAttributes { InheritHandle = true };
             uint threadId = 0;
 
-            var result = CreateRemoteThread(process, ref securityAttributes, stackSize, startAddress, parameter, creationFlags, ref threadId);
+            var result = CreateRemoteThread(process, securityAttributes, stackSize, startAddress, parameter, creationFlags, ref threadId);
             if (result == IntPtr.Zero)
             {
                 throw new Win32Exception();
@@ -109,18 +109,18 @@ namespace Tewls.Windows.Advapi
         {
             var processes = Process.GetProcessesByName(name);
             if (processes.Length == 0)
-            { 
+            {
                 throw new Exception($"Process {name} not found.");
             }
 
             Handle = processes[0].Handle;
-            
+
             // Handle will be closed by the runtime
             Disposed = true;
         }
 
         public NativeProcess(IntPtr processHandle, bool dispose = false) : base(processHandle, dispose)
-        { 
+        {
         }
 
         public NativeToken OpenProcessToken(TokenAccess desiredAccess)
@@ -141,7 +141,7 @@ namespace Tewls.Windows.Advapi
 
         public IntPtr VirtualAllocEx(uint size, MemAllocations allocationType, MemProtections protect, IntPtr address = default)
         {
-            return VirtualAllocEx((IntPtr) size, allocationType, protect, address);
+            return VirtualAllocEx((IntPtr)size, allocationType, protect, address);
         }
 
         public MemoryBasicInformation VirtualQueryEx(IntPtr remoteBuffer)
@@ -158,9 +158,9 @@ namespace Tewls.Windows.Advapi
 
         public IntPtr ReadProcessMemory(IntPtr remoteBuffer, IntPtr localBuffer, uint size)
         {
-            return ReadProcessMemory(remoteBuffer, localBuffer, (IntPtr) size);
+            return ReadProcessMemory(remoteBuffer, localBuffer, (IntPtr)size);
         }
-                
+
         public TStruct ReadProcessMemory<TStruct>(IntPtr remoteBuffer)
             where TStruct : class, new()
         {
@@ -172,7 +172,7 @@ namespace Tewls.Windows.Advapi
                 return NativeBuffer<TStruct>.PtrToStructure<TStruct>(localBuffer);
             }
         }
-        
+
         public IntPtr WriteProcessMemory(IntPtr remoteBuffer, IntPtr localBuffer, IntPtr size)
         {
             return WriteProcessMemory(Handle, remoteBuffer, localBuffer, size);
@@ -180,9 +180,9 @@ namespace Tewls.Windows.Advapi
 
         public IntPtr WriteProcessMemory(IntPtr remoteBuffer, IntPtr localBuffer, uint size)
         {
-            return WriteProcessMemory(remoteBuffer, localBuffer, (IntPtr) size);
+            return WriteProcessMemory(remoteBuffer, localBuffer, (IntPtr)size);
         }
-               
+
         public IntPtr WriteProcessMemory<TStruct>(TStruct structure)
             where TStruct : class
         {
@@ -190,8 +190,8 @@ namespace Tewls.Windows.Advapi
             {
                 var remoteBuffer = VirtualAllocEx(localBuffer.Size, MemAllocations.Commit, MemProtections.ReadWrite);
                 localBuffer.Rebase(localBuffer, remoteBuffer);
-                WriteProcessMemory(remoteBuffer, localBuffer, (uint) localBuffer.Size);
-                
+                WriteProcessMemory(remoteBuffer, localBuffer, (uint)localBuffer.Size);
+
                 return remoteBuffer;
             }
         }
@@ -203,7 +203,7 @@ namespace Tewls.Windows.Advapi
 
         public MemProtections VirtualProtectEx(IntPtr remoteBuffer, MemProtections protection)
         {
-            var query = VirtualQueryEx(remoteBuffer);    
+            var query = VirtualQueryEx(remoteBuffer);
             return VirtualProtectEx(remoteBuffer, query.RegionSize, protection);
         }
 
@@ -214,6 +214,11 @@ namespace Tewls.Windows.Advapi
             {
                 throw new Win32Exception();
             }
+        }
+
+        public NativeToken CreateRemoteThread(IntPtr stackSize, IntPtr startAddress, IntPtr parameter)
+        {
+            return new NativeToken(CreateRemoteThread(Handle, stackSize, startAddress, parameter));
         }
     }
 }
