@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Drawing;
-using System.Reflection;
 using System.Runtime.InteropServices;
 using Tewls.Windows.Utils;
 
@@ -104,7 +102,8 @@ namespace Tewls.Windows.Kernel
                 CopyMemory(buffer + offset, temp, temp.Size);
             }
 
-            offset = Marshal.SizeOf(@object);
+            // Calculate offset
+            offset += Marshal.SizeOf(@object);
 
             var type = @object.GetType();
 
