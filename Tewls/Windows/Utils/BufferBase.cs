@@ -125,20 +125,26 @@ namespace Tewls.Windows.Utils
     {
         public override void Free()
         {
-            Marshal.DestroyStructure(Buffer, typeof(TStruct));
+            if (typeof(TStruct).IsLayoutSequential)
+            {
+                Marshal.DestroyStructure(Buffer, typeof(TStruct));
+            }
             base.Free();
         }
 
         public override void ReAlloc(IntPtr size)
         {
-            Marshal.DestroyStructure(Buffer, typeof(TStruct));
+            if (typeof(TStruct).IsLayoutSequential)
+            {
+                Marshal.DestroyStructure(Buffer, typeof(TStruct));
+            }
             base.ReAlloc(size);
         }
 
         protected BufferBase() 
         {
         }
-
+                
         protected BufferBase(TStruct s) : base((IntPtr) Marshal.SizeOf(s))
         {
             Marshal.StructureToPtr(s, Buffer, false);

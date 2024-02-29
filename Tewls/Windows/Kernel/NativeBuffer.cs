@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Drawing;
 using System.Reflection;
 using System.Runtime.InteropServices;
 using Tewls.Windows.Utils;
@@ -94,6 +95,57 @@ namespace Tewls.Windows.Kernel
                 }
             }
         }
+
+        public static int ToBuffer(object @object, IntPtr buffer, int offset = 0)
+        {
+            // Copy marshalled structure to our own buffer
+            using (var temp = new HGlobalBuffer<object>(@object))
+            {
+                CopyMemory(buffer + offset, temp, temp.Size);
+            }
+
+            offset = Marshal.SizeOf(@object);
+
+            var type = @object.GetType();
+
+            foreach (var field in type.GetFields())
+            {
+                // Ref types
+                if (field.FieldType.IsValueType)
+                {
+                    continue;
+                }
+
+                var value = field.GetValue(@object);
+                if (value == null)
+                {
+                    continue;
+                }
+
+                if (field.FieldType == typeof(string))
+                {
+                    var @string = (string)value;
+                    var fieldSize = (@string.Length + 1) * sizeof(char);
+
+                    // Copy string to buffer
+                    var destination = buffer + offset;
+                    destination = lstrcpyn(destination, @string);
+
+                    // Update pointer
+                    var fieldOffset = Marshal.OffsetOf(type, field.Name);
+                    Marshal.WriteIntPtr(buffer + (int)fieldOffset, destination);
+
+                    offset += fieldSize;
+                }
+                else
+                {
+                    // Recursive
+                    offset += ToBuffer(@object, buffer, offset);
+                }
+            }
+
+            return offset;
+        }
     }
 
     public class NativeBuffer<TStruct> : BufferBase<HGlobalBuffer.Allocator>
@@ -116,58 +168,14 @@ namespace Tewls.Windows.Kernel
                 return Marshal.ReAllocHGlobal(buffer, size);
             }
         }
-
-        private static readonly Type Type = typeof(TStruct);
-        private static readonly FieldInfo[] Fields = Type.GetFields();
-               
-        public void ToBuffer(TStruct structure)
+                               
+        private int ToBuffer(TStruct structure)
         {
-            // TODO: make it recursive
-            var offset = Marshal.SizeOf(structure);
-
             Size = (IntPtr) NativeBuffer.GetObjectSize(structure);
             Buffer = Marshal.AllocHGlobal(Size);
 
-            // Copy marshalled structure to our own buffer
-            using (var temp = new HGlobalBuffer<TStruct>(structure))
-            {
-                NativeBuffer.CopyMemory(Buffer, temp, temp.Size);
-            }
-
-            foreach (var field in Fields)
-            {
-                // Ref types
-                if (field.FieldType.IsValueType)
-                {
-                    continue;
-                }
-
-                var value = field.GetValue(structure);
-                if (value == null)
-                {
-                    continue;
-                }
-
-                if (field.FieldType == typeof(string))
-                {
-                    var @string = (string) value;                                       
-                    var fieldSize = (@string.Length + 1) * sizeof(char);
-                    
-                    // Copy string to buffer
-                    var destination = Buffer + offset;
-                    destination = NativeBuffer.lstrcpyn(destination, @string);
-
-                    // Update pointer
-                    var fieldOffset = Marshal.OffsetOf(Type, field.Name);
-                    Marshal.WriteIntPtr(Buffer + (int)fieldOffset, destination);
-
-                    offset += fieldSize;
-                }
-                else
-                {
-
-                }
-            }
+            // Build buffer
+            return NativeBuffer.ToBuffer(structure, Buffer);
         }
 
         public void Rebase(IntPtr from, IntPtr to)
