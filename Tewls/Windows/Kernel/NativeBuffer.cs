@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Runtime.InteropServices;
+using System.Security.Cryptography;
 using Tewls.Windows.Utils;
 
 namespace Tewls.Windows.Kernel
@@ -8,6 +9,9 @@ namespace Tewls.Windows.Kernel
     {
         [DllImport("kernel32.dll", CharSet = CharSet.Auto, SetLastError = true)]
         public static extern IntPtr lstrcpyn(IntPtr lpString1, string lpString2, int iMaxLength);
+
+        [DllImport("kernel32.dll", CharSet = CharSet.Auto, SetLastError = true)]
+        public static extern void CopyMemory(IntPtr Destination, IntPtr Source, IntPtr Length);
 
         public static IntPtr lstrcpyn(IntPtr lpString1, string lpString2)
         {
@@ -39,8 +43,16 @@ namespace Tewls.Windows.Kernel
         public void ToBuffer(TStruct structure)
         {
             var classType = typeof(TStruct);
-            var size = Marshal.SizeOf(structure);
-            Marshal.StructureToPtr(structure, Buffer, false);
+            var offset = Marshal.SizeOf(structure);
+
+            Size = (IntPtr) GetSize(structure);
+            Buffer = Marshal.AllocHGlobal(Size);
+
+            // Copy marshalled structure to our own buffer
+            using (var temp = new HGlobalBuffer<TStruct>(structure))
+            {
+                NativeBuffer.CopyMemory(Buffer, temp, temp.Size);
+            }
 
             foreach (var field in classType.GetFields())
             {
@@ -59,19 +71,17 @@ namespace Tewls.Windows.Kernel
                     }
 
                     var fieldSize = (value.Length + 1) * sizeof(char);
-                    Buffer = Marshal.ReAllocHGlobal(Buffer, (IntPtr)size + fieldSize);
-                    var destination = Buffer + size;
-                    var r = NativeBuffer.lstrcpyn(destination, value);
+                    var destination = Buffer + offset;
+                    destination = NativeBuffer.lstrcpyn(destination, value);
                     var fieldOffset = Marshal.OffsetOf(classType, field.Name);
-                    Marshal.WriteIntPtr(Buffer + (int)fieldOffset, r);
+                    Marshal.WriteIntPtr(Buffer + (int)fieldOffset, destination);
 
-                    // Increase size                    
-                    size += fieldSize;
+                    offset += fieldSize;
                 }
             }
         }
 
-        public void Rebase(IntPtr baseAddress)
+        public void Rebase(IntPtr from, IntPtr to)
         {
             var classType = typeof(TStruct);
 
@@ -93,8 +103,13 @@ namespace Tewls.Windows.Kernel
                     continue;
                 }
 
-                var offset = (int)(value.ToInt64() - Buffer.ToInt64());
-                var destination = IntPtr.Add(baseAddress, offset);
+                // Calculate offset of pointer in the buffer
+                var offset = (int) (value.ToInt64() - from.ToInt64());
+
+                // Rebase
+                var destination = IntPtr.Add(to, offset);
+
+                // Write new value
                 Marshal.WriteIntPtr(IntPtr.Add(Buffer, fieldOffset.ToInt32()), destination);
             }
         }
@@ -126,8 +141,6 @@ namespace Tewls.Windows.Kernel
 
             return size;
         }
-
-
 
         public NativeBuffer(IntPtr size) : base(size)
         {

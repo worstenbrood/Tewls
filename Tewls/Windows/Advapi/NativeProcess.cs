@@ -122,7 +122,7 @@ namespace Tewls.Windows.Advapi
             using (var buffer = new NativeBuffer<TStruct>(query.RegionSize))
             {
                 ReadProcessMemory(baseAddress, buffer, (uint) buffer.Size);
-                buffer.Rebase(buffer.Buffer);
+                buffer.Rebase(baseAddress, buffer.Buffer);
                 return NativeBuffer<TStruct>.PtrToStructure<TStruct>(buffer);
             }
         }
@@ -144,7 +144,7 @@ namespace Tewls.Windows.Advapi
             using (var buffer = new NativeBuffer<TStruct>(structure))
             {
                 var baseAddress = VirtualAllocEx(buffer.Size, AllocationTypes.Commit, Pages.ReadWrite);
-                buffer.Rebase(baseAddress);
+                buffer.Rebase(buffer, baseAddress);
                 WriteProcessMemory(baseAddress, buffer, (uint) buffer.Size);
                 
                 return baseAddress;
