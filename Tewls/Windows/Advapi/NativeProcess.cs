@@ -18,14 +18,17 @@ namespace Tewls.Windows.Advapi
         private static extern bool WriteProcessMemory(IntPtr hProcess, IntPtr lpBaseAddress, IntPtr lpBuffer, IntPtr nSize, ref IntPtr lpNumberOfBytesWritten);
 
         [DllImport("kernel32.dll", CharSet = CharSet.Auto, SetLastError = true)]
-        public static extern IntPtr VirtualAllocEx(IntPtr hProcess, IntPtr lpAddress, IntPtr dwSize, AllocationTypes flAllocationType, Pages flProtect);
+        public static extern IntPtr VirtualAllocEx(IntPtr hProcess, IntPtr lpAddress, IntPtr dwSize, MemAllocations flAllocationType, MemProtections flProtect);
 
         [DllImport("kernel32.dll", CharSet = CharSet.Auto, SetLastError = true)]
         private static extern UIntPtr VirtualQueryEx(IntPtr hProcess, IntPtr lpAddress, MemoryBasicInformation lpBuffer, IntPtr dwLength);
 
         [DllImport("kernel32.dll", CharSet = CharSet.Auto, SetLastError = true)]
-        public static extern bool VirtualFreeEx(IntPtr hProcess, IntPtr lpAddress, IntPtr dwSize, MemFreeType dwFreeType);
+        private static extern bool VirtualProtectEx(IntPtr hProcess, IntPtr lpAddress, IntPtr dwSize, MemProtections flNewProtect, ref MemProtections lpflOldProtect);
 
+        [DllImport("kernel32.dll", CharSet = CharSet.Auto, SetLastError = true)]
+        public static extern bool VirtualFreeEx(IntPtr hProcess, IntPtr lpAddress, IntPtr dwSize, MemFreeType dwFreeType);
+        
         // Static
 
         public static IntPtr OpenProcessToken(IntPtr processHandle, TokenAccess desiredAccess)
@@ -61,6 +64,18 @@ namespace Tewls.Windows.Advapi
             return bytesRead;
         }
 
+        public static MemProtections VirtualProtectEx(IntPtr process, IntPtr address, IntPtr size, MemProtections protection)
+        {
+            MemProtections previous = 0;
+
+            var result = VirtualProtectEx(process, address, size, protection, ref previous);
+            if (!result)
+            {
+                throw new Win32Exception();
+            }
+            return previous;
+        }
+
         public static UIntPtr VirtualQueryEx(IntPtr process, IntPtr address, MemoryBasicInformation buffer)
         {
             var result = VirtualQueryEx(process, address, buffer, (IntPtr) Marshal.SizeOf(buffer));
@@ -82,7 +97,7 @@ namespace Tewls.Windows.Advapi
             return new NativeToken(OpenProcessToken(Handle, desiredAccess));
         }
 
-        public IntPtr VirtualAllocEx(IntPtr size, AllocationTypes allocationType, Pages protect, IntPtr address = default)
+        public IntPtr VirtualAllocEx(IntPtr size, MemAllocations allocationType, MemProtections protect, IntPtr address = default)
         {
             var result = VirtualAllocEx(Handle, address, size, allocationType, protect);
             if (result == IntPtr.Zero)
@@ -93,7 +108,7 @@ namespace Tewls.Windows.Advapi
             return result;
         }
 
-        public IntPtr VirtualAllocEx(uint size, AllocationTypes allocationType, Pages protect, IntPtr address = default)
+        public IntPtr VirtualAllocEx(uint size, MemAllocations allocationType, MemProtections protect, IntPtr address = default)
         {
             return VirtualAllocEx((IntPtr) size, allocationType, protect, address);
         }
@@ -143,12 +158,17 @@ namespace Tewls.Windows.Advapi
         {
             using (var buffer = new NativeBuffer<TStruct>(structure))
             {
-                var baseAddress = VirtualAllocEx(buffer.Size, AllocationTypes.Commit, Pages.ReadWrite);
+                var baseAddress = VirtualAllocEx(buffer.Size, MemAllocations.Commit, MemProtections.ReadWrite);
                 buffer.Rebase(buffer, baseAddress);
                 WriteProcessMemory(baseAddress, buffer, (uint) buffer.Size);
                 
                 return baseAddress;
             }
+        }
+
+        public MemProtections VirtualProtectEx(IntPtr address, IntPtr size, MemProtections protection)
+        {
+            return VirtualProtectEx(Handle, address, size, protection);
         }
 
         public void VirtualFreeEx(IntPtr address, MemFreeType freeType = MemFreeType.Release, IntPtr size = default)

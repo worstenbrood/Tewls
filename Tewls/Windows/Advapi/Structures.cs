@@ -199,7 +199,7 @@ namespace Tewls.Windows.Advapi
     };
 
     [Flags]
-    public enum AllocationTypes : uint
+    public enum MemAllocations : uint
     {
         None = 0,
         Commit = 0x00001000,
@@ -213,7 +213,7 @@ namespace Tewls.Windows.Advapi
     }
 
     [Flags]
-    public enum Pages : uint
+    public enum MemProtections : uint
     {
         NoAccess = 0x1,
         ReadOnly = 0x2,
@@ -243,11 +243,11 @@ namespace Tewls.Windows.Advapi
     {
         public IntPtr BaseAddress;
         public IntPtr AllocationBase;
-        public Pages AllocationProtect;
+        public MemProtections AllocationProtect;
         public short PartitionId;
         public IntPtr RegionSize;
-        public AllocationTypes State;
-        public AllocationTypes Protect;
+        public MemAllocations State;
+        public MemAllocations Protect;
         public MemType Type;
     };
 
