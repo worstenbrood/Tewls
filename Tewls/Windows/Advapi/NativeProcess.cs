@@ -93,7 +93,7 @@ namespace Tewls.Windows.Advapi
             var processes = Process.GetProcessesByName(name);
             if (processes.Length == 0)
             { 
-                throw new Exception();
+                throw new Exception($"Process {name} not found.");
             }
 
             Handle = processes[0].Handle;
@@ -163,7 +163,6 @@ namespace Tewls.Windows.Advapi
             return WriteProcessMemory(baseAddress, buffer, (IntPtr) size);
         }
                
-
         public IntPtr WriteProcessMemory<TStruct>(TStruct structure)
             where TStruct : class
         {
