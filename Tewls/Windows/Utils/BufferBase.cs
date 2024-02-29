@@ -1,6 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Runtime.InteropServices;
+using Tewls.Windows.Advapi;
+using Tewls.Windows.Kernel;
 
 namespace Tewls.Windows.Utils
 {
@@ -90,7 +93,9 @@ namespace Tewls.Windows.Utils
                 Marshal.PtrToStructure(Buffer + (Marshal.SizeOf(typeof(TStruct)) * i), structure);
                 yield return structure;
             }
-        }     
+        }
+
+        
 
         public void Dispose()
         {

@@ -3,7 +3,6 @@ using System.ComponentModel;
 using System.Runtime.InteropServices;
 using Tewls.Windows.Kernel;
 using Tewls.Windows.Utils;
-using System.Reflection;
 
 namespace Tewls.Windows.Advapi
 {
@@ -115,21 +114,19 @@ namespace Tewls.Windows.Advapi
         {
             return ReadProcessMemory(baseAddress, buffer, (IntPtr) size);
         }
-
-        /*
+                
         public TStruct ReadProcessMemory<TStruct>(IntPtr baseAddress)
             where TStruct : class, new()
         {
             var query = VirtualQueryEx(baseAddress);
-
-            using (var buffer = new HGlobalBuffer<TStruct>(query.RegionSize))
+            using (var buffer = new NativeBuffer<TStruct>(query.RegionSize))
             {
                 ReadProcessMemory(baseAddress, buffer, (uint) buffer.Size);
-                return HGlobalBuffer.PtrToStructure<TStruct>(buffer);
+                buffer.Rebase(buffer.Buffer);
+                return NativeBuffer<TStruct>.PtrToStructure<TStruct>(buffer);
             }
         }
-        */
-
+        
         public IntPtr WriteProcessMemory(IntPtr baseAddress, IntPtr buffer, IntPtr size)
         {
             return WriteProcessMemory(Handle, baseAddress, buffer, size);
@@ -139,40 +136,20 @@ namespace Tewls.Windows.Advapi
         {
             return WriteProcessMemory(baseAddress, buffer, (IntPtr) size);
         }
+               
 
-        /*
-        public int GetSize<TStruct>(TStruct structure)
+        public IntPtr WriteProcessMemory<TStruct>(TStruct structure)
             where TStruct : class
         {
-            var size = 0;
-
-            foreach (var field in typeof(TStruct).GetFields(BindingFlags.Instance|BindingFlags.Public))
+            using (var buffer = new NativeBuffer<TStruct>(structure))
             {
-                if (field.FieldType == typeof(string))
-                {                  
-                }
-                else
-                {
-                    size += Marshal.SizeOf()
-                }
-            }
-
-            return 0;
-        }
-            
-
-
-        public IntPtr WriteProcessMemory<TStruct>(TStruct structure, IntPtr baseAddress)
-            where TStruct : class
-        {
-            var size = GetSize(structure);
-
-            using (var buffer = new HGlobalBuffer<TStruct>(structure))
-            {
+                var baseAddress = VirtualAllocEx(buffer.Size, AllocationTypes.Commit, Pages.ReadWrite);
+                buffer.Rebase(baseAddress);
+                WriteProcessMemory(baseAddress, buffer, (uint) buffer.Size);
                 
-                return WriteProcessMemory(baseAddress, buffer, (uint) buffer.Size);
+                return baseAddress;
             }
-        }*/
+        }
 
         public void VirtualFreeEx(IntPtr address, MemFreeType freeType = MemFreeType.Release, IntPtr size = default)
         {
