@@ -1,6 +1,6 @@
 ﻿using System;
+using System.Reflection;
 using System.Runtime.InteropServices;
-using System.Security.Cryptography;
 using Tewls.Windows.Utils;
 
 namespace Tewls.Windows.Kernel
@@ -40,9 +40,11 @@ namespace Tewls.Windows.Kernel
             }
         }
 
+        private static readonly Type Type = typeof(TStruct);
+        private static readonly FieldInfo[] Fields = Type.GetFields();
+
         public void ToBuffer(TStruct structure)
         {
-            var classType = typeof(TStruct);
             var offset = Marshal.SizeOf(structure);
 
             Size = (IntPtr) GetSize(structure);
@@ -54,7 +56,7 @@ namespace Tewls.Windows.Kernel
                 NativeBuffer.CopyMemory(Buffer, temp, temp.Size);
             }
 
-            foreach (var field in classType.GetFields())
+            foreach (var field in Fields)
             {
                 // Ref types
                 if (field.FieldType.IsValueType)
@@ -69,11 +71,11 @@ namespace Tewls.Windows.Kernel
                     {
                         continue;
                     }
-
+                                        
                     var fieldSize = (value.Length + 1) * sizeof(char);
                     var destination = Buffer + offset;
                     destination = NativeBuffer.lstrcpyn(destination, value);
-                    var fieldOffset = Marshal.OffsetOf(classType, field.Name);
+                    var fieldOffset = Marshal.OffsetOf(Type, field.Name);
                     Marshal.WriteIntPtr(Buffer + (int)fieldOffset, destination);
 
                     offset += fieldSize;
@@ -83,9 +85,7 @@ namespace Tewls.Windows.Kernel
 
         public void Rebase(IntPtr from, IntPtr to)
         {
-            var classType = typeof(TStruct);
-
-            foreach (var field in classType.GetFields())
+            foreach (var field in Fields)
             {
                 // Ref types
                 if (field.FieldType.IsValueType)
@@ -94,7 +94,7 @@ namespace Tewls.Windows.Kernel
                 }
 
                 // Offset of field in Buffer
-                var fieldOffset = Marshal.OffsetOf(classType, field.Name);
+                var fieldOffset = Marshal.OffsetOf(Type, field.Name);
                 // Pointer to ref type
                 var value = Marshal.ReadIntPtr(IntPtr.Add(Buffer, fieldOffset.ToInt32()));
 
@@ -116,10 +116,9 @@ namespace Tewls.Windows.Kernel
 
         public int GetSize(TStruct structure)
         {
-            var classType = typeof(TStruct);
-            var size = Marshal.SizeOf(classType);
+            var size = Marshal.SizeOf(Type);
 
-            foreach (var field in classType.GetFields())
+            foreach (var field in Fields)
             {
                 // Ref types
                 if (field.FieldType.IsValueType)
@@ -146,7 +145,7 @@ namespace Tewls.Windows.Kernel
         {
         }
 
-        public NativeBuffer(TStruct structure) : base ((IntPtr) Marshal.SizeOf(typeof(TStruct)))
+        public NativeBuffer(TStruct structure) 
         {
             ToBuffer(structure);
         }
