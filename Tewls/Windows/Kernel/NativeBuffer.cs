@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Drawing;
 using System.Reflection;
 using System.Runtime.InteropServices;
 using Tewls.Windows.Utils;
@@ -16,6 +17,79 @@ namespace Tewls.Windows.Kernel
         public static IntPtr lstrcpyn(IntPtr lpString1, string lpString2)
         {
             return lstrcpyn(lpString1, lpString2, lpString2.Length + 1);
+        }
+
+        public static int GetObjectSize(object @object)
+        {
+            var type = @object.GetType();
+            var size = Marshal.SizeOf(type);
+
+            foreach (var field in type.GetFields())
+            {
+                // Ref types, value types are included in Marshal.SizeOf
+                if (field.FieldType.IsValueType)
+                {
+                    continue;
+                }
+
+                // Check for null
+                var value = field.GetValue(@object);
+                if (value == null)
+                {
+                    continue;
+                }
+
+                if (field.FieldType == typeof(string))
+                {
+                    var @string = (string) value;
+                    size += (@string.Length + 1) * sizeof(char);
+                }
+                else
+                {
+                    // Recursive
+                    size += GetObjectSize(value);
+                }
+            }
+
+            return size;
+        }
+
+        public static void Rebase(Type type, IntPtr buffer, IntPtr from, IntPtr to)
+        {
+            foreach (var field in type.GetFields())
+            {
+                // Ref types
+                if (field.FieldType.IsValueType)
+                {
+                    continue;
+                }
+
+                // Offset of field in Buffer
+                var fieldOffset = Marshal.OffsetOf(type, field.Name);
+                // Pointer to ref type
+                var ptr = Marshal.ReadIntPtr(IntPtr.Add(buffer, fieldOffset.ToInt32()));
+
+                // null
+                if (ptr == IntPtr.Zero)
+                {
+                    continue;
+                }
+
+                // Calculate offset of pointer in the buffer
+                var offset = (int) (ptr.ToInt64() - from.ToInt64());
+
+                // Rebase
+                var destination = IntPtr.Add(to, offset);
+
+                // Write new value
+                Marshal.WriteIntPtr(IntPtr.Add(buffer, fieldOffset.ToInt32()), destination);
+
+                if (field.FieldType != typeof(string))
+                {
+                    // Recursive
+                    Rebase(field.FieldType, buffer + offset, from, to);
+                }
+            }
         }
     }
 
@@ -42,12 +116,13 @@ namespace Tewls.Windows.Kernel
 
         private static readonly Type Type = typeof(TStruct);
         private static readonly FieldInfo[] Fields = Type.GetFields();
-
+               
         public void ToBuffer(TStruct structure)
         {
+            // TODO: make it recursive
             var offset = Marshal.SizeOf(structure);
 
-            Size = (IntPtr) GetSize(structure);
+            Size = (IntPtr) NativeBuffer.GetObjectSize(structure);
             Buffer = Marshal.AllocHGlobal(Size);
 
             // Copy marshalled structure to our own buffer
@@ -64,82 +139,38 @@ namespace Tewls.Windows.Kernel
                     continue;
                 }
 
+                var value = field.GetValue(structure);
+                if (value == null)
+                {
+                    continue;
+                }
+
                 if (field.FieldType == typeof(string))
                 {
-                    var value = (string)field.GetValue(structure);
-                    if (value == null)
-                    {
-                        continue;
-                    }
-                                        
-                    var fieldSize = (value.Length + 1) * sizeof(char);
+                    var @string = (string) value;                                       
+                    var fieldSize = (@string.Length + 1) * sizeof(char);
+                    
+                    // Copy string to buffer
                     var destination = Buffer + offset;
-                    destination = NativeBuffer.lstrcpyn(destination, value);
+                    destination = NativeBuffer.lstrcpyn(destination, @string);
+
+                    // Update pointer
                     var fieldOffset = Marshal.OffsetOf(Type, field.Name);
                     Marshal.WriteIntPtr(Buffer + (int)fieldOffset, destination);
 
                     offset += fieldSize;
+                }
+                else
+                {
+
                 }
             }
         }
 
         public void Rebase(IntPtr from, IntPtr to)
         {
-            foreach (var field in Fields)
-            {
-                // Ref types
-                if (field.FieldType.IsValueType)
-                {
-                    continue;
-                }
-
-                // Offset of field in Buffer
-                var fieldOffset = Marshal.OffsetOf(Type, field.Name);
-                // Pointer to ref type
-                var value = Marshal.ReadIntPtr(IntPtr.Add(Buffer, fieldOffset.ToInt32()));
-
-                if (value == IntPtr.Zero)
-                {
-                    continue;
-                }
-
-                // Calculate offset of pointer in the buffer
-                var offset = (int) (value.ToInt64() - from.ToInt64());
-
-                // Rebase
-                var destination = IntPtr.Add(to, offset);
-
-                // Write new value
-                Marshal.WriteIntPtr(IntPtr.Add(Buffer, fieldOffset.ToInt32()), destination);
-            }
-        }
-
-        public int GetSize(TStruct structure)
-        {
-            var size = Marshal.SizeOf(Type);
-
-            foreach (var field in Fields)
-            {
-                // Ref types
-                if (field.FieldType.IsValueType)
-                {
-                    continue;
-                }
-
-                if (field.FieldType == typeof(string))
-                {
-                    var value = (string)field.GetValue(structure);
-                    if (value == null)
-                    {
-                        continue;
-                    }
-
-                    size += (value.Length + 1) * sizeof(char);
-                }
-            }
-
-            return size;
-        }
+            NativeBuffer.Rebase(typeof(TStruct), Buffer, from, to);
+        }      
 
         public NativeBuffer(IntPtr size) : base(size)
         {
