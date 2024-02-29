@@ -3,6 +3,7 @@ using System.ComponentModel;
 using System.Diagnostics;
 using System.Runtime.InteropServices;
 using Tewls.Windows.Kernel;
+using Tewls.Windows.Utils;
 
 namespace Tewls.Windows.Advapi
 {
@@ -191,6 +192,29 @@ namespace Tewls.Windows.Advapi
                 var remoteBuffer = VirtualAllocEx(localBuffer.Size, MemAllocations.Commit, MemProtections.ReadWrite);
                 localBuffer.Rebase(localBuffer, remoteBuffer);
                 WriteProcessMemory(remoteBuffer, localBuffer, (uint)localBuffer.Size);
+
+                return remoteBuffer;
+            }
+        }
+
+        public string ReadString(IntPtr remoteBuffer)
+        {
+            var query = VirtualQueryEx(remoteBuffer);
+            using (var localBuffer = new HGlobalBuffer(query.RegionSize))
+            {
+                ReadProcessMemory(remoteBuffer, localBuffer, (uint)localBuffer.Size);
+                return Marshal.PtrToStringAuto(localBuffer);
+            }
+        }
+
+        public IntPtr WriteString(string s)
+        {
+            var size = (s.Length + 1) * sizeof(char);
+            using (var localBuffer = new HGlobalBuffer((IntPtr) size))
+            {
+                NativeBuffer.lstrcpyn(localBuffer, s);
+                var remoteBuffer = VirtualAllocEx(localBuffer.Size, MemAllocations.Commit, MemProtections.ReadWrite);
+                WriteProcessMemory(remoteBuffer, localBuffer, localBuffer.Size);
 
                 return remoteBuffer;
             }
