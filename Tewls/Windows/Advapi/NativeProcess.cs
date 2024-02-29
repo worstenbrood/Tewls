@@ -97,6 +97,9 @@ namespace Tewls.Windows.Advapi
             }
 
             Handle = processes[0].Handle;
+            
+            // Handle will be closed by the runtime
+            Disposed = true;
         }
 
         public NativeProcess(IntPtr processHandle, bool dispose = false) : base(processHandle, dispose)

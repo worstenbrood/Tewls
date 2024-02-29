@@ -21,7 +21,7 @@ namespace Tewls.Windows.Kernel
             }
         }
 
-        private bool _disposed = false;
+        protected bool Disposed = false;
         public IntPtr Handle;
 
         protected NativeHandle() 
@@ -31,7 +31,7 @@ namespace Tewls.Windows.Kernel
         public NativeHandle(IntPtr handle, bool dispose = true)
         {
             Handle = handle;
-            _disposed = !dispose;
+            Disposed = !dispose;
         }
 
         public void Close()
@@ -47,12 +47,12 @@ namespace Tewls.Windows.Kernel
 
         private void Dispose(bool disposing)
         {
-            if (!_disposed)
+            if (!Disposed)
             {
                 Close();
             }
 
-            _disposed = true;
+            Disposed = true;
         }
 
         ~NativeHandle()
