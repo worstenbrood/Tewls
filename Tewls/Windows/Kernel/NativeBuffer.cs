@@ -121,26 +121,30 @@ namespace Tewls.Windows.Kernel
                     continue;
                 }
 
+                IntPtr destination = IntPtr.Zero;
+                int fieldSize = 0;
+
                 if (field.FieldType == typeof(string))
                 {
                     var @string = (string)value;
-                    var fieldSize = (@string.Length + 1) * sizeof(char);
+                    fieldSize = (@string.Length + 1) * sizeof(char);
 
                     // Copy string to buffer
-                    var destination = buffer + offset;
+                    destination = IntPtr.Add(buffer, offset);
                     destination = lstrcpyn(destination, @string);
-
-                    // Update pointer
-                    var fieldOffset = Marshal.OffsetOf(type, field.Name);
-                    Marshal.WriteIntPtr(buffer + (int)fieldOffset, destination);
-
-                    offset += fieldSize;
                 }
                 else
                 {
                     // Recursive
-                    offset += ToBuffer(@object, buffer, offset);
+                    fieldSize = ToBuffer(@object, buffer, offset);
+                    destination = IntPtr.Add(buffer, offset);
                 }
+
+                // Update pointer
+                var fieldOffset = Marshal.OffsetOf(type, field.Name);
+                Marshal.WriteIntPtr(buffer + (int)fieldOffset, destination);
+
+                offset += fieldSize;
             }
 
             return offset;
@@ -149,25 +153,7 @@ namespace Tewls.Windows.Kernel
 
     public class NativeBuffer<TStruct> : BufferBase<HGlobalBuffer.Allocator>
         where TStruct: class
-    {
-        public class Allocator : IAllocator
-        {
-            public IntPtr Alloc(IntPtr size)
-            {
-                return Marshal.AllocHGlobal(size);
-            }
-
-            public void Free(IntPtr buffer)
-            {
-                Marshal.FreeHGlobal(buffer);
-            }
-
-            public IntPtr ReAlloc(IntPtr buffer, IntPtr size)
-            {
-                return Marshal.ReAllocHGlobal(buffer, size);
-            }
-        }
-                               
+    {                              
         private int ToBuffer(TStruct structure)
         {
             Size = (IntPtr) NativeBuffer.GetObjectSize(structure);
