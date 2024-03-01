@@ -33,6 +33,8 @@ namespace Tewls.Windows.Advapi
         [DllImport("kernel32.dll", CharSet = CharSet.Auto, SetLastError = true)]
         private static extern IntPtr CreateRemoteThread(IntPtr hProcess, SecurityAttributes lpThreadAttributes, IntPtr dwStackSize, IntPtr lpStartAddress, IntPtr lpParameter, CreationFlags dwCreationFlags, ref uint lpThreadId);
 
+        [DllImport("kernel32.dll", CharSet = CharSet.Auto, SetLastError = true)]
+        private static extern uint GetProcessId(IntPtr Process);
         // Static
 
         public static IntPtr OpenProcessToken(IntPtr processHandle, TokenAccess desiredAccess)
@@ -197,7 +199,7 @@ namespace Tewls.Windows.Advapi
             }
         }
 
-        public string ReadString(IntPtr remoteBuffer)
+        public string ReadString(RemoteBuffer remoteBuffer)
         {
             var query = VirtualQueryEx(remoteBuffer);
             using (var localBuffer = new HGlobalBuffer(query.RegionSize))
@@ -207,7 +209,7 @@ namespace Tewls.Windows.Advapi
             }
         }
 
-        public IntPtr WriteString(string s)
+        public RemoteBuffer WriteString(string s)
         {
             var size = (s.Length + 1) * sizeof(char);
             using (var localBuffer = new HGlobalBuffer((IntPtr) size))
@@ -216,7 +218,7 @@ namespace Tewls.Windows.Advapi
                 var remoteBuffer = VirtualAllocEx(localBuffer.Size, MemAllocations.Commit, MemProtections.ReadWrite);
                 WriteProcessMemory(remoteBuffer, localBuffer, localBuffer.Size);
 
-                return remoteBuffer;
+                return new RemoteBuffer(this, remoteBuffer);
             }
         }
 
@@ -243,6 +245,22 @@ namespace Tewls.Windows.Advapi
         public NativeToken CreateRemoteThread(IntPtr stackSize, IntPtr startAddress, IntPtr parameter)
         {
             return new NativeToken(CreateRemoteThread(Handle, stackSize, startAddress, parameter));
+        }
+
+        public uint GetProcessId()
+        {
+            var result = GetProcessId(Handle);
+            if (result == 0)
+            {
+                throw new Win32Exception();
+            }
+
+            return result;
+        }
+
+        public override int GetHashCode()
+        {
+            return (int) GetProcessId();
         }
     }
 }
