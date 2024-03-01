@@ -191,13 +191,7 @@ namespace Tewls.Windows.Advapi
         public TStruct ReadProcessMemory<TStruct>(RemoteBuffer remoteBuffer)
             where TStruct : class, new()
         {
-            var query = VirtualQueryEx(remoteBuffer);
-            using (var localBuffer = new NativeBuffer<TStruct>(query.RegionSize))
-            {
-                ReadProcessMemory(remoteBuffer, localBuffer.Buffer, (uint)localBuffer.Size);
-                localBuffer.Rebase(remoteBuffer.Buffer, localBuffer.Buffer);
-                return BufferBase.PtrToStructure<TStruct>(localBuffer.Buffer);
-            }
+            return ReadProcessMemory<TStruct>(remoteBuffer.Buffer);
         }
 
         public IntPtr WriteProcessMemory(IntPtr remoteBuffer, IntPtr localBuffer, IntPtr size)
@@ -268,9 +262,14 @@ namespace Tewls.Windows.Advapi
             }
         }
 
-        public MemProtections VirtualProtectEx(RemoteBuffer remoteBuffer, IntPtr size, MemProtections protection)
+        public MemProtections VirtualProtectEx(IntPtr remoteBuffer, IntPtr size, MemProtections protection)
         {
             return VirtualProtectEx(Handle, remoteBuffer, size, protection);
+        }
+
+        public MemProtections VirtualProtectEx(RemoteBuffer remoteBuffer, IntPtr size, MemProtections protection)
+        {
+            return VirtualProtectEx(remoteBuffer.Buffer, size, protection);
         }
 
         public MemProtections VirtualProtectEx(RemoteBuffer remoteBuffer, MemProtections protection)
