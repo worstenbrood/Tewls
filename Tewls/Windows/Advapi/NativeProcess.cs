@@ -154,12 +154,13 @@ namespace Tewls.Windows.Advapi
             return info;
         }
 
-        public IntPtr ReadProcessMemory(IntPtr remoteBuffer, IntPtr localBuffer, IntPtr size)
+        public RemoteBuffer ReadProcessMemory(IntPtr remoteBuffer, IntPtr localBuffer, IntPtr size)
         {
-            return ReadProcessMemory(Handle, remoteBuffer, localBuffer, size);
+            ReadProcessMemory(Handle, remoteBuffer, localBuffer, size);
+            return new RemoteBuffer(this, remoteBuffer, size);
         }
 
-        public IntPtr ReadProcessMemory(IntPtr remoteBuffer, IntPtr localBuffer, uint size)
+        public RemoteBuffer ReadProcessMemory(IntPtr remoteBuffer, IntPtr localBuffer, uint size)
         {
             return ReadProcessMemory(remoteBuffer, localBuffer, (IntPtr)size);
         }
@@ -170,42 +171,42 @@ namespace Tewls.Windows.Advapi
             var query = VirtualQueryEx(remoteBuffer);
             using (var localBuffer = new NativeBuffer<TStruct>(query.RegionSize))
             {
-                ReadProcessMemory(remoteBuffer, localBuffer, (uint)localBuffer.Size);
+                ReadProcessMemory(remoteBuffer, localBuffer.Buffer, (uint)localBuffer.Size);
                 localBuffer.Rebase(remoteBuffer, localBuffer.Buffer);
-                return NativeBuffer<TStruct>.PtrToStructure<TStruct>(localBuffer);
+                return BufferBase.PtrToStructure<TStruct>(localBuffer.Buffer);
             }
         }
 
-        public IntPtr WriteProcessMemory(IntPtr remoteBuffer, IntPtr localBuffer, IntPtr size)
+        public RemoteBuffer WriteProcessMemory(IntPtr remoteBuffer, IntPtr localBuffer, IntPtr size)
         {
-            return WriteProcessMemory(Handle, remoteBuffer, localBuffer, size);
+            WriteProcessMemory(Handle, remoteBuffer, localBuffer, size);
+            return new RemoteBuffer(this, remoteBuffer, size);
         }
 
-        public IntPtr WriteProcessMemory(IntPtr remoteBuffer, IntPtr localBuffer, uint size)
+        public RemoteBuffer WriteProcessMemory(IntPtr remoteBuffer, IntPtr localBuffer, uint size)
         {
             return WriteProcessMemory(remoteBuffer, localBuffer, (IntPtr)size);
         }
 
-        public IntPtr WriteProcessMemory<TStruct>(TStruct structure)
+        public RemoteBuffer WriteProcessMemory<TStruct>(TStruct structure)
             where TStruct : class
         {
             using (var localBuffer = new NativeBuffer<TStruct>(structure))
             {
                 var remoteBuffer = VirtualAllocEx(localBuffer.Size, MemAllocations.Commit, MemProtections.ReadWrite);
-                localBuffer.Rebase(localBuffer, remoteBuffer);
-                WriteProcessMemory(remoteBuffer, localBuffer, (uint)localBuffer.Size);
-
-                return remoteBuffer;
+                localBuffer.Rebase(localBuffer.Buffer, remoteBuffer);
+                WriteProcessMemory(remoteBuffer, localBuffer.Buffer, (uint)localBuffer.Size);
+                return new RemoteBuffer(this, remoteBuffer, localBuffer.Size);
             }
         }
 
         public string ReadString(RemoteBuffer remoteBuffer)
         {
-            var query = VirtualQueryEx(remoteBuffer);
+            var query = VirtualQueryEx(remoteBuffer.Buffer);
             using (var localBuffer = new HGlobalBuffer(query.RegionSize))
             {
-                ReadProcessMemory(remoteBuffer, localBuffer, (uint)localBuffer.Size);
-                return Marshal.PtrToStringAuto(localBuffer);
+                ReadProcessMemory(remoteBuffer.Buffer, localBuffer.Buffer, (uint)localBuffer.Size);
+                return Marshal.PtrToStringAuto(localBuffer.Buffer);
             }
         }
 
@@ -214,11 +215,9 @@ namespace Tewls.Windows.Advapi
             var size = (s.Length + 1) * sizeof(char);
             using (var localBuffer = new HGlobalBuffer((IntPtr) size))
             {
-                NativeBuffer.lstrcpyn(localBuffer, s);
+                NativeBuffer.lstrcpyn(localBuffer.Buffer, s);
                 var remoteBuffer = VirtualAllocEx(localBuffer.Size, MemAllocations.Commit, MemProtections.ReadWrite);
-                WriteProcessMemory(remoteBuffer, localBuffer, localBuffer.Size);
-
-                return new RemoteBuffer(this, remoteBuffer);
+                return WriteProcessMemory(remoteBuffer, localBuffer.Buffer, localBuffer.Size);
             }
         }
 
