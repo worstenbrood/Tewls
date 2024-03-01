@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Diagnostics;
+using Tewls.Windows.Kernel;
 using Tewls.Windows.Utils;
 
 namespace Tewls.Windows.Advapi
@@ -30,14 +32,23 @@ namespace Tewls.Windows.Advapi
             }
         }
 
+        private readonly NativeProcess _process;
         private readonly IAllocator _allocator;
         public override IAllocator GetAllocator => _allocator;
                
         public RemoteBuffer(NativeProcess process, IntPtr buffer, IntPtr size)
         {
-            _allocator = new ProcessAllocator(process);
+            _process = process;
+            _allocator = new ProcessAllocator(_process);
             Buffer = buffer;
             Size = size;
         }
+
+        public void Write<TStruct>(TStruct structure, int offset)
+            where TStruct : class
+        {
+            _process.WriteProcessMemory(structure, Buffer + offset);
+        }
+
     }
 }

@@ -131,7 +131,7 @@ namespace Tewls.Windows.Advapi
             return new NativeToken(OpenProcessToken(Handle, desiredAccess));
         }
 
-        public RemoteBuffer VirtualAllocEx(IntPtr size, MemAllocations allocationType, MemProtections protect, IntPtr address = default)
+        public IntPtr VirtualAllocEx(IntPtr size, MemAllocations allocationType, MemProtections protect, IntPtr address = default)
         {
             var result = VirtualAllocEx(Handle, address, size, allocationType, protect);
             if (result == IntPtr.Zero)
@@ -139,12 +139,17 @@ namespace Tewls.Windows.Advapi
                 throw new Win32Exception();
             }
 
-            return new RemoteBuffer(this, result, size);
+            return result;
         }
 
-        public IntPtr VirtualAllocEx(uint size, MemAllocations allocationType, MemProtections protect, IntPtr address = default)
+        public RemoteBuffer VirtualAllocEx2(IntPtr size, MemAllocations allocationType, MemProtections protect, IntPtr address = default)
         {
-            return VirtualAllocEx((IntPtr)size, allocationType, protect, address);
+            return new RemoteBuffer(this, VirtualAllocEx(size, allocationType, protect, address), size);
+        }
+
+        public RemoteBuffer VirtualAllocEx(uint size, MemAllocations allocationType, MemProtections protect, IntPtr address = default)
+        {
+            return new RemoteBuffer(this, VirtualAllocEx((IntPtr)size, allocationType, protect, address), (IntPtr)size);
         }
 
         public MemoryBasicInformation VirtualQueryEx(IntPtr remoteBuffer)
@@ -152,6 +157,11 @@ namespace Tewls.Windows.Advapi
             var info = new MemoryBasicInformation();
             VirtualQueryEx(Handle, remoteBuffer, info);
             return info;
+        }
+
+        public IntPtr ReadProcessMemory(IntPtr remoteBuffer, IntPtr localBuffer, IntPtr size)
+        {
+            return ReadProcessMemory(Handle, remoteBuffer, localBuffer, size);
         }
 
         public RemoteBuffer ReadProcessMemory(RemoteBuffer remoteBuffer, IntPtr localBuffer, IntPtr size)
@@ -178,6 +188,11 @@ namespace Tewls.Windows.Advapi
             }
         }
 
+        public IntPtr WriteProcessMemory(IntPtr remoteBuffer, IntPtr localBuffer, IntPtr size)
+        {
+            return WriteProcessMemory(Handle, remoteBuffer, localBuffer, size);
+        }
+
         public RemoteBuffer WriteProcessMemory(RemoteBuffer remoteBuffer, IntPtr localBuffer, IntPtr size)
         {
             WriteProcessMemory(Handle, remoteBuffer.Buffer, localBuffer, size);
@@ -189,14 +204,34 @@ namespace Tewls.Windows.Advapi
             return WriteProcessMemory(remoteBuffer, localBuffer, (IntPtr)size);
         }
 
+        public IntPtr WriteProcessMemory<TStruct>(TStruct structure, IntPtr remoteBuffer)
+            where TStruct : class
+        {
+            using (var localBuffer = new NativeBuffer<TStruct>(structure))
+            {
+                localBuffer.Rebase(localBuffer.Buffer, remoteBuffer);
+                return WriteProcessMemory(remoteBuffer, localBuffer.Buffer, localBuffer.Size);
+            }
+        }
+
+        public RemoteBuffer WriteProcessMemory<TStruct>(TStruct structure, RemoteBuffer remoteBuffer)
+            where TStruct : class
+        {
+            using (var localBuffer = new NativeBuffer<TStruct>(structure))
+            {
+                localBuffer.Rebase(localBuffer.Buffer, remoteBuffer);
+                return WriteProcessMemory(remoteBuffer, localBuffer.Buffer, (uint)localBuffer.Size);
+            }
+        }
+
         public RemoteBuffer WriteProcessMemory<TStruct>(TStruct structure)
             where TStruct : class
         {
             using (var localBuffer = new NativeBuffer<TStruct>(structure))
             {
-                var remoteBuffer = VirtualAllocEx(localBuffer.Size, MemAllocations.Commit|MemAllocations.TopDown, MemProtections.ReadWrite);
+                var remoteBuffer = VirtualAllocEx2(localBuffer.Size, MemAllocations.Commit|MemAllocations.TopDown, MemProtections.ReadWrite);
                 localBuffer.Rebase(localBuffer.Buffer, remoteBuffer);
-                return WriteProcessMemory(remoteBuffer, localBuffer.Buffer, (uint)localBuffer.Size);
+                return WriteProcessMemory(remoteBuffer, localBuffer.Buffer, localBuffer.Size);
             }
         }
 
@@ -216,7 +251,7 @@ namespace Tewls.Windows.Advapi
             using (var localBuffer = new HGlobalBuffer((IntPtr) size))
             {
                 NativeBuffer.lstrcpyn(localBuffer.Buffer, s);
-                var remoteBuffer = VirtualAllocEx(localBuffer.Size, MemAllocations.Commit|MemAllocations.Reserve|MemAllocations.TopDown, MemProtections.ReadWrite);
+                var remoteBuffer = VirtualAllocEx2(localBuffer.Size, MemAllocations.Commit|MemAllocations.Reserve|MemAllocations.TopDown, MemProtections.ReadWrite);
                 return WriteProcessMemory(remoteBuffer, localBuffer.Buffer, localBuffer.Size);
             }
         }
