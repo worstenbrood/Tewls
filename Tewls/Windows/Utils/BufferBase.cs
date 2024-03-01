@@ -134,7 +134,7 @@ namespace Tewls.Windows.Utils
         where TAlloc : class, IAllocator, new()
         where TStruct : class
     {
-        private readonly static Type Type = typeof(TStruct);
+        protected readonly static Type Type = typeof(TStruct);
 
         public override void Free()
         {
