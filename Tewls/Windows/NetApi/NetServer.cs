@@ -129,7 +129,7 @@ namespace Tewls.Windows.NetApi
             {
                 uint paramIndex = 0;
 
-                var result = NetServerSetInfo(serverName, info.GetLevel(), buffer, ref paramIndex);
+                var result = NetServerSetInfo(serverName, info.GetLevel(), buffer.Buffer, ref paramIndex);
                 if (result != Error.Success)
                 {
                     throw new Win32Exception((int)result);
@@ -142,7 +142,7 @@ namespace Tewls.Windows.NetApi
         {
             using (var buffer = new NetBuffer<TStruct>(info))
             {
-                var result = NetServerTransportAdd(serverName, info.GetLevel(), buffer);
+                var result = NetServerTransportAdd(serverName, info.GetLevel(), buffer.Buffer);
                 if (result != Error.Success)
                 {
                     throw new Win32Exception((int)result);
@@ -155,7 +155,7 @@ namespace Tewls.Windows.NetApi
         {
             using (var buffer = new NetBuffer<TStruct>(info))
             {
-                var result = NetServerTransportAddEx(serverName, info.GetLevel(), buffer);
+                var result = NetServerTransportAddEx(serverName, info.GetLevel(), buffer.Buffer);
                 if (result != Error.Success)
                 {
                     throw new Win32Exception((int)result);
@@ -168,7 +168,7 @@ namespace Tewls.Windows.NetApi
         {
             using (var buffer = new NetBuffer<TStruct>(info))
             {
-                var result = NetServerTransportDel(serverName, info.GetLevel(), buffer);
+                var result = NetServerTransportDel(serverName, info.GetLevel(), buffer.Buffer);
                 if (result != Error.Success)
                 {
                     throw new Win32Exception((int)result);

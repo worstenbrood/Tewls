@@ -84,7 +84,7 @@ namespace Tewls.Windows.Advapi
                 var array = new IntPtr[count];
 
                 // Result buffer contains an array of pointers to Credential records
-                Marshal.Copy(buffer, array, 0, (int) count);
+                Marshal.Copy(buffer.Buffer, array, 0, (int) count);
 
                 var credential = new Credential();
                 for(var i = 0; i < count; i++)

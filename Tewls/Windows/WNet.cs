@@ -358,7 +358,7 @@ namespace Tewls.Windows
 
                     do
                     {
-                        result = WNetEnumResource(handle, ref count, buffer, ref bufferSize);
+                        result = WNetEnumResource(handle, ref count, buffer.Buffer, ref bufferSize);
 
                         if (result == Error.NoError)
                         {
@@ -445,11 +445,11 @@ namespace Tewls.Windows
             using (var buffer = new HGlobalBuffer((IntPtr) bufferSize))
             {
                 // Get buffer size
-                var result = WNetGetConnection(localName, buffer, ref bufferSize);
+                var result = WNetGetConnection(localName, buffer.Buffer, ref bufferSize);
                 if (result == Error.MoreData)
                 {
                     buffer.ReAlloc((IntPtr) bufferSize);
-                    result = WNetGetConnection(localName, buffer, ref bufferSize);
+                    result = WNetGetConnection(localName, buffer.Buffer, ref bufferSize);
                 }
 
                 // Return null if network is unavailable
@@ -464,7 +464,7 @@ namespace Tewls.Windows
                     throw ex;
                 }
 
-                return Marshal.PtrToStringUni(buffer);
+                return Marshal.PtrToStringUni(buffer.Buffer);
             }
         }
 
@@ -486,11 +486,11 @@ namespace Tewls.Windows
             using (var buffer = new HGlobalBuffer((IntPtr) bufferSize))
             {
                 // Get buffer size
-                var result = WNetGetUser(localOrRemoteName, buffer, ref bufferSize);
+                var result = WNetGetUser(localOrRemoteName, buffer.Buffer, ref bufferSize);
                 if (result == Error.MoreData)
                 {
                     buffer.ReAlloc((IntPtr)(bufferSize * sizeof(char)));
-                    result = WNetGetUser(localOrRemoteName, buffer, ref bufferSize);
+                    result = WNetGetUser(localOrRemoteName, buffer.Buffer, ref bufferSize);
                 }
 
                 var ex = GetLastException(result);
@@ -499,7 +499,7 @@ namespace Tewls.Windows
                     throw ex;
                 }
 
-                return Marshal.PtrToStringUni(buffer);
+                return Marshal.PtrToStringUni(buffer.Buffer);
             }
         }
 
@@ -509,11 +509,11 @@ namespace Tewls.Windows
             using (var buffer = new HGlobalBuffer((IntPtr) bufferSize))
             {
                 // Get buffer size
-                var result = WNetGetUniversalName(localPath, (uint)InfoLevel.UniversalName, buffer, ref bufferSize);
+                var result = WNetGetUniversalName(localPath, (uint)InfoLevel.UniversalName, buffer.Buffer, ref bufferSize);
                 if (result == Error.MoreData)
                 {
                     buffer.ReAlloc((IntPtr) bufferSize);
-                    result = WNetGetUniversalName(localPath, (uint)InfoLevel.UniversalName, buffer, ref bufferSize);
+                    result = WNetGetUniversalName(localPath, (uint)InfoLevel.UniversalName, buffer.Buffer, ref bufferSize);
                 }
 
                 var ex = GetLastException(result);
@@ -532,11 +532,11 @@ namespace Tewls.Windows
             using (var buffer = new HGlobalBuffer((IntPtr) bufferSize))
             {
                 // Get buffer size
-                var result = WNetGetUniversalName(localPath, (uint)InfoLevel.RemoteName, buffer, ref bufferSize);
+                var result = WNetGetUniversalName(localPath, (uint)InfoLevel.RemoteName, buffer.Buffer, ref bufferSize);
                 if (result == Error.MoreData)
                 {
                     buffer.ReAlloc((IntPtr)bufferSize);
-                    result = WNetGetUniversalName(localPath, (uint)InfoLevel.RemoteName, buffer, ref bufferSize);
+                    result = WNetGetUniversalName(localPath, (uint)InfoLevel.RemoteName, buffer.Buffer, ref bufferSize);
                 }
 
                 var ex = GetLastException(result);
@@ -555,11 +555,11 @@ namespace Tewls.Windows
             using (var buffer = new HGlobalBuffer((IntPtr) bufferSize))
             {
                 // Get buffer size
-                var result = WNetGetResourceParent(netResource, buffer, ref bufferSize);
+                var result = WNetGetResourceParent(netResource, buffer.Buffer, ref bufferSize);
                 if (result == Error.MoreData)
                 {
                     buffer.ReAlloc((IntPtr) bufferSize);
-                    result = WNetGetResourceParent(netResource, buffer, ref bufferSize);
+                    result = WNetGetResourceParent(netResource, buffer.Buffer, ref bufferSize);
                 }
 
                 var ex = GetLastException(result);
@@ -578,11 +578,11 @@ namespace Tewls.Windows
             using (var buffer = new HGlobalBuffer((IntPtr) bufferSize))
             {
                 // Get buffer size
-                var result = WNetGetProviderName(type, buffer, ref bufferSize);
+                var result = WNetGetProviderName(type, buffer.Buffer, ref bufferSize);
                 if (result == Error.MoreData)
                 {
                     buffer.ReAlloc((IntPtr)(bufferSize * sizeof(char)));
-                    result = WNetGetProviderName(type, buffer, ref bufferSize);
+                    result = WNetGetProviderName(type, buffer.Buffer, ref bufferSize);
                 }
 
                 var ex = GetLastException(result);
@@ -591,7 +591,7 @@ namespace Tewls.Windows
                     throw ex;
                 }
 
-                return Marshal.PtrToStringUni(buffer);
+                return Marshal.PtrToStringUni(buffer.Buffer);
             }
         }
 
@@ -603,11 +603,11 @@ namespace Tewls.Windows
             using (var buffer = new HGlobalBuffer((IntPtr) bufferSize))
             {
                 // Get buffer size
-                var result = WNetGetResourceInformation(netResource, buffer, ref bufferSize, ref pointer);
+                var result = WNetGetResourceInformation(netResource, buffer.Buffer, ref bufferSize, ref pointer);
                 if (result == Error.MoreData)
                 {
                     buffer.ReAlloc((IntPtr)bufferSize);
-                    result = WNetGetResourceInformation(netResource, buffer, ref bufferSize, ref pointer);
+                    result = WNetGetResourceInformation(netResource, buffer.Buffer, ref bufferSize, ref pointer);
                 }
 
                 var ex = GetLastException(result);

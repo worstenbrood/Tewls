@@ -102,7 +102,7 @@ namespace Tewls.Windows.Kernel
             // Copy marshalled structure to our own buffer
             using (var temp = new HGlobalBuffer<object>(@object))
             {
-                CopyMemory(buffer + offset, temp, temp.Size);
+                CopyMemory(buffer + offset, temp.Buffer, temp.Size);
             }
 
             // Calculate offset

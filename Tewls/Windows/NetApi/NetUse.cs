@@ -26,7 +26,7 @@ namespace Tewls.Windows.NetApi
             using (var buffer = new NetBuffer<TStruct>(info)) 
             {
                 uint paramIndex = 0;
-                var result = NetUseAdd(serverName, info.GetLevel(), buffer, ref paramIndex);
+                var result = NetUseAdd(serverName, info.GetLevel(), buffer.Buffer, ref paramIndex);
                 if (result != Error.Success)
                 {
                     throw new Win32Exception((int)result);
