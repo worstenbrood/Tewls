@@ -6,10 +6,9 @@ namespace Tewls.Windows.Utils
 {
     public abstract class BufferBase : object, IDisposable
     {
-        private bool _disposed = false;
-        private readonly IAllocator _allocator;
-
-        public virtual IAllocator GetAllocator { get { return _allocator; } }
+        protected bool Disposed = false;
+       
+        public virtual IAllocator GetAllocator { get { throw new NotImplementedException(); } }
 
         public IntPtr Size = IntPtr.Zero;
         public IntPtr Buffer = IntPtr.Zero;
@@ -29,21 +28,7 @@ namespace Tewls.Windows.Utils
 
             return resource;
         }
-
-        protected BufferBase()
-        {
-        }
-
-        protected BufferBase(IntPtr size)
-        {
-            if (size != IntPtr.Zero) 
-            {
-                Buffer = Alloc(size);
-            }
-            
-            Size = size;
-        }
-
+                
         public virtual IntPtr Alloc(IntPtr size)
         {
             return GetAllocator.Alloc(size);
@@ -80,12 +65,26 @@ namespace Tewls.Windows.Utils
 
         private void Dispose(bool disposing)
         {
-            if (!_disposed)
+            if (!Disposed)
             {
                Free();
             }
 
-            _disposed = true;
+            Disposed = true;
+        }
+
+        protected BufferBase()
+        {
+        }
+
+        protected BufferBase(IntPtr size)
+        {
+            if (size != IntPtr.Zero)
+            {
+                Buffer = Alloc(size);
+            }
+
+            Size = size;
         }
 
         ~BufferBase()

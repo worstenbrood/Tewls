@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Runtime.InteropServices;
+using Tewls.Windows.Utils;
 
 namespace Tewls.Windows.Advapi
 {
@@ -89,7 +90,7 @@ namespace Tewls.Windows.Advapi
                 var credential = new Credential();
                 for(var i = 0; i < count; i++)
                 {
-                    yield return CredBuffer.PtrToStructure(array[i], credential);
+                    yield return BufferBase.PtrToStructure(array[i], credential);
                 }
             }
         }
