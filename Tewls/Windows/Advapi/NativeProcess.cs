@@ -176,6 +176,18 @@ namespace Tewls.Windows.Advapi
             return remoteBuffer;
         }
 
+        public TStruct ReadProcessMemory<TStruct>(IntPtr remoteBuffer)
+            where TStruct : class, new()
+        {
+            var query = VirtualQueryEx(remoteBuffer);
+            using (var localBuffer = new NativeBuffer<TStruct>(query.RegionSize))
+            {
+                ReadProcessMemory(remoteBuffer, localBuffer.Buffer, query.RegionSize);
+                localBuffer.Rebase(remoteBuffer, localBuffer.Buffer);
+                return BufferBase.PtrToStructure<TStruct>(localBuffer.Buffer);
+            }
+        }
+
         public TStruct ReadProcessMemory<TStruct>(RemoteBuffer remoteBuffer)
             where TStruct : class, new()
         {
