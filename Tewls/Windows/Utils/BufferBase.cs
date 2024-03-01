@@ -134,20 +134,22 @@ namespace Tewls.Windows.Utils
         where TAlloc : class, IAllocator, new()
         where TStruct : class
     {
+        private readonly static Type Type = typeof(TStruct);
+
         public override void Free()
         {
-            if (typeof(TStruct).IsLayoutSequential)
+            if (Type.IsLayoutSequential)
             {
-                Marshal.DestroyStructure(Buffer, typeof(TStruct));
+                Marshal.DestroyStructure(Buffer, Type);
             }
             base.Free();
         }
 
         public override void ReAlloc(IntPtr size)
         {
-            if (typeof(TStruct).IsLayoutSequential)
+            if (Type.IsLayoutSequential)
             {
-                Marshal.DestroyStructure(Buffer, typeof(TStruct));
+                Marshal.DestroyStructure(Buffer, Type);
             }
             base.ReAlloc(size);
         }
