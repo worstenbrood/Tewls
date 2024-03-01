@@ -7,7 +7,7 @@ namespace Tewls.Windows.Advapi
     {
         public class ProcessAllocator : IAllocator
         {
-            private NativeProcess _process;
+            private readonly NativeProcess _process;
 
             public IntPtr Alloc(IntPtr size)
             {
@@ -16,7 +16,7 @@ namespace Tewls.Windows.Advapi
 
             public void Free(IntPtr buffer)
             {
-                NativeProcess.VirtualFreeEx(_process.Handle, buffer, IntPtr.Zero, MemFreeType.Release);
+                _process.VirtualFreeEx(buffer, MemFreeType.Release);
             }
 
             public IntPtr ReAlloc(IntPtr buffer, IntPtr size)
@@ -32,7 +32,7 @@ namespace Tewls.Windows.Advapi
 
         private readonly IAllocator _allocator;
         public override IAllocator GetAllocator => _allocator;
-
+               
         public RemoteBuffer(NativeProcess process, IntPtr buffer, IntPtr size)
         {
             _allocator = new ProcessAllocator(process);

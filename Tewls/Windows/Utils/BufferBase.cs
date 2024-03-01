@@ -4,7 +4,7 @@ using System.Runtime.InteropServices;
 
 namespace Tewls.Windows.Utils
 {
-    public abstract class BufferBase : IDisposable
+    public abstract class BufferBase : object, IDisposable
     {
         private bool _disposed = false;
         private readonly IAllocator _allocator;
