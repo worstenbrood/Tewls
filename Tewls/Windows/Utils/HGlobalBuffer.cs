@@ -40,19 +40,7 @@ namespace Tewls.Windows.Utils
     public class HGlobalBuffer<TStruct> : BufferBase<HGlobalBuffer.Allocator, TStruct>
             where TStruct : class
     {
-        public HGlobalBuffer()
-        {
-        }
-
-        public HGlobalBuffer(IntPtr size) : base(size)
-        {
-        }
-
         public HGlobalBuffer(TStruct s) : base(s)
-        {
-        }
-
-        public HGlobalBuffer(uint size) : base((IntPtr)size)
         {
         }
     }
