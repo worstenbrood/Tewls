@@ -10,6 +10,16 @@ namespace Tewls.Windows
     {
         public uint Size;
         public IntPtr Data;
+
+        public DataBlob()
+        {
+        }
+
+        public DataBlob(IntPtr data, uint size) 
+        { 
+            Size = size;
+            Data = data;
+        }
     }
 
     [StructLayout(LayoutKind.Sequential)]

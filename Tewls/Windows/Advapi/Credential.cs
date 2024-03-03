@@ -40,20 +40,10 @@ namespace Tewls.Windows.Advapi
         {
             try
             {
-                var dataBlob = new DataBlob
-                {
-                    Data = CredentialBlob,
-                    Size = CredentialBlobSize
-                };
-                            
+                var dataBlob = new DataBlob(CredentialBlob, CredentialBlobSize);               
                 using (var buffer = new HGlobalBuffer(entropy))
                 {
-                    var entropyBlob = new DataBlob
-                    {
-                        Data = buffer.Buffer,
-                        Size = (uint)buffer.Size
-                    };
-
+                    var entropyBlob = new DataBlob(buffer, (uint)buffer.Size);
                     return Crypt.UnprotectData(dataBlob, entropyBlob);
                 }
             }
