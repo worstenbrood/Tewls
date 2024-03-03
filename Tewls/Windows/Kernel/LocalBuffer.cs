@@ -7,6 +7,24 @@ namespace Tewls.Windows.Kernel
 {
     public class LocalBuffer : BufferBase<LocalBuffer.Allocator>
     {
+        public class Allocator : IAllocator
+        {
+            public IntPtr Alloc(IntPtr size)
+            {
+                return LocalBuffer.Alloc(size);
+            }
+
+            public void Free(IntPtr buffer)
+            {
+                LocalBuffer.Free(buffer);
+            }
+
+            public IntPtr ReAlloc(IntPtr buffer, IntPtr size)
+            {
+                return LocalBuffer.ReAlloc(buffer, size);
+            }
+        }
+
         [DllImport("kernel32.dll", CharSet = CharSet.Auto, SetLastError = true)]
         private static extern IntPtr LocalFree(IntPtr hMem);
 
@@ -44,24 +62,6 @@ namespace Tewls.Windows.Kernel
             if (result == IntPtr.Zero)
             {
                 throw new Win32Exception();
-            }
-        }
-
-        public class Allocator : IAllocator
-        {
-            public IntPtr Alloc(IntPtr size)
-            {
-                return LocalBuffer.Alloc(size);
-            }
-
-            public void Free(IntPtr buffer)
-            {
-                LocalBuffer.Free(buffer);
-            }
-
-            public IntPtr ReAlloc(IntPtr buffer, IntPtr size)
-            {
-                return LocalBuffer.ReAlloc(buffer, size);
             }
         }
     }

@@ -7,18 +7,6 @@ namespace Tewls.Windows.NetApi
 {
     public class NetBuffer : BufferBase<NetBuffer.Allocator>
     {
-        [DllImport("netapi32.dll", CallingConvention = CallingConvention.Winapi, SetLastError = true)]
-        private static extern Error NetApiBufferAllocate(uint ByteCount, ref IntPtr Buffer);
-
-        [DllImport("netapi32.dll", CallingConvention = CallingConvention.Winapi, SetLastError = true)]
-        private static extern Error NetApiBufferReallocate(IntPtr OldBuffer, uint NewByteCount, ref IntPtr NewBuffer);
-
-        [DllImport("netapi32.dll", CallingConvention = CallingConvention.Winapi, SetLastError = true)]
-        private static extern Error NetApiBufferSize(IntPtr Buffer, ref uint ByteCount);
-
-        [DllImport("netapi32.dll", CallingConvention = CallingConvention.Winapi, SetLastError = true)]
-        private static extern Error NetApiBufferFree(IntPtr Buffer);
-
         public class Allocator : IAllocator
         {
             public IntPtr Alloc(IntPtr size)
@@ -36,6 +24,18 @@ namespace Tewls.Windows.NetApi
                 return BufferReAllocate(buffer, (uint)size);
             }
         }
+
+        [DllImport("netapi32.dll", CallingConvention = CallingConvention.Winapi, SetLastError = true)]
+        private static extern Error NetApiBufferAllocate(uint ByteCount, ref IntPtr Buffer);
+
+        [DllImport("netapi32.dll", CallingConvention = CallingConvention.Winapi, SetLastError = true)]
+        private static extern Error NetApiBufferReallocate(IntPtr OldBuffer, uint NewByteCount, ref IntPtr NewBuffer);
+
+        [DllImport("netapi32.dll", CallingConvention = CallingConvention.Winapi, SetLastError = true)]
+        private static extern Error NetApiBufferSize(IntPtr Buffer, ref uint ByteCount);
+
+        [DllImport("netapi32.dll", CallingConvention = CallingConvention.Winapi, SetLastError = true)]
+        private static extern Error NetApiBufferFree(IntPtr Buffer);
 
         public static IntPtr BufferAllocate(uint byteCount)
         {
