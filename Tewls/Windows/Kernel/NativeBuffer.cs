@@ -97,18 +97,19 @@ namespace Tewls.Windows.Kernel
             }
         }
 
-        public static int CopyToBuffer(object @object, IntPtr buffer, int offset = 0)
+        public static int CopyToBuffer<TStruct>(TStruct structure, IntPtr buffer, int offset = 0)
+            where TStruct: class
         {
             // Copy marshalled structure to our own buffer
-            using (var temp = new HGlobalBuffer<object>(@object))
+            using (var temp = new HGlobalBuffer<TStruct>(structure))
             {
                 CopyMemory(buffer + offset, temp.Buffer, temp.Size);
             }
 
             // Calculate offset
-            offset += Marshal.SizeOf(@object);
+            offset += Marshal.SizeOf(structure);
 
-            var type = @object.GetType();
+            var type = structure.GetType();
 
             foreach (var field in FieldCache[type])
             {
@@ -118,7 +119,7 @@ namespace Tewls.Windows.Kernel
                     continue;
                 }
 
-                var value = field.GetValue(@object);
+                var value = field.GetValue(structure);
                 if (value == null)
                 {
                     continue;
@@ -139,7 +140,7 @@ namespace Tewls.Windows.Kernel
                 else
                 {
                     // Recursive
-                    fieldSize = CopyToBuffer(@object, buffer, offset);
+                    fieldSize = CopyToBuffer(structure, buffer, offset);
                     destination = IntPtr.Add(buffer, offset);
                 }
 
