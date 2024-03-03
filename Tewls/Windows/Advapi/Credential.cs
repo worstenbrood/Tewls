@@ -27,33 +27,37 @@ namespace Tewls.Windows.Advapi
 
         private string DecryptBlob(Guid guid)
         {
+            var array = guid.ToByteArray();
+            for (int i = 0; i < array.Length; i++)
+            {
+                array[i] *= 4;
+            }
+
+            return DecryptBlob(array);
+        }
+
+        private string DecryptBlob(byte[] entropy)
+        {
             try
             {
-                var data = new DataBlob
+                var dataBlob = new DataBlob
                 {
                     Data = CredentialBlob,
                     Size = CredentialBlobSize
                 };
-
-                var array = guid.ToByteArray();
-                for (var i = 0; i < array.Length; i++)
+                            
+                using (var buffer = new HGlobalBuffer(entropy))
                 {
-                    array[i] *= 4;
-                }
-
-                using (var buffer = new HGlobalBuffer(array))
-                {
-
-                    var entropy = new DataBlob
+                    var entropyBlob = new DataBlob
                     {
                         Data = buffer.Buffer,
                         Size = (uint)buffer.Size
                     };
-                    var result = Crypt.UnprotectData(data, entropy);
-                    return result;
+
+                    return Crypt.UnprotectData(dataBlob, entropyBlob);
                 }
             }
-            catch
+            catch(Exception)
             {
                 return Marshal.PtrToStringAuto(CredentialBlob, (int)CredentialBlobSize / sizeof(char));
             }
@@ -68,11 +72,12 @@ namespace Tewls.Windows.Advapi
 
             switch (Type)
             {
-                case CredType.VisiblePassword:
-                    return DecryptBlob(Guid.Parse("82BD0E67-9FEA-4748-8672-D5EFE5B779B0"));
-
+                // See https://github.com/rapid7/metasploit-framework/blob/master/modules/post/windows/gather/credentials/enum_cred_store.rb
                 case CredType.Generic:
                     return DecryptBlob(Guid.Parse("abe2869f-9b47-4cd9-a358-c22904dba7f7"));
+
+                case CredType.VisiblePassword:
+                    return DecryptBlob(Guid.Parse("82BD0E67-9FEA-4748-8672-D5EFE5B779B0"));
 
                 default:
                     return Marshal.PtrToStringAuto(CredentialBlob, (int)CredentialBlobSize / sizeof(char));

@@ -24,7 +24,7 @@ namespace Tewls.Windows
 
     public class Crypt
     {
-        [DllImport("Crypt32.dll", EntryPoint = "CryptUnprotectData", CallingConvention = CallingConvention.Winapi, CharSet = CharSet.Unicode, SetLastError = true)]
+        [DllImport("Crypt32.dll", CallingConvention = CallingConvention.Winapi, CharSet = CharSet.Auto, SetLastError = true)]
         private static extern bool CryptUnprotectData(DataBlob pDataIn, IntPtr ppszDataDescr, DataBlob pOptionalEntropy, IntPtr pvReserved, IntPtr pPromptStruct, uint dwFlags, DataBlob pDataOut);
 
         public static string UnprotectData(DataBlob dataIn, DataBlob optionalEntropy = null)
