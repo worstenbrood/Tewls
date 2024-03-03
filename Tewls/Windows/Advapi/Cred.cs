@@ -15,10 +15,7 @@ namespace Tewls.Windows.Advapi
         private static extern bool CredWrite(ref Credential Credential, CredWriteFlags Flags);
 
         [DllImport("advapi32.dll", CharSet = CharSet.Auto, CallingConvention = CallingConvention.Winapi, SetLastError = true)]
-        private static extern bool CredDelete(string TargetName, CredType Type, uint Flags = 0);
-
-        [DllImport("advapi32.dll", CharSet = CharSet.Auto, CallingConvention = CallingConvention.Winapi, SetLastError = true)]
-        public static extern void CredFree(IntPtr Buffer);
+        private static extern bool CredDelete(string TargetName, CredType Type, uint Flags = 0);  
 
         [DllImport("advapi32.dll", CharSet = CharSet.Auto, CallingConvention = CallingConvention.Winapi, SetLastError = true)]
         private static extern bool CredEnumerate(string Filter, CredEnumFlags Flags, ref uint Count, ref IntPtr Credential);

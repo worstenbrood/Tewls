@@ -1,10 +1,14 @@
 ﻿using System;
+using System.Runtime.InteropServices;
 using Tewls.Windows.Utils;
 
 namespace Tewls.Windows.Advapi
 {
     public class CredBuffer : BufferBase<CredBuffer.Allocator>
     {
+        [DllImport("advapi32.dll", CharSet = CharSet.Auto, CallingConvention = CallingConvention.Winapi, SetLastError = true)]
+        public static extern void CredFree(IntPtr Buffer);
+
         public class Allocator : IAllocator
         {
             public IntPtr Alloc(IntPtr size)
@@ -14,7 +18,7 @@ namespace Tewls.Windows.Advapi
 
             public void Free(IntPtr buffer)
             {
-                Cred.CredFree(buffer);
+                CredFree(buffer);
             }
 
             public IntPtr ReAlloc(IntPtr buffer, IntPtr size)
