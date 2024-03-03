@@ -55,6 +55,11 @@ namespace Tewls.Windows.Kernel
             Disposed = true;
         }
 
+        public override int GetHashCode()
+        {
+            return Handle.GetHashCode();
+        }
+
         ~NativeHandle()
         {
             Dispose(false);
