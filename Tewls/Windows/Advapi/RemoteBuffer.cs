@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics;
 using Tewls.Windows.Kernel;
 using Tewls.Windows.Utils;
 
@@ -31,7 +32,7 @@ namespace Tewls.Windows.Advapi
             }
         }
 
-        private readonly NativeProcess _process;
+        protected readonly NativeProcess _process;
         private readonly IAllocator _allocator;
         public override IAllocator GetAllocator => _allocator;
 
@@ -102,11 +103,28 @@ namespace Tewls.Windows.Advapi
     }
 
     public class RemoteBuffer<TStruct> : RemoteBuffer
-        where TStruct : class
+        where TStruct : class, new()
     {
         public RemoteBuffer(NativeProcess process, TStruct structure) : base(process, (IntPtr) NativeBuffer.GetObjectSize(structure))
         {
             process.WriteProcessMemory(structure, Buffer);
+        }
+
+        public TStruct Read(int offset = 0)
+        {
+            return _process.ReadProcessMemory<TStruct>(Buffer + offset);
+        }
+
+        public RemoteBuffer<TStruct> Write(TStruct structure, int offset = 0)
+        {
+            _process.WriteProcessMemory(structure, Buffer + offset);
+            return this;
+        }      
+
+        public new RemoteBuffer<TStruct> Protect(MemProtections protection)
+        {
+            _process.VirtualProtectEx(this, protection);
+            return this;
         }
     }
 }

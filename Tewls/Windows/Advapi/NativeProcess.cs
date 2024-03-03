@@ -223,11 +223,7 @@ namespace Tewls.Windows.Advapi
         public RemoteBuffer WriteProcessMemory<TStruct>(TStruct structure, RemoteBuffer remoteBuffer)
             where TStruct : class
         {
-            using (var localBuffer = new NativeBuffer<TStruct>(structure))
-            {
-                localBuffer.Rebase(localBuffer.Buffer, remoteBuffer.Buffer);
-                return WriteProcessMemory(remoteBuffer, localBuffer.Buffer, (uint)localBuffer.Size);
-            }
+                return WriteProcessMemory(structure, remoteBuffer);
         }
 
         public RemoteBuffer WriteProcessMemory<TStruct>(TStruct structure)
