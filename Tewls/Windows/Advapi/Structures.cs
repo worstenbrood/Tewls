@@ -206,17 +206,22 @@ namespace Tewls.Windows.Advapi
     }
 
     [StructLayout(LayoutKind.Sequential)]
-    public class MemoryBasicInformation
+    public class MemoryBasicInformation<TPointer>
     {
-        public IntPtr BaseAddress;
-        public IntPtr AllocationBase;
+        public TPointer BaseAddress;
+        public TPointer AllocationBase;
         public MemProtections AllocationProtect;
         public short PartitionId;
-        public IntPtr RegionSize;
+        public TPointer RegionSize;
         public MemAllocations State;
         public MemAllocations Protect;
         public MemType Type;
     };
+
+    [StructLayout(LayoutKind.Sequential)]
+    public class MemoryBasicInformation : MemoryBasicInformation<IntPtr>
+    {
+    }
 
     public enum MemFreeType : uint
     {
