@@ -1,4 +1,5 @@
 ﻿using System;
+using Tewls.Windows.Kernel;
 using Tewls.Windows.Utils;
 
 namespace Tewls.Windows.Advapi
@@ -76,6 +77,15 @@ namespace Tewls.Windows.Advapi
         public MemoryBasicInformation GetInformation()
         {
             return _process.VirtualQueryEx(Buffer);
+        }
+    }
+
+    public class RemoteBuffer<TStruct> : RemoteBuffer
+        where TStruct : class
+    {
+        public RemoteBuffer(NativeProcess process, TStruct structure) : base(process, (IntPtr) NativeBuffer.GetObjectSize(structure))
+        {
+
         }
     }
 }

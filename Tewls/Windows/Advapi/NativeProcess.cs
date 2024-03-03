@@ -147,6 +147,12 @@ namespace Tewls.Windows.Advapi
             return new RemoteBuffer(this, VirtualAllocEx(size, allocationType, protect, address), size);
         }
 
+        public RemoteBuffer VirtualAllocExBuffer<TStruct>(TStruct structure)
+            where TStruct : class
+        {
+            return new RemoteBuffer<TStruct>(this, structure);
+        }
+
         public RemoteBuffer VirtualAllocExBuffer(uint size, MemAllocations allocationType, MemProtections protect, IntPtr address = default)
         {
             return VirtualAllocExBuffer((IntPtr) size, allocationType, protect, address);
