@@ -1,6 +1,7 @@
 ﻿using System;
 using System.ComponentModel;
 using System.Runtime.InteropServices;
+using Tewls.Windows.Kernel;
 using Tewls.Windows.Utils;
 
 namespace Tewls.Windows
@@ -39,14 +40,13 @@ namespace Tewls.Windows
 
         public static string UnprotectData(DataBlob dataIn, DataBlob optionalEntropy = null)
         {
-            using (var buffer = new HGlobalBuffer())
+            using (var buffer = new LocalBuffer())
             {
                 var dataOut = new DataBlob();
                 var result = CryptUnprotectData(dataIn, IntPtr.Zero, optionalEntropy, IntPtr.Zero, IntPtr.Zero, 0, dataOut);
                 
                 // Free buffer
-                buffer.Buffer = dataOut.Data;
-                buffer.Size = (IntPtr) dataOut.Size;
+                buffer.Set(dataOut.Data,(IntPtr) dataOut.Size);
 
                 if (!result)
                 {

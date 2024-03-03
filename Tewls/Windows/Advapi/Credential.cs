@@ -2,6 +2,7 @@
 using System.Runtime.InteropServices.ComTypes;
 using System.Runtime.InteropServices;
 using Tewls.Windows.Utils;
+using Tewls.Windows.Kernel;
 
 namespace Tewls.Windows.Advapi
 {
@@ -43,7 +44,7 @@ namespace Tewls.Windows.Advapi
                 var dataBlob = new DataBlob(CredentialBlob, CredentialBlobSize);               
                 using (var buffer = new HGlobalBuffer(entropy))
                 {
-                    var entropyBlob = new DataBlob(buffer, (uint)buffer.Size);
+                    var entropyBlob = new DataBlob(buffer.Buffer, (uint)buffer.Size);
                     return Crypt.UnprotectData(dataBlob, entropyBlob);
                 }
             }

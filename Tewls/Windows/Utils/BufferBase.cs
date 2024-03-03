@@ -87,6 +87,12 @@ namespace Tewls.Windows.Utils
             Size = size;
         }
 
+        public void Set(IntPtr buffer, IntPtr size)
+        {
+            Buffer = buffer;
+            Size = size;
+        }
+
         public override int GetHashCode()
         {
             return Buffer.GetHashCode();

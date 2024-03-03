@@ -43,14 +43,12 @@ namespace Tewls.Windows.Advapi
 
         public RemoteBuffer(NativeProcess process, IntPtr size) : this(process)
         {
-            Buffer = Alloc(size);
-            Size = size;
+            Set(Alloc(size), size);
         }
 
         public RemoteBuffer(NativeProcess process, IntPtr buffer, IntPtr size) : this(process)
         {
-            Buffer = buffer;
-            Size = size;
+            Set(buffer, size);
         }
 
         public RemoteBuffer(NativeProcess process, string s) : this(process, (IntPtr)((s.Length + 1) * sizeof(char)))
