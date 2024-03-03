@@ -23,6 +23,16 @@ namespace Tewls.Windows.Kernel
         Unknown = 0xffff
     }
 
+    public enum ProcessorType : ushort
+    {
+        Intel386 = 386,
+        Intel486 = 486,
+        IntelPentium = 586,
+        IntelIA64 = 2200,
+        IntelAMDX8664 = 8664,
+        Arm = 0
+    }
+
     [StructLayout(LayoutKind.Sequential)]
     public class SystemInfo
     {
@@ -33,7 +43,7 @@ namespace Tewls.Windows.Kernel
         public IntPtr MaximumApplicationAddress;
         public IntPtr ActiveProcessorMask;
         public uint NumberOfProcessors;
-        public uint ProcessorType;
+        public ProcessorType ProcessorType;
         public uint AllocationGranularity;
         public short ProcessorLevel;
         public short ProcessorRevision;
