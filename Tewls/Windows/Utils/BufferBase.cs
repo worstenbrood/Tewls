@@ -36,7 +36,7 @@ namespace Tewls.Windows.Utils
               
         public virtual void ReAlloc(IntPtr size)
         {
-            if (Buffer == null)
+            if (Buffer == IntPtr.Zero)
             {
                 Buffer = GetAllocator.Alloc(size);
             }
@@ -85,6 +85,11 @@ namespace Tewls.Windows.Utils
             }
 
             Size = size;
+        }
+
+        public override int GetHashCode()
+        {
+            return Buffer.GetHashCode();
         }
 
         ~BufferBase()

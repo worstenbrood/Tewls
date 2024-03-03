@@ -180,10 +180,5 @@ namespace Tewls.Windows.Kernel
         {
             AllocAndCopyToBuffer(structure);
         }
-
-        public override int GetHashCode()
-        {
-            return Buffer.GetHashCode();
-        }
     }
 }

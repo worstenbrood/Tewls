@@ -35,29 +35,37 @@ namespace Tewls.Windows.Advapi
         private readonly IAllocator _allocator;
         public override IAllocator GetAllocator => _allocator;
 
-        public RemoteBuffer(NativeProcess process, IntPtr size)
+        protected RemoteBuffer(NativeProcess process)
         {
             _process = process;
             _allocator = new ProcessAllocator(_process);
-            Buffer = _allocator.Alloc(size);
+        }
+
+        public RemoteBuffer(NativeProcess process, IntPtr size) : this(process)
+        {
+            Buffer = Alloc(size);
             Size = size;
         }
 
-        public RemoteBuffer(NativeProcess process, IntPtr buffer, IntPtr size)
+        public RemoteBuffer(NativeProcess process, IntPtr buffer, IntPtr size) : this(process)
         {
-            _process = process;
-            _allocator = new ProcessAllocator(_process);
             Buffer = buffer;
             Size = size;
         }
 
-        public RemoteBuffer(NativeProcess process, string s)
+        public RemoteBuffer(NativeProcess process, string s) : this(process, (IntPtr)((s.Length + 1) * sizeof(char)))
         {
-            _process = process;
-            _allocator = new ProcessAllocator(_process);
-            Size = (IntPtr)((s.Length + 1) * sizeof(char));
-            Buffer = _allocator.Alloc(Size);
             process.WriteString(this, s);
+        }
+
+        public RemoteBuffer(NativeProcess process, byte[] bytes) : this(process)
+        {
+            using (var localBuffer = new HGlobalBuffer(bytes))
+            {
+                Size = localBuffer.Size;
+                Buffer = Alloc(Size);
+                process.WriteProcessMemory(Buffer, localBuffer, Size);
+            }
         }
 
         public RemoteBuffer Write<TStruct>(TStruct structure, int offset = 0)
