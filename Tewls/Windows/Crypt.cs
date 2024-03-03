@@ -43,7 +43,7 @@ namespace Tewls.Windows
                     throw new Win32Exception();
                 }
 
-                return Marshal.PtrToStringAuto(dataOut.Data);
+                return Marshal.PtrToStringAuto(dataOut.Data, (int) dataOut.Size / sizeof(char));
             }
         }
     }
