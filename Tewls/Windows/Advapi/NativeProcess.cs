@@ -35,6 +35,10 @@ namespace Tewls.Windows.Advapi
 
         [DllImport("kernel32.dll", CharSet = CharSet.Auto, SetLastError = true)]
         private static extern uint GetProcessId(IntPtr Process);
+
+        [DllImport("kernel32.dll", CharSet = CharSet.Auto, SetLastError = true)]
+        private static extern bool IsWow64Process(IntPtr hProcess, ref bool Wow64Process);
+
         // Static
 
         public static IntPtr OpenProcessToken(IntPtr processHandle, TokenAccess desiredAccess)
@@ -103,6 +107,16 @@ namespace Tewls.Windows.Advapi
                 throw new Win32Exception();
             }
 
+            return result;
+        }
+
+        public static bool IsWow64Process(IntPtr hProcess)
+        {
+            var result = false;
+            if (!IsWow64Process(hProcess, ref result))
+            {
+                throw new Win32Exception();
+            }
             return result;
         }
 
@@ -311,6 +325,11 @@ namespace Tewls.Windows.Advapi
             }
 
             return result;
+        }
+
+        public bool IsWow64Process()
+        {
+            return IsWow64Process(Handle);
         }
 
         public override int GetHashCode()
