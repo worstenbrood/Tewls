@@ -29,7 +29,12 @@ namespace Tewls.Windows.Utils
 
         public HGlobalBuffer(IntPtr size) : base(size)
         {
-        }        
+        }
+
+        public HGlobalBuffer(byte[] bytes) : base((IntPtr) bytes.Length)
+        {
+            Marshal.Copy(bytes, 0, Buffer, bytes.Length);
+        }
     }
 
     public class HGlobalBuffer<TStruct> : BufferBase<HGlobalBuffer.Allocator, TStruct>
