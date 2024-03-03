@@ -2,7 +2,7 @@
 
 namespace Tewls.Windows.Utils
 {
-    public interface IAllocator
+    public interface IMemory
     {
         IntPtr Alloc(IntPtr size);
         IntPtr ReAlloc(IntPtr buffer, IntPtr size);

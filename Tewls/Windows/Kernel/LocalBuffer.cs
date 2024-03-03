@@ -7,7 +7,7 @@ namespace Tewls.Windows.Kernel
 {
     public class LocalBuffer : BufferBase<LocalBuffer.Allocator>
     {
-        public class Allocator : IAllocator
+        public class Allocator : IMemory
         {
             public IntPtr Alloc(IntPtr size)
             {

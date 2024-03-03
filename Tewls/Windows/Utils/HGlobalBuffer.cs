@@ -5,7 +5,7 @@ namespace Tewls.Windows.Utils
 {
     public class HGlobalBuffer : BufferBase<HGlobalBuffer.Allocator>
     {
-        public class Allocator : IAllocator
+        public class Allocator : IMemory
         {
             public IntPtr Alloc(IntPtr size)
             {

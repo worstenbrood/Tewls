@@ -6,7 +6,7 @@ namespace Tewls.Windows.Advapi
 {
     public class CredBuffer : BufferBase<CredBuffer.Allocator>
     {
-        public class Allocator : IAllocator
+        public class Allocator : IMemory
         {
             public IntPtr Alloc(IntPtr size)
             {

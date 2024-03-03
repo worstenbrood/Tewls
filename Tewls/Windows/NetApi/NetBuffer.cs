@@ -7,7 +7,7 @@ namespace Tewls.Windows.NetApi
 {
     public class NetBuffer : BufferBase<NetBuffer.Allocator>
     {
-        public class Allocator : IAllocator
+        public class Allocator : IMemory
         {
             public IntPtr Alloc(IntPtr size)
             {

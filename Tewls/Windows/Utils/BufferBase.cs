@@ -8,7 +8,7 @@ namespace Tewls.Windows.Utils
     {
         protected bool Disposed = false;
        
-        public virtual IAllocator GetAllocator { get { throw new NotImplementedException(); } }
+        public virtual IMemory Memory { get { throw new NotImplementedException(); } }
 
         public IntPtr Size = IntPtr.Zero;
         public IntPtr Buffer = IntPtr.Zero;
@@ -31,18 +31,18 @@ namespace Tewls.Windows.Utils
                 
         public virtual IntPtr Alloc(IntPtr size)
         {
-            return GetAllocator.Alloc(size);
+            return Memory.Alloc(size);
         }
               
         public virtual void ReAlloc(IntPtr size)
         {
             if (Buffer == IntPtr.Zero)
             {
-                Buffer = GetAllocator.Alloc(size);
+                Buffer = Memory.Alloc(size);
             }
             else
             {
-                Buffer = GetAllocator.ReAlloc(Buffer, size);
+                Buffer = Memory.ReAlloc(Buffer, size);
             }
             Size = size;
         }
@@ -51,7 +51,7 @@ namespace Tewls.Windows.Utils
         {
             if (Buffer != IntPtr.Zero)
             {
-                GetAllocator.Free(Buffer);
+                Memory.Free(Buffer);
                 Buffer = IntPtr.Zero;
                 Size = IntPtr.Zero;
             }
@@ -105,11 +105,11 @@ namespace Tewls.Windows.Utils
     }
 
     public abstract class BufferBase<TAlloc> : BufferBase
-       where TAlloc : class, IAllocator, new()
+       where TAlloc : class, IMemory, new()
     {
-        private static readonly IAllocator _allocator = new TAlloc();
+        private static readonly IMemory _allocator = new TAlloc();
 
-        public override IAllocator GetAllocator { get { return _allocator; } }
+        public override IMemory Memory { get { return _allocator; } }
 
         public T PtrToStructure<T>(T resource = null)
           where T : class, new()
@@ -142,7 +142,7 @@ namespace Tewls.Windows.Utils
     }
 
     public abstract class BufferBase<TAlloc, TStruct> : BufferBase<TAlloc>
-        where TAlloc : class, IAllocator, new()
+        where TAlloc : class, IMemory, new()
         where TStruct : class
     {
         protected readonly static Type Type = typeof(TStruct);

@@ -7,7 +7,7 @@ namespace Tewls.Windows.Advapi
 {
     public class RemoteBuffer : BufferBase
     {
-        public class ProcessAllocator : IAllocator
+        public class ProcessAllocator : IMemory
         {
             private readonly NativeProcess _process;
 
@@ -33,8 +33,9 @@ namespace Tewls.Windows.Advapi
         }
 
         protected readonly NativeProcess _process;
-        private readonly IAllocator _allocator;
-        public override IAllocator GetAllocator => _allocator;
+        private readonly IMemory _allocator;
+
+        public override IMemory Memory => _allocator;
 
         protected RemoteBuffer(NativeProcess process)
         {
