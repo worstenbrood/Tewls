@@ -51,6 +51,15 @@ namespace Tewls.Windows.Advapi
             Size = size;
         }
 
+        public RemoteBuffer(NativeProcess process, string s)
+        {
+            _process = process;
+            _allocator = new ProcessAllocator(_process);
+            Size = (IntPtr)((s.Length + 1) * sizeof(char));
+            Buffer = _allocator.Alloc(Size);
+            process.WriteString(this, s);
+        }
+
         public RemoteBuffer Write<TStruct>(TStruct structure, int offset = 0)
             where TStruct : class
         {
@@ -85,7 +94,7 @@ namespace Tewls.Windows.Advapi
     {
         public RemoteBuffer(NativeProcess process, TStruct structure) : base(process, (IntPtr) NativeBuffer.GetObjectSize(structure))
         {
-
+            process.WriteProcessMemory(structure, Buffer);
         }
     }
 }
