@@ -63,7 +63,7 @@ namespace Tewls.Windows.Advapi
             }
         }
 
-        public string GetPassword()
+        public virtual string GetPassword()
         {
             if (CredentialBlob == IntPtr.Zero)
             {
