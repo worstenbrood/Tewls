@@ -86,15 +86,7 @@ namespace Tewls.Windows.NetApi
         public NetBuffer()
         {
         }
-
-        public NetBuffer(IntPtr size) : base(size)
-        {
-        }
-
-        public NetBuffer(uint size) : base((IntPtr)size)
-        {
-        }
-
+              
         public uint GetSize()
         {
             return BufferSize(Buffer);
@@ -104,14 +96,6 @@ namespace Tewls.Windows.NetApi
     public class NetBuffer<TStruct> : BufferBase<NetBuffer.Allocator, TStruct>
             where TStruct : class
     {
-        public NetBuffer()
-        {
-        }
-
-        public NetBuffer(IntPtr size) : base(size)
-        {
-        }
-
         public NetBuffer(TStruct s) : base(s)
         {
         }
