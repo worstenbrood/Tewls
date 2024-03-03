@@ -44,14 +44,13 @@ namespace Tewls.Windows
             {
                 var dataOut = new DataBlob();
                 var result = CryptUnprotectData(dataIn, IntPtr.Zero, optionalEntropy, IntPtr.Zero, IntPtr.Zero, 0, dataOut);
-                
-                // Free buffer
-                buffer.Set(dataOut.Data,(IntPtr) dataOut.Size);
-
                 if (!result)
                 {
                     throw new Win32Exception();
                 }
+
+                // Free buffer
+                buffer.Set(dataOut.Data, (IntPtr)dataOut.Size);
 
                 return Marshal.PtrToStringAuto(dataOut.Data, (int) dataOut.Size / sizeof(char));
             }
