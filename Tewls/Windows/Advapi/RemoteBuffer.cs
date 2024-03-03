@@ -50,16 +50,32 @@ namespace Tewls.Windows.Advapi
             Size = size;
         }
 
-        public void Write<TStruct>(TStruct structure, int offset = 0)
+        public RemoteBuffer Write<TStruct>(TStruct structure, int offset = 0)
             where TStruct : class
         {
             _process.WriteProcessMemory(structure, Buffer + offset);
+            return this;
         }
 
         public TStruct Read<TStruct>(int offset = 0)
             where TStruct : class, new()
         {
             return _process.ReadProcessMemory<TStruct>(Buffer + offset);
+        }
+
+        public string ReadString()
+        {
+            return _process.ReadString(this);
+        }
+
+        public RemoteBuffer WriteString(string s)
+        {
+            return _process.WriteString(this, s);
+        }
+
+        public MemoryBasicInformation GetInformation()
+        {
+            return _process.VirtualQueryEx(Buffer);
         }
     }
 }

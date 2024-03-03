@@ -251,15 +251,20 @@ namespace Tewls.Windows.Advapi
             }
         }
 
+        public RemoteBuffer WriteString(RemoteBuffer remoteBuffer, string s)
+        {
+            using (var localBuffer = new HGlobalBuffer(remoteBuffer.Size))
+            {
+                NativeBuffer.lstrcpyn(localBuffer.Buffer, s);
+                return WriteProcessMemory(remoteBuffer, localBuffer.Buffer, localBuffer.Size);
+            }
+        }
+
         public RemoteBuffer WriteString(string s)
         {
             var size = (s.Length + 1) * sizeof(char);
-            using (var localBuffer = new HGlobalBuffer((IntPtr) size))
-            {
-                NativeBuffer.lstrcpyn(localBuffer.Buffer, s);
-                var remoteBuffer = VirtualAllocExBuffer(localBuffer.Size, MemAllocations.Commit|MemAllocations.Reserve|MemAllocations.TopDown, MemProtections.ReadWrite);
-                return WriteProcessMemory(remoteBuffer, localBuffer.Buffer, localBuffer.Size);
-            }
+            var remoteBuffer = VirtualAllocExBuffer((IntPtr) size, MemAllocations.Commit | MemAllocations.Reserve | MemAllocations.TopDown, MemProtections.ReadWrite);
+            return WriteString(remoteBuffer, s);
         }
 
         public MemProtections VirtualProtectEx(IntPtr remoteBuffer, IntPtr size, MemProtections protection)
