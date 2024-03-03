@@ -149,7 +149,7 @@ namespace Tewls.Windows.Utils
 
         public override void Free()
         {
-            if (Type.IsLayoutSequential)
+            if (Buffer != IntPtr.Zero && Type.IsLayoutSequential)
             {
                 Marshal.DestroyStructure(Buffer, Type);
             }
@@ -158,7 +158,7 @@ namespace Tewls.Windows.Utils
 
         public override void ReAlloc(IntPtr size)
         {
-            if (Type.IsLayoutSequential)
+            if (Buffer != IntPtr.Zero && Type.IsLayoutSequential)
             {
                 Marshal.DestroyStructure(Buffer, Type);
             }
