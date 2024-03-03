@@ -81,16 +81,12 @@ namespace Tewls.Windows.Advapi
                 {
                     throw new Win32Exception();
                 }
-
-                var array = new IntPtr[count];
-
-                // Result buffer contains an array of pointers to Credential records
-                Marshal.Copy(buffer.Buffer, array, 0, (int) count);
-
+                             
                 var credential = new Credential();
                 for(var i = 0; i < count; i++)
                 {
-                    yield return BufferBase.PtrToStructure(array[i], credential);
+                    var record = Marshal.ReadIntPtr(buffer.Buffer, i * Marshal.SizeOf(typeof(IntPtr)));
+                    yield return BufferBase.PtrToStructure(record, credential);
                 }
             }
         }
