@@ -1,7 +1,9 @@
 ﻿using System;
+using System.ComponentModel;
 using System.Runtime.InteropServices;
 using System.Runtime.InteropServices.ComTypes;
 using System.Security.Cryptography;
+using Tewls.Windows.Utils;
 
 namespace Tewls.Windows.Advapi
 {
@@ -37,41 +39,6 @@ namespace Tewls.Windows.Advapi
         LocalMachine,
         Entreprise
     }
-
-    [StructLayout(LayoutKind.Sequential)]
-    public class Credential
-    {
-        public CredFlags Flags;
-        public CredType Type;
-        [MarshalAs(UnmanagedType.LPTStr)]
-        public string TargetName;
-        [MarshalAs(UnmanagedType.LPTStr)]
-        public string Comment;
-        public FILETIME LastWritten;
-        public uint CredentialBlobSize;
-        public IntPtr CredentialBlob;
-        public CredPersist Persist;
-        public uint AttributeCount;
-        public IntPtr Attributes;
-        [MarshalAs(UnmanagedType.LPTStr)]
-        public string TargetAlias;
-        [MarshalAs(UnmanagedType.LPTStr)]
-        public string UserName;
-
-        public string GetPassword()
-        {
-            if (CredentialBlob == IntPtr.Zero)
-            {
-                return null;
-            }
-
-            switch(Type)
-            {
-                default:
-                    return Marshal.PtrToStringUni(CredentialBlob, (int) CredentialBlobSize / sizeof(char));
-            }
-        }
-    };
 
     [StructLayout(LayoutKind.Sequential)]
     public class CredentialTargetInformation
