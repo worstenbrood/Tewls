@@ -62,7 +62,7 @@ namespace Tewls.Windows.Advapi
             {
                 Size = localBuffer.Size;
                 Buffer = Alloc(Size);
-                process.WriteProcessMemory(Buffer, localBuffer, Size);
+                process.WriteProcessMemory(Buffer, localBuffer.Buffer, Size);
             }
         }
 
@@ -92,6 +92,12 @@ namespace Tewls.Windows.Advapi
         public MemoryBasicInformation GetInformation()
         {
             return _process.VirtualQueryEx(Buffer);
+        }
+
+        public RemoteBuffer Protect(MemProtections protection)
+        {
+            _process.VirtualProtectEx(this, protection);
+            return this;
         }
     }
 
