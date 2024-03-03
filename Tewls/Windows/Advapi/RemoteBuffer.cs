@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Diagnostics;
 using Tewls.Windows.Kernel;
 using Tewls.Windows.Utils;
 
@@ -33,14 +32,14 @@ namespace Tewls.Windows.Advapi
         }
 
         protected readonly NativeProcess _process;
-        private readonly IMemory _allocator;
+        private readonly IMemory _memory;
 
-        public override IMemory Memory => _allocator;
+        public override IMemory Memory => _memory;
 
         protected RemoteBuffer(NativeProcess process)
         {
             _process = process;
-            _allocator = new ProcessAllocator(_process);
+            _memory = new ProcessAllocator(_process);
         }
 
         public RemoteBuffer(NativeProcess process, IntPtr size) : this(process)

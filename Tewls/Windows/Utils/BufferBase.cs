@@ -104,12 +104,12 @@ namespace Tewls.Windows.Utils
         }
     }
 
-    public abstract class BufferBase<TAlloc> : BufferBase
-       where TAlloc : class, IMemory, new()
+    public abstract class BufferBase<TMemory> : BufferBase
+       where TMemory : class, IMemory, new()
     {
-        private static readonly IMemory _allocator = new TAlloc();
+        private static readonly IMemory _memory = new TMemory();
 
-        public override IMemory Memory { get { return _allocator; } }
+        public override IMemory Memory { get { return _memory; } }
 
         public T PtrToStructure<T>(T resource = null)
           where T : class, new()
@@ -141,8 +141,8 @@ namespace Tewls.Windows.Utils
         }
     }
 
-    public abstract class BufferBase<TAlloc, TStruct> : BufferBase<TAlloc>
-        where TAlloc : class, IMemory, new()
+    public abstract class BufferBase<TMemory, TStruct> : BufferBase<TMemory>
+        where TMemory : class, IMemory, new()
         where TStruct : class
     {
         protected readonly static Type Type = typeof(TStruct);
