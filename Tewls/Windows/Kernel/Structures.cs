@@ -13,10 +13,20 @@ namespace Tewls.Windows.Kernel
         Hnd = 0x0042,
     }
 
+    public enum ProcessorArchitecture : ushort
+    {
+        Amd64 = 9,
+        Arm = 5,
+        Arm64 = 12,
+        IA64 = 6,
+        Intel = 0,
+        Unknown = 0xffff
+    }
+
     [StructLayout(LayoutKind.Sequential)]
     public class SystemInfo
     {
-        public short ProcessorArchitecture;
+        public ProcessorArchitecture ProcessorArchitecture;
         public short Reserved;
         public uint PageSize;
         public IntPtr MinimumApplicationAddress;
