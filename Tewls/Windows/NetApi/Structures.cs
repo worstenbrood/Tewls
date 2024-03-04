@@ -443,4 +443,40 @@ namespace Tewls.Windows.NetApi.Structures
             return ShareLevel.Share503;
         }
     };
+
+    public enum ConnectionLevel
+    {
+        Connection0 = 0,
+        Connection1 = 1,
+    };
+
+    [StructLayout(LayoutKind.Sequential)]
+    public class ConnectionInfo0 : IInfo<ConnectionLevel>
+    {
+        public uint Id;
+
+        public ConnectionLevel GetLevel()
+        {
+            return ConnectionLevel.Connection0;
+        }
+    };
+
+    [StructLayout(LayoutKind.Sequential)]
+    public class ConnectionInfo1 : IInfo<ConnectionLevel>
+    {
+        public uint Id;
+        public ShareType Type;
+        public uint NumOpens;
+        public uint NumUsers;
+        public uint Time;
+        [MarshalAs(UnmanagedType.LPWStr)]
+        public string Username;
+        [MarshalAs(UnmanagedType.LPWStr)]
+        public string Netname;
+
+        public ConnectionLevel GetLevel()
+        {
+            return ConnectionLevel.Connection1;
+        }
+    }
 }
