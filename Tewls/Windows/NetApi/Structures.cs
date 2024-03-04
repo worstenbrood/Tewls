@@ -487,6 +487,13 @@ namespace Tewls.Windows.NetApi.Structures
         Session2 = 2,
     }
 
+    [Flags]
+    public enum SessionFlags : uint
+    {
+        Guest = 1,
+        NoEncryption = 2
+    }
+
     [StructLayout(LayoutKind.Sequential)]
     public class SessionInfo0 : IInfo<SessionLevel>
     {
@@ -500,6 +507,24 @@ namespace Tewls.Windows.NetApi.Structures
     };
 
     [StructLayout(LayoutKind.Sequential)]
+    public class SessionInfo1 : IInfo<SessionLevel>
+    {
+        [MarshalAs(UnmanagedType.LPWStr)]
+        public string CName;
+        [MarshalAs(UnmanagedType.LPWStr)]
+        public string Username;
+        public uint NumOpens;
+        public uint Time;
+        public uint IdleTime;
+        public SessionFlags UserFlags;
+      
+        public SessionLevel GetLevel()
+        {
+            return SessionLevel.Session1;
+        }
+    };
+
+    [StructLayout(LayoutKind.Sequential)]
     public class SessionInfo2 : IInfo<SessionLevel>
     {
         [MarshalAs(UnmanagedType.LPWStr)]
@@ -509,9 +534,10 @@ namespace Tewls.Windows.NetApi.Structures
         public uint NumOpens;
         public uint Time;
         public uint IdleTime;
-        public uint UserFlags;
+        public SessionFlags UserFlags;
         [MarshalAs(UnmanagedType.LPWStr)]
         public string CLTypeName;
+
         public SessionLevel GetLevel()
         {
             return SessionLevel.Session2;
