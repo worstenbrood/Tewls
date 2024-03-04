@@ -324,4 +324,45 @@ namespace Tewls.Windows.NetApi.Structures
         public DayOfWeek WeekDay;
         public uint Tinterval;
     };
+
+    public enum ShareLevel
+    {
+        Share0 = 0,
+        Share1 = 1,
+    };
+
+    [StructLayout(LayoutKind.Sequential)]
+    public class ShareInfo0 : IInfo<ShareLevel>
+    {
+        [MarshalAs(UnmanagedType.LPWStr)]
+        public string Netname;
+
+        public ShareLevel GetLevel()
+        {
+            return ShareLevel.Share0;
+        }
+    };
+
+    public enum ShareType : uint
+    {
+        DiskTree = 0,
+        PrintQueue,
+        Device,
+        Ipc
+    }
+
+    [StructLayout(LayoutKind.Sequential)]
+    public class ShareInfo1 : IInfo<ShareLevel>
+    {
+        [MarshalAs(UnmanagedType.LPWStr)]
+        public string Netname;
+        public ShareType Type;
+        [MarshalAs(UnmanagedType.LPWStr)]
+        public string Remark;
+
+        public ShareLevel GetLevel()
+        {
+            return ShareLevel.Share1;
+        }
+    };
 }
