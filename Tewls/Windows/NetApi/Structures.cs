@@ -479,4 +479,42 @@ namespace Tewls.Windows.NetApi.Structures
             return ConnectionLevel.Connection1;
         }
     }
+
+    public enum SessionLevel : uint
+    {
+        Session0 = 0,
+        Session1 = 1,
+        Session2 = 2,
+    }
+
+    [StructLayout(LayoutKind.Sequential)]
+    public class SessionInfo0 : IInfo<SessionLevel>
+    {
+        [MarshalAs(UnmanagedType.LPWStr)]
+        public string CName;
+
+        public SessionLevel GetLevel()
+        {
+            return SessionLevel.Session0;
+        }
+    };
+
+    [StructLayout(LayoutKind.Sequential)]
+    public class SessionInfo2 : IInfo<SessionLevel>
+    {
+        [MarshalAs(UnmanagedType.LPWStr)]
+        public string CName;
+        [MarshalAs(UnmanagedType.LPWStr)]
+        public string Username;
+        public uint NumOpens;
+        public uint Time;
+        public uint IdleTime;
+        public uint UserFlags;
+        [MarshalAs(UnmanagedType.LPWStr)]
+        public string CLTypeName;
+        public SessionLevel GetLevel()
+        {
+            return SessionLevel.Session2;
+        }
+    };
 }
