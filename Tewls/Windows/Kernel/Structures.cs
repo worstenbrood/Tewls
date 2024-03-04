@@ -58,4 +58,18 @@ namespace Tewls.Windows.Kernel
             return info;
         }
     };
+
+    [Flags]
+    public enum AccessFlags : uint
+    {
+        None = 0,
+        Read = 0x00000001,
+        Write = 0x00000002,
+        Create = 0x00000004,
+        Execute = 0x00000008,
+        Delete = 0x00000010,
+        Attributes = 0x00000020,
+        Permissions = 0x00000040,
+        All = 0x00008000
+    }
 }

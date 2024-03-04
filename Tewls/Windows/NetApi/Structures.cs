@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Runtime.InteropServices;
+using Tewls.Windows.Kernel;
 
 namespace Tewls.Windows.NetApi.Structures
 {
@@ -329,6 +330,9 @@ namespace Tewls.Windows.NetApi.Structures
     {
         Share0 = 0,
         Share1 = 1,
+        Share2 = 2,
+        Share502 = 502,
+        Share503 = 503
     };
 
     [StructLayout(LayoutKind.Sequential)]
@@ -348,7 +352,9 @@ namespace Tewls.Windows.NetApi.Structures
         DiskTree = 0,
         PrintQueue,
         Device,
-        Ipc
+        Ipc,
+        Temporary = 0x40000000,
+        Special = 0x80000000
     }
 
     [StructLayout(LayoutKind.Sequential)]
@@ -363,6 +369,78 @@ namespace Tewls.Windows.NetApi.Structures
         public ShareLevel GetLevel()
         {
             return ShareLevel.Share1;
+        }
+    };
+
+    [StructLayout(LayoutKind.Sequential)]
+    public class ShareInfo2 : IInfo<ShareLevel>
+    {
+        [MarshalAs(UnmanagedType.LPWStr)]
+        public string Netname;
+        public ShareType Type;
+        [MarshalAs(UnmanagedType.LPWStr)]
+        public string Remark;
+        public AccessFlags Permissions;
+        public uint MaxUses;
+        public uint CurrentUses;
+        [MarshalAs(UnmanagedType.LPWStr)]
+        public string Path;
+        [MarshalAs(UnmanagedType.LPWStr)]
+        public string Password;
+
+        public ShareLevel GetLevel()
+        {
+            return ShareLevel.Share2;
+        }
+    };
+
+    [StructLayout(LayoutKind.Sequential)]
+    public class ShareInfo502 : IInfo<ShareLevel>
+    {
+        [MarshalAs(UnmanagedType.LPWStr)]
+        public string Netname;
+        public ShareType Type;
+        [MarshalAs(UnmanagedType.LPWStr)]
+        public string Remark;
+        public AccessFlags Permissions;
+        public uint MaxUses;
+        public uint CurrentUses;
+        [MarshalAs(UnmanagedType.LPWStr)]
+        public string Path;
+        [MarshalAs(UnmanagedType.LPWStr)]
+        public string Password;
+        public uint Reserved;
+        public IntPtr SecurityDescriptor;
+
+        public ShareLevel GetLevel()
+        {
+            return ShareLevel.Share502;
+        }
+    }
+
+    [StructLayout(LayoutKind.Sequential)]
+    public class ShareInfo503 : IInfo<ShareLevel>
+    {
+        [MarshalAs(UnmanagedType.LPWStr)]
+        public string Netname;
+        public ShareType Type;
+        [MarshalAs(UnmanagedType.LPWStr)]
+        public string Remark;
+        public AccessFlags Permissions;
+        public uint MaxUses;
+        public uint CurrentUses;
+        [MarshalAs(UnmanagedType.LPWStr)]
+        public string Path;
+        [MarshalAs(UnmanagedType.LPWStr)]
+        public string Password;
+        [MarshalAs(UnmanagedType.LPWStr)]
+        public string Servername;
+        public uint Reserved;
+        public IntPtr SecurityDescriptor;
+
+        public ShareLevel GetLevel()
+        {
+            return ShareLevel.Share503;
         }
     };
 }
