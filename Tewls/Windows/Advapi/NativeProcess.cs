@@ -42,6 +42,8 @@ namespace Tewls.Windows.Advapi
         [DllImport("kernel32.dll", CharSet = CharSet.Auto, SetLastError = true)]
         private static extern IntPtr OpenProcess(ProcessAccessRights dwDesiredAccess, bool bInheritHandle, int dwProcessId);
 
+        [DllImport("kernel32.dll", CharSet = CharSet.Auto, SetLastError = true)]
+        private static extern bool TerminateProcess(IntPtr hProcess, uint uExitCode);
         // Static
 
         public static IntPtr OpenProcess(int processId, ProcessAccessRights desiredAccess, bool inheritHandle = true)
@@ -52,6 +54,14 @@ namespace Tewls.Windows.Advapi
                 throw new Win32Exception();
             }
             return result;
+        }
+
+        public static void TerminateProcess(IntPtr hProcess, int uExitCode = 0)
+        {
+            if (!TerminateProcess(hProcess, (uint) uExitCode))
+            {
+                throw new Win32Exception();
+            }
         }
 
         public static IntPtr OpenProcessToken(IntPtr processHandle, TokenAccess desiredAccess)
@@ -345,6 +355,11 @@ namespace Tewls.Windows.Advapi
         public bool IsWow64Process()
         {
             return IsWow64Process(Handle);
+        }
+
+        public void TerminateProcess(int exitCode = 0)
+        {
+            TerminateProcess(Handle, exitCode);
         }
 
         public override int GetHashCode()
