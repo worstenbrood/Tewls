@@ -40,18 +40,18 @@ namespace Tewls.Windows.Advapi
         private static extern bool IsWow64Process(IntPtr hProcess, ref bool Wow64Process);
 
         [DllImport("kernel32.dll", CharSet = CharSet.Auto, SetLastError = true)]
-        private static extern IntPtr OpenProcess(ProcessAccessRights dwDesiredAccess, bool bInheritHandle, uint dwProcessId);
+        private static extern IntPtr OpenProcess(ProcessAccessRights dwDesiredAccess, bool bInheritHandle, int dwProcessId);
 
         // Static
 
-        public static IntPtr OpenProcess(uint processId, ProcessAccessRights desiredAccess, bool inheritHandle = true)
+        public static IntPtr OpenProcess(int processId, ProcessAccessRights desiredAccess, bool inheritHandle = true)
         {
             var result = OpenProcess(desiredAccess, inheritHandle, processId);
             if (result == IntPtr.Zero) 
             {
                 throw new Win32Exception();
             }
-            return new NativeProcess(result);
+            return result;
         }
 
         public static IntPtr OpenProcessToken(IntPtr processHandle, TokenAccess desiredAccess)
@@ -135,7 +135,7 @@ namespace Tewls.Windows.Advapi
 
         // Class
 
-        public NativeProcess(string name)
+        public NativeProcess(string name, ProcessAccessRights accessRights)
         {
             var processes = Process.GetProcessesByName(name);
             if (processes.Length == 0)
@@ -143,10 +143,12 @@ namespace Tewls.Windows.Advapi
                 throw new Exception($"Process {name} not found.");
             }
 
-            Handle = processes[0].Handle;
+            Handle = OpenProcess(processes[0].Id, accessRights);
+        }
 
-            // Handle will be closed by the runtime
-            Disposed = true;
+        public NativeProcess(int processId, ProcessAccessRights accessRights)
+        {
+            Handle = OpenProcess(processId, accessRights);
         }
 
         public NativeProcess(IntPtr processHandle, bool dispose = false) : base(processHandle, dispose)
