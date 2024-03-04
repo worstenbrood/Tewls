@@ -39,7 +39,20 @@ namespace Tewls.Windows.Advapi
         [DllImport("kernel32.dll", CharSet = CharSet.Auto, SetLastError = true)]
         private static extern bool IsWow64Process(IntPtr hProcess, ref bool Wow64Process);
 
+        [DllImport("kernel32.dll", CharSet = CharSet.Auto, SetLastError = true)]
+        private static extern IntPtr OpenProcess(ProcessAccessRights dwDesiredAccess, bool bInheritHandle, uint dwProcessId);
+
         // Static
+
+        public static IntPtr OpenProcess(uint processId, ProcessAccessRights desiredAccess, bool inheritHandle = true)
+        {
+            var result = OpenProcess(desiredAccess, inheritHandle, processId);
+            if (result == IntPtr.Zero) 
+            {
+                throw new Win32Exception();
+            }
+            return new NativeProcess(result);
+        }
 
         public static IntPtr OpenProcessToken(IntPtr processHandle, TokenAccess desiredAccess)
         {
