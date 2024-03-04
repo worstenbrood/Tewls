@@ -2,7 +2,6 @@
 using System.Runtime.InteropServices.ComTypes;
 using System.Runtime.InteropServices;
 using Tewls.Windows.Utils;
-using Tewls.Windows.Kernel;
 
 namespace Tewls.Windows.Advapi
 {
