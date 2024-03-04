@@ -2,6 +2,7 @@
 using System.ComponentModel;
 using System.Diagnostics;
 using System.Runtime.InteropServices;
+using Tewls.Windows.Kernel;
 
 namespace Tewls.Windows.Advapi
 {

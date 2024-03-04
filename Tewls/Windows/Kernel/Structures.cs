@@ -72,4 +72,102 @@ namespace Tewls.Windows.Kernel
         Permissions = 0x00000040,
         All = 0x00008000
     }
+
+    [Flags]
+    public enum MemAllocations : uint
+    {
+        None = 0,
+        Commit = 0x00001000,
+        Reserve = 0x00002000,
+        Reset = 0x00080000,
+        Free = 0x000010000,
+        ResetUndo = 0x1000000,
+        LargePages = 0x20000000,
+        Physical = 0x00400000,
+        TopDown = 0x00100000
+    }
+
+    [Flags]
+    public enum MemProtections : uint
+    {
+        NoAccess = 0x1,
+        ReadOnly = 0x2,
+        ReadWrite = 0x4,
+        WriteCopy = 0x8,
+        Execute = 0x10,
+        ExecuteRead = 0x20,
+        ExecuteReadWrite = 0x40,
+        ExecuteWriteCopy = 0x80,
+        Guard = 0x100,
+        NoCache = 0x200,
+        WriteCombine = 0x400,
+        TargetsInvalid = 0x40000000,
+    }
+
+    [Flags]
+    public enum MemType : uint
+    {
+        None = 0,
+        Image = 0x1000000,
+        Mapped = 0x40000,
+        Private = 0x20000,
+    }
+
+    [StructLayout(LayoutKind.Sequential)]
+    public class MemoryBasicInformation<TPointer>
+    {
+        public TPointer BaseAddress;
+        public TPointer AllocationBase;
+        public MemProtections AllocationProtect;
+        public short PartitionId;
+        public TPointer RegionSize;
+        public MemAllocations State;
+        public MemAllocations Protect;
+        public MemType Type;
+    };
+
+    [StructLayout(LayoutKind.Sequential)]
+    public class MemoryBasicInformation : MemoryBasicInformation<IntPtr>
+    {
+    }
+
+    public enum MemFreeType : uint
+    {
+        Decommit = 0x00004000,
+        Release = 0x00008000,
+        CoalescePlaceholder = 0x00000001,
+        PreserverPlaceHolder = 0x00000002
+    }
+
+    [Flags]
+    public enum CreationFlags : uint
+    {
+        None = 0,
+        Suspended = 4,
+        StackSizeParamIsAReservation = 0x00010000
+    }
+
+    [Flags]
+    public enum ProcessAccessRights : uint
+    {
+        Terminate = 0x0001,
+        CreateThread = 0x0002,
+        VmOperation = 0x0008,
+        VmRead = 0x0010,
+        VmWrite = 0x0020,
+        DuplicateHandle = 0x0040,
+        CreateProcess = 0x0080,
+        SetQuota = 0x0100,
+        SetInformation = 0x0200,
+        QueryInformation = 0x0400,
+        SuspendResume = 0x0800,
+        QueryLimitedInformation = 0x1000,
+        Delete = 0x00010000,
+        ReadControl = 0x00020000,
+        WriteDac = 0x00040000,
+        WriteOwner = 0x00080000,
+        Synchronize = 0x00100000,
+        StandardRightsRequired = 0x000F0000,
+        AllAccess = StandardRightsRequired | Synchronize | 0xFFF
+    }
 }
