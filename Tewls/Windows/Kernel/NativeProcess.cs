@@ -2,10 +2,10 @@
 using System.ComponentModel;
 using System.Diagnostics;
 using System.Runtime.InteropServices;
-using Tewls.Windows.Kernel;
+using Tewls.Windows.Advapi;
 using Tewls.Windows.Utils;
 
-namespace Tewls.Windows.Advapi
+namespace Tewls.Windows.Kernel
 {
     public class NativeProcess : NativeHandle
     {
@@ -44,12 +44,16 @@ namespace Tewls.Windows.Advapi
 
         [DllImport("kernel32.dll", CharSet = CharSet.Auto, SetLastError = true)]
         private static extern bool TerminateProcess(IntPtr hProcess, uint uExitCode);
+
+        [DllImport("kernel32.dll", CharSet = CharSet.Auto, SetLastError = true)]
+        public static extern IntPtr GetCurrentProcess();
+
         // Static
 
         public static IntPtr OpenProcess(int processId, ProcessAccessRights desiredAccess, bool inheritHandle = true)
         {
             var result = OpenProcess(desiredAccess, inheritHandle, processId);
-            if (result == IntPtr.Zero) 
+            if (result == IntPtr.Zero)
             {
                 throw new Win32Exception();
             }
@@ -58,7 +62,7 @@ namespace Tewls.Windows.Advapi
 
         public static void TerminateProcess(IntPtr hProcess, int uExitCode = 0)
         {
-            if (!TerminateProcess(hProcess, (uint) uExitCode))
+            if (!TerminateProcess(hProcess, (uint)uExitCode))
             {
                 throw new Win32Exception();
             }
@@ -145,6 +149,10 @@ namespace Tewls.Windows.Advapi
 
         // Class
 
+        public NativeProcess() : base(GetCurrentProcess(), false)
+        {
+        }
+
         public NativeProcess(string name, ProcessAccessRights accessRights)
         {
             var processes = Process.GetProcessesByName(name);
@@ -184,11 +192,11 @@ namespace Tewls.Windows.Advapi
         public RemoteBuffer VirtualAllocExBuffer(IntPtr size, MemAllocations allocationType, MemProtections protect, IntPtr address = default)
         {
             return new RemoteBuffer(this, VirtualAllocEx(size, allocationType, protect, address), size);
-        }     
+        }
 
         public RemoteBuffer VirtualAllocExBuffer(uint size, MemAllocations allocationType, MemProtections protect, IntPtr address = default)
         {
-            return VirtualAllocExBuffer((IntPtr) size, allocationType, protect, address);
+            return VirtualAllocExBuffer((IntPtr)size, allocationType, protect, address);
         }
 
         public MemoryBasicInformation VirtualQueryEx(IntPtr remoteBuffer)
@@ -211,7 +219,7 @@ namespace Tewls.Windows.Advapi
 
         public RemoteBuffer ReadProcessMemory(RemoteBuffer remoteBuffer, IntPtr localBuffer, uint size)
         {
-            ReadProcessMemory(remoteBuffer, localBuffer, (IntPtr) size);
+            ReadProcessMemory(remoteBuffer, localBuffer, (IntPtr)size);
             return remoteBuffer;
         }
 
@@ -262,7 +270,7 @@ namespace Tewls.Windows.Advapi
         public RemoteBuffer WriteProcessMemory<TStruct>(TStruct structure, RemoteBuffer remoteBuffer)
             where TStruct : class
         {
-                return WriteProcessMemory(structure, remoteBuffer);
+            return WriteProcessMemory(structure, remoteBuffer);
         }
 
         public RemoteBuffer WriteProcessMemory<TStruct>(TStruct structure)
@@ -298,7 +306,7 @@ namespace Tewls.Windows.Advapi
         public RemoteBuffer WriteString(string s)
         {
             var size = (s.Length + 1) * sizeof(char);
-            var remoteBuffer = VirtualAllocExBuffer((IntPtr) size, MemAllocations.Commit | MemAllocations.Reserve | MemAllocations.TopDown, MemProtections.ReadWrite);
+            var remoteBuffer = VirtualAllocExBuffer((IntPtr)size, MemAllocations.Commit | MemAllocations.Reserve | MemAllocations.TopDown, MemProtections.ReadWrite);
             return WriteString(remoteBuffer, s);
         }
 
@@ -364,7 +372,7 @@ namespace Tewls.Windows.Advapi
 
         public override int GetHashCode()
         {
-            return (int) GetProcessId();
+            return (int)GetProcessId();
         }
     }
 }

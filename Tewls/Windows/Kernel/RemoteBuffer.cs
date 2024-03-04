@@ -1,8 +1,8 @@
 ﻿using System;
-using Tewls.Windows.Kernel;
+using Tewls.Windows.Advapi;
 using Tewls.Windows.Utils;
 
-namespace Tewls.Windows.Advapi
+namespace Tewls.Windows.Kernel
 {
     public class RemoteBuffer : BufferBase
     {
@@ -25,7 +25,7 @@ namespace Tewls.Windows.Advapi
                 throw new NotImplementedException();
             }
 
-            public ProcessAllocator(NativeProcess process) 
+            public ProcessAllocator(NativeProcess process)
             {
                 _process = process;
             }
@@ -105,7 +105,7 @@ namespace Tewls.Windows.Advapi
     public class RemoteBuffer<TStruct> : RemoteBuffer
         where TStruct : class, new()
     {
-        public RemoteBuffer(NativeProcess process, TStruct structure) : base(process, (IntPtr) NativeBuffer.GetObjectSize(structure))
+        public RemoteBuffer(NativeProcess process, TStruct structure) : base(process, (IntPtr)NativeBuffer.GetObjectSize(structure))
         {
             process.WriteProcessMemory(structure, Buffer);
         }
@@ -119,7 +119,7 @@ namespace Tewls.Windows.Advapi
         {
             _process.WriteProcessMemory(structure, Buffer + offset);
             return this;
-        }      
+        }
 
         public new RemoteBuffer<TStruct> Protect(MemProtections protection)
         {
