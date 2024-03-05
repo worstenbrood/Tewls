@@ -232,54 +232,6 @@ namespace Tewls.Windows
             public string RemainingPath;
         };
 
-        [DllImport("Mpr.dll", CallingConvention = CallingConvention.Winapi, CharSet = CharSet.Auto, SetLastError = true)]
-        private static extern Error WNetOpenEnum(ResourceScope dwScope, ResourceType dwType, ResourceUsage dwUsage, NetResource p, out IntPtr lphEnum);
-
-        [DllImport("Mpr.dll", CallingConvention = CallingConvention.Winapi, SetLastError = true)]
-        private static extern Error WNetCloseEnum(IntPtr hEnum);
-
-        [DllImport("Mpr.dll", CallingConvention = CallingConvention.Winapi, CharSet = CharSet.Auto, SetLastError = true)]
-        private static extern Error WNetEnumResource(IntPtr hEnum, ref uint lpcCount, IntPtr buffer, ref uint lpBufferSize);
-
-        [DllImport("Mpr.dll", CallingConvention = CallingConvention.Winapi, CharSet = CharSet.Auto, SetLastError = true)]
-        private static extern Error WNetAddConnection(string lpRemoteName, string lpPassword, string lpLocalName);
-
-        [DllImport("Mpr.dll", CallingConvention = CallingConvention.Winapi, CharSet = CharSet.Auto, SetLastError = true)]
-        private static extern Error WNetGetLastError(ref uint lpError, IntPtr lpErrorBuf, uint nErrorBufSize, IntPtr lpNameBuf, uint nNameBufSize);
-
-        [DllImport("Mpr.dll", CallingConvention = CallingConvention.Winapi, CharSet = CharSet.Auto, SetLastError = true)]
-        private static extern Error WNetAddConnection2(NetResource lpNetResource, string lpPassword, string lpUserName, uint dwFlags);
-
-        [DllImport("Mpr.dll", CallingConvention = CallingConvention.Winapi, CharSet = CharSet.Auto, SetLastError = true)]
-        private static extern Error WNetGetNetworkInformation(string lpProvider, NetInfoStruct lpNetInfoStruct);
-
-        [DllImport("Mpr.dll", CallingConvention = CallingConvention.Winapi, CharSet = CharSet.Auto, SetLastError = true)]
-        private static extern Error WNetCancelConnection(string lpName, bool fForce);
-
-        [DllImport("Mpr.dll", CallingConvention = CallingConvention.Winapi, CharSet = CharSet.Auto, SetLastError = true)]
-        private static extern Error WNetCancelConnection2(string lpName, uint dwFlags, bool fForce);
-
-        [DllImport("Mpr.dll", CallingConvention = CallingConvention.Winapi, CharSet = CharSet.Auto, SetLastError = true)]
-        private static extern Error WNetGetConnection(string lpLocalName, IntPtr lpRemoteName, ref uint lpnLength);
-
-        [DllImport("Mpr.dll", CallingConvention = CallingConvention.Winapi, CharSet = CharSet.Auto, SetLastError = true)]
-        private static extern Error MultinetGetConnectionPerformance(NetResource lpNetResource, NetConnectionInfoStruct lpNetConnectInfoStruct);
-
-        [DllImport("Mpr.dll", CallingConvention = CallingConvention.Winapi, CharSet = CharSet.Auto, SetLastError = true)]
-        private static extern Error WNetGetUser(string lpName, IntPtr lpUserName, ref uint lpnLength);
-
-        [DllImport("Mpr.dll", CallingConvention = CallingConvention.Winapi, CharSet = CharSet.Auto, SetLastError = true)]
-        private static extern Error WNetGetUniversalName(string lpLocalPath, uint dwInfoLevel, IntPtr lpBuffer, ref uint lpBufferSize);
-
-        [DllImport("Mpr.dll", CallingConvention = CallingConvention.Winapi, CharSet = CharSet.Auto, SetLastError = true)]
-        private static extern Error WNetGetResourceParent(NetResource lpNetResource, IntPtr lpBuffer, ref uint lpcbBuffer);
-
-        [DllImport("Mpr.dll", CallingConvention = CallingConvention.Winapi, CharSet = CharSet.Auto, SetLastError = true)]
-        private static extern Error WNetGetProviderName(uint dwNetType, IntPtr lpProviderName, ref uint lpBufferSize);
-
-        [DllImport("Mpr.dll", CallingConvention = CallingConvention.Winapi, CharSet = CharSet.Auto, SetLastError = true)]
-        private static extern Error WNetGetResourceInformation(NetResource lpNetResource, IntPtr lpBuffer, ref uint lpcbBuffer, ref IntPtr lplpSystem);
-
         private const int ErrorBufferSize = 1024;
         private const int EnumBufferSize = 16384;
         private const int BufferSize = 32;       
@@ -307,7 +259,7 @@ namespace Tewls.Windows
                 namePtr = Marshal.AllocHGlobal(ErrorBufferSize);
                 uint errorCode = 0;
 
-                var result = WNetGetLastError(ref errorCode, errorPtr, ErrorBufferSize, namePtr, ErrorBufferSize);
+                var result = Mpr.WNetGetLastError(ref errorCode, errorPtr, ErrorBufferSize, namePtr, ErrorBufferSize);
                 if (result == Error.NoError)
                 {
                     if (errorCode != (int)Error.NoError)
@@ -347,7 +299,7 @@ namespace Tewls.Windows
                 using (var buffer = new HGlobalBuffer((IntPtr) bufferSize))
                 {
 
-                    var result = WNetOpenEnum(dwScope, dwType, dwUsage, resource, out handle);
+                    var result = Mpr.WNetOpenEnum(dwScope, dwType, dwUsage, resource, out handle);
                     var ex = GetLastException(result);
                     if (ex != null)
                     {
@@ -358,7 +310,7 @@ namespace Tewls.Windows
 
                     do
                     {
-                        result = WNetEnumResource(handle, ref count, buffer.Buffer, ref bufferSize);
+                        result = Mpr.WNetEnumResource(handle, ref count, buffer.Buffer, ref bufferSize);
 
                         if (result == Error.NoError)
                         {
@@ -382,14 +334,14 @@ namespace Tewls.Windows
                 // Close handle
                 if (handle != IntPtr.Zero)
                 {
-                    WNetCloseEnum(handle);
+                    Mpr.WNetCloseEnum(handle);
                 }
             }
         }
 
         public static void AddConnection(string remoteName, string localName, string password = null)
         {
-            var result = WNetAddConnection(remoteName, password, localName);
+            var result = Mpr.WNetAddConnection(remoteName, password, localName);
             var ex = GetLastException(result);
             if (ex != null)
             {
@@ -399,7 +351,7 @@ namespace Tewls.Windows
 
         public static void AddConnection2(NetResource netResource, string password = null, string userName = null, Connect flags = Connect.UpdateProfile)
         {
-            var result = WNetAddConnection2(netResource, password, userName, (uint)flags);
+            var result = Mpr.WNetAddConnection2(netResource, password, userName, (uint)flags);
             var ex = GetLastException(result);
             if (ex != null)
             {
@@ -410,7 +362,7 @@ namespace Tewls.Windows
         public static NetInfoStruct GetNetworkInformation(string provider)
         {
             var info = new NetInfoStruct();
-            var result = WNetGetNetworkInformation(provider, info);
+            var result = Mpr.WNetGetNetworkInformation(provider, info);
             var ex = GetLastException(result);
             if (ex != null)
             {
@@ -421,7 +373,7 @@ namespace Tewls.Windows
 
         public static void CancelConnection(string localOrRemoteName, bool force)
         {
-            var result = WNetCancelConnection(localOrRemoteName, force);
+            var result = Mpr.WNetCancelConnection(localOrRemoteName, force);
             var ex = GetLastException(result);
             if (ex != null)
             {
@@ -431,7 +383,7 @@ namespace Tewls.Windows
 
         public static void CancelConnection2(string localOrRemoteName, Connect flags, bool force)
         {
-            var result = WNetCancelConnection2(localOrRemoteName, (uint)flags, force);
+            var result = Mpr.WNetCancelConnection2(localOrRemoteName, (uint)flags, force);
             var ex = GetLastException(result);
             if (ex != null)
             {
@@ -445,11 +397,11 @@ namespace Tewls.Windows
             using (var buffer = new HGlobalBuffer((IntPtr) bufferSize))
             {
                 // Get buffer size
-                var result = WNetGetConnection(localName, buffer.Buffer, ref bufferSize);
+                var result = Mpr.WNetGetConnection(localName, buffer.Buffer, ref bufferSize);
                 if (result == Error.MoreData)
                 {
                     buffer.ReAlloc((IntPtr) bufferSize);
-                    result = WNetGetConnection(localName, buffer.Buffer, ref bufferSize);
+                    result = Mpr.WNetGetConnection(localName, buffer.Buffer, ref bufferSize);
                 }
 
                 // Return null if network is unavailable
@@ -471,7 +423,7 @@ namespace Tewls.Windows
         public static NetConnectionInfoStruct MultinetGetConnectionPerformance(NetResource resource)
         {
             var info = new NetConnectionInfoStruct();
-            var result = MultinetGetConnectionPerformance(resource, info);
+            var result = Mpr.MultinetGetConnectionPerformance(resource, info);
             var ex = GetLastException(result);
             if (ex != null)
             {
@@ -486,11 +438,11 @@ namespace Tewls.Windows
             using (var buffer = new HGlobalBuffer((IntPtr) bufferSize))
             {
                 // Get buffer size
-                var result = WNetGetUser(localOrRemoteName, buffer.Buffer, ref bufferSize);
+                var result = Mpr.WNetGetUser(localOrRemoteName, buffer.Buffer, ref bufferSize);
                 if (result == Error.MoreData)
                 {
                     buffer.ReAlloc((IntPtr)(bufferSize * sizeof(char)));
-                    result = WNetGetUser(localOrRemoteName, buffer.Buffer, ref bufferSize);
+                    result = Mpr.WNetGetUser(localOrRemoteName, buffer.Buffer, ref bufferSize);
                 }
 
                 var ex = GetLastException(result);
@@ -509,11 +461,11 @@ namespace Tewls.Windows
             using (var buffer = new HGlobalBuffer((IntPtr) bufferSize))
             {
                 // Get buffer size
-                var result = WNetGetUniversalName(localPath, (uint)InfoLevel.UniversalName, buffer.Buffer, ref bufferSize);
+                var result = Mpr.WNetGetUniversalName(localPath, (uint)InfoLevel.UniversalName, buffer.Buffer, ref bufferSize);
                 if (result == Error.MoreData)
                 {
                     buffer.ReAlloc((IntPtr) bufferSize);
-                    result = WNetGetUniversalName(localPath, (uint)InfoLevel.UniversalName, buffer.Buffer, ref bufferSize);
+                    result = Mpr.WNetGetUniversalName(localPath, (uint)InfoLevel.UniversalName, buffer.Buffer, ref bufferSize);
                 }
 
                 var ex = GetLastException(result);
@@ -532,11 +484,11 @@ namespace Tewls.Windows
             using (var buffer = new HGlobalBuffer((IntPtr) bufferSize))
             {
                 // Get buffer size
-                var result = WNetGetUniversalName(localPath, (uint)InfoLevel.RemoteName, buffer.Buffer, ref bufferSize);
+                var result = Mpr.WNetGetUniversalName(localPath, (uint)InfoLevel.RemoteName, buffer.Buffer, ref bufferSize);
                 if (result == Error.MoreData)
                 {
                     buffer.ReAlloc((IntPtr)bufferSize);
-                    result = WNetGetUniversalName(localPath, (uint)InfoLevel.RemoteName, buffer.Buffer, ref bufferSize);
+                    result = Mpr.WNetGetUniversalName(localPath, (uint)InfoLevel.RemoteName, buffer.Buffer, ref bufferSize);
                 }
 
                 var ex = GetLastException(result);
@@ -555,11 +507,11 @@ namespace Tewls.Windows
             using (var buffer = new HGlobalBuffer((IntPtr) bufferSize))
             {
                 // Get buffer size
-                var result = WNetGetResourceParent(netResource, buffer.Buffer, ref bufferSize);
+                var result = Mpr.WNetGetResourceParent(netResource, buffer.Buffer, ref bufferSize);
                 if (result == Error.MoreData)
                 {
                     buffer.ReAlloc((IntPtr) bufferSize);
-                    result = WNetGetResourceParent(netResource, buffer.Buffer, ref bufferSize);
+                    result = Mpr.WNetGetResourceParent(netResource, buffer.Buffer, ref bufferSize);
                 }
 
                 var ex = GetLastException(result);
@@ -578,11 +530,11 @@ namespace Tewls.Windows
             using (var buffer = new HGlobalBuffer((IntPtr) bufferSize))
             {
                 // Get buffer size
-                var result = WNetGetProviderName(type, buffer.Buffer, ref bufferSize);
+                var result = Mpr.WNetGetProviderName(type, buffer.Buffer, ref bufferSize);
                 if (result == Error.MoreData)
                 {
                     buffer.ReAlloc((IntPtr)(bufferSize * sizeof(char)));
-                    result = WNetGetProviderName(type, buffer.Buffer, ref bufferSize);
+                    result = Mpr.WNetGetProviderName(type, buffer.Buffer, ref bufferSize);
                 }
 
                 var ex = GetLastException(result);
@@ -603,11 +555,11 @@ namespace Tewls.Windows
             using (var buffer = new HGlobalBuffer((IntPtr) bufferSize))
             {
                 // Get buffer size
-                var result = WNetGetResourceInformation(netResource, buffer.Buffer, ref bufferSize, ref pointer);
+                var result = Mpr.WNetGetResourceInformation(netResource, buffer.Buffer, ref bufferSize, ref pointer);
                 if (result == Error.MoreData)
                 {
                     buffer.ReAlloc((IntPtr)bufferSize);
-                    result = WNetGetResourceInformation(netResource, buffer.Buffer, ref bufferSize, ref pointer);
+                    result = Mpr.WNetGetResourceInformation(netResource, buffer.Buffer, ref bufferSize, ref pointer);
                 }
 
                 var ex = GetLastException(result);
