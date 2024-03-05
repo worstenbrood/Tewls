@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 
 namespace Tewls.Windows.Kernel
@@ -169,5 +170,83 @@ namespace Tewls.Windows.Kernel
         Synchronize = 0x00100000,
         StandardRightsRequired = 0x000F0000,
         AllAccess = StandardRightsRequired | Synchronize | 0xFFF
+    }
+
+    public enum ProcessInformationClass
+    {
+        ProcessMemoryPriority,
+        ProcessMemoryExhaustionInfo,
+        ProcessAppMemoryInfo,
+        ProcessInPrivateInfo,
+        ProcessPowerThrottling,
+        ProcessReservedValue1,
+        ProcessTelemetryCoverageInfo,
+        ProcessProtectionLevelInfo,
+        ProcessLeapSecondInfo,
+        ProcessMachineTypeInfo,
+        ProcessOverrideSubsequentPrefetchParameter,
+        ProcessMaxOverridePrefetchParameter,
+        ProcessInformationClassMax
+    };
+    
+    public enum MemoryPriority : uint
+    {
+        VeryLow = 1,
+        Low,
+        Medium,
+        BelowNormal,
+        Normal
+    }
+
+    public interface IProcessClass
+    {
+        ProcessInformationClass GetClass();
+    }
+
+    [StructLayout(LayoutKind.Sequential)]
+    public class MemoryPriorityInformation : IProcessClass
+    {
+        public MemoryPriority MemoryPriority;
+
+        public ProcessInformationClass GetClass()
+        {
+            return ProcessInformationClass.ProcessMemoryPriority;
+        }
+    };
+
+    [StructLayout(LayoutKind.Sequential)]
+    public class ProcessPowerThrottlingState : IProcessClass
+    {
+        public ulong Version;
+        public ulong ControlMask;
+        public ulong StateMask;
+
+        public ProcessInformationClass GetClass()
+        {
+            return ProcessInformationClass.ProcessPowerThrottling;
+        }
+    }
+
+    [StructLayout(LayoutKind.Sequential)]
+    public class ProcessProtectionLevelInformation : IProcessClass
+    {
+        public uint ProtectionLevel;
+
+        public ProcessInformationClass GetClass()
+        {
+            return ProcessInformationClass.ProcessProtectionLevelInfo;
+        }
+    };
+
+    [StructLayout(LayoutKind.Sequential, Pack = 1)]
+    public class ProcessLeapSecondInfo : IProcessClass
+    {
+        public ulong Flags;
+        public ulong Reserved;
+
+        public ProcessInformationClass GetClass()
+        {
+            return ProcessInformationClass.ProcessLeapSecondInfo;
+        }
     }
 }

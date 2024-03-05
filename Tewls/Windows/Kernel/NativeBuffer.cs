@@ -7,15 +7,9 @@ namespace Tewls.Windows.Kernel
 {
     public class NativeBuffer
     {
-        [DllImport("kernel32.dll", CharSet = CharSet.Auto, SetLastError = true)]
-        public static extern IntPtr lstrcpyn(IntPtr lpString1, string lpString2, int iMaxLength);
-
-        [DllImport("kernel32.dll", CharSet = CharSet.Auto, SetLastError = true)]
-        public static extern void CopyMemory(IntPtr Destination, IntPtr Source, IntPtr Length);
-
         public static IntPtr lstrcpyn(IntPtr lpString1, string lpString2)
         {
-            return lstrcpyn(lpString1, lpString2, lpString2.Length + 1);
+            return Kernel32.lstrcpyn(lpString1, lpString2, lpString2.Length + 1);
         }
 
         private static readonly Cache<Type, FieldInfo[]> FieldCache = new Cache<Type, FieldInfo[]>(t => t.GetFields());
@@ -103,7 +97,7 @@ namespace Tewls.Windows.Kernel
             // Copy marshalled structure to our own buffer
             using (var temp = new HGlobalBuffer<TStruct>(structure))
             {
-                CopyMemory(buffer + offset, temp.Buffer, temp.Size);
+                Kernel32.CopyMemory(buffer + offset, temp.Buffer, temp.Size);
             }
 
             // Calculate offset

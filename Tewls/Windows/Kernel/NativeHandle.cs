@@ -6,15 +6,14 @@ namespace Tewls.Windows.Kernel
 {
     public class NativeHandle : IDisposable
     {
-        [DllImport("kernel32.dll", CharSet = CharSet.Auto, SetLastError = true)]
-        private static extern bool CloseHandle(IntPtr hObject);
+        
 
         public static implicit operator IntPtr(NativeHandle b) => b.Handle;
         public static implicit operator NativeHandle(IntPtr b) => new NativeHandle(b);
 
         public static void Close(IntPtr handle)
         {
-            var result = CloseHandle(handle);
+            var result = Kernel32.CloseHandle(handle);
             if (!result)
             {
                 throw new Win32Exception();

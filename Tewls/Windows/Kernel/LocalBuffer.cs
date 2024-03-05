@@ -25,18 +25,9 @@ namespace Tewls.Windows.Kernel
             }
         }
 
-        [DllImport("kernel32.dll", CharSet = CharSet.Auto, SetLastError = true)]
-        private static extern IntPtr LocalFree(IntPtr hMem);
-
-        [DllImport("kernel32.dll", CharSet = CharSet.Auto, SetLastError = true)]
-        private static extern IntPtr LocalAlloc(LocalMemFlags uFlags, IntPtr uBytes);
-
-        [DllImport("kernel32.dll", CharSet = CharSet.Auto, SetLastError = true)]
-        private static extern IntPtr LocalReAlloc(IntPtr hMem, IntPtr uBytes, LocalMemFlags uFlags);
-
         public static IntPtr Alloc(IntPtr size, LocalMemFlags uFlags = LocalMemFlags.Fixed)
         {
-            var result = LocalAlloc(uFlags, size);
+            var result = Kernel32.LocalAlloc(uFlags, size);
             if (result == IntPtr.Zero)
             {
                 throw new Win32Exception();
@@ -47,7 +38,7 @@ namespace Tewls.Windows.Kernel
 
         public static IntPtr ReAlloc(IntPtr buffer, IntPtr size, LocalMemFlags flags = LocalMemFlags.Fixed)
         {
-            var result = LocalReAlloc(buffer, size, flags);
+            var result = Kernel32.LocalReAlloc(buffer, size, flags);
             if (result == IntPtr.Zero)
             {
                 throw new Win32Exception();
@@ -58,7 +49,7 @@ namespace Tewls.Windows.Kernel
 
         public static void Free(IntPtr buffer)
         {
-            var result = LocalFree(buffer);
+            var result = Kernel32.LocalFree(buffer);
             if (result == IntPtr.Zero)
             {
                 throw new Win32Exception();

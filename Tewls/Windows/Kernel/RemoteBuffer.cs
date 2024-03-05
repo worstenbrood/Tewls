@@ -1,5 +1,4 @@
 ﻿using System;
-using Tewls.Windows.Advapi;
 using Tewls.Windows.Utils;
 
 namespace Tewls.Windows.Kernel

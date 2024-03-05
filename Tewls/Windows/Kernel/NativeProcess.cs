@@ -9,50 +9,12 @@ namespace Tewls.Windows.Kernel
 {
     public class NativeProcess : NativeHandle
     {
-        [DllImport("advapi32.dll", CharSet = CharSet.Auto, SetLastError = true)]
-        private static extern bool OpenProcessToken(IntPtr ProcessHandle, TokenAccess DesiredAccess, ref IntPtr TokenHandle);
-
-        [DllImport("kernel32.dll", CharSet = CharSet.Auto, SetLastError = true)]
-        private static extern bool ReadProcessMemory(IntPtr hProcess, IntPtr lpBaseAddress, IntPtr lpBuffer, IntPtr nSize, ref IntPtr lpNumberOfBytesRead);
-
-        [DllImport("kernel32.dll", CharSet = CharSet.Auto, SetLastError = true)]
-        private static extern bool WriteProcessMemory(IntPtr hProcess, IntPtr lpBaseAddress, IntPtr lpBuffer, IntPtr nSize, ref IntPtr lpNumberOfBytesWritten);
-
-        [DllImport("kernel32.dll", CharSet = CharSet.Auto, SetLastError = true)]
-        public static extern IntPtr VirtualAllocEx(IntPtr hProcess, IntPtr lpAddress, IntPtr dwSize, MemAllocations flAllocationType, MemProtections flProtect);
-
-        [DllImport("kernel32.dll", CharSet = CharSet.Auto, SetLastError = true)]
-        private static extern IntPtr VirtualQueryEx(IntPtr hProcess, IntPtr lpAddress, MemoryBasicInformation lpBuffer, IntPtr dwLength);
-
-        [DllImport("kernel32.dll", CharSet = CharSet.Auto, SetLastError = true)]
-        private static extern bool VirtualProtectEx(IntPtr hProcess, IntPtr lpAddress, IntPtr dwSize, MemProtections flNewProtect, ref MemProtections lpflOldProtect);
-
-        [DllImport("kernel32.dll", CharSet = CharSet.Auto, SetLastError = true)]
-        public static extern bool VirtualFreeEx(IntPtr hProcess, IntPtr lpAddress, IntPtr dwSize, MemFreeType dwFreeType);
-
-        [DllImport("kernel32.dll", CharSet = CharSet.Auto, SetLastError = true)]
-        private static extern IntPtr CreateRemoteThread(IntPtr hProcess, SecurityAttributes lpThreadAttributes, IntPtr dwStackSize, IntPtr lpStartAddress, IntPtr lpParameter, CreationFlags dwCreationFlags, ref uint lpThreadId);
-
-        [DllImport("kernel32.dll", CharSet = CharSet.Auto, SetLastError = true)]
-        private static extern uint GetProcessId(IntPtr Process);
-
-        [DllImport("kernel32.dll", CharSet = CharSet.Auto, SetLastError = true)]
-        private static extern bool IsWow64Process(IntPtr hProcess, ref bool Wow64Process);
-
-        [DllImport("kernel32.dll", CharSet = CharSet.Auto, SetLastError = true)]
-        private static extern IntPtr OpenProcess(ProcessAccessRights dwDesiredAccess, bool bInheritHandle, int dwProcessId);
-
-        [DllImport("kernel32.dll", CharSet = CharSet.Auto, SetLastError = true)]
-        private static extern bool TerminateProcess(IntPtr hProcess, uint uExitCode);
-
-        [DllImport("kernel32.dll", CharSet = CharSet.Auto, SetLastError = true)]
-        public static extern IntPtr GetCurrentProcess();
-
+        
         // Static
 
         public static IntPtr OpenProcess(int processId, ProcessAccessRights desiredAccess, bool inheritHandle = true)
         {
-            var result = OpenProcess(desiredAccess, inheritHandle, processId);
+            var result = Kernel32.OpenProcess(desiredAccess, inheritHandle, processId);
             if (result == IntPtr.Zero)
             {
                 throw new Win32Exception();
@@ -62,7 +24,7 @@ namespace Tewls.Windows.Kernel
 
         public static void TerminateProcess(IntPtr hProcess, int uExitCode = 0)
         {
-            if (!TerminateProcess(hProcess, (uint)uExitCode))
+            if (!Kernel32.TerminateProcess(hProcess, (uint)uExitCode))
             {
                 throw new Win32Exception();
             }
@@ -71,7 +33,7 @@ namespace Tewls.Windows.Kernel
         public static IntPtr OpenProcessToken(IntPtr processHandle, TokenAccess desiredAccess)
         {
             IntPtr tokenHandle = IntPtr.Zero;
-            var result = OpenProcessToken(processHandle, desiredAccess, ref tokenHandle);
+            var result = Kernel32.OpenProcessToken(processHandle, desiredAccess, ref tokenHandle);
             if (!result)
             {
                 throw new Win32Exception();
@@ -82,7 +44,7 @@ namespace Tewls.Windows.Kernel
         public static IntPtr ReadProcessMemory(IntPtr process, IntPtr baseAddress, IntPtr buffer, IntPtr size)
         {
             IntPtr bytesRead = IntPtr.Zero;
-            var result = ReadProcessMemory(process, baseAddress, buffer, size, ref bytesRead);
+            var result = Kernel32.ReadProcessMemory(process, baseAddress, buffer, size, ref bytesRead);
             if (!result)
             {
                 throw new Win32Exception();
@@ -93,7 +55,7 @@ namespace Tewls.Windows.Kernel
         public static IntPtr WriteProcessMemory(IntPtr process, IntPtr baseAddress, IntPtr buffer, IntPtr size)
         {
             IntPtr bytesRead = IntPtr.Zero;
-            var result = WriteProcessMemory(process, baseAddress, buffer, size, ref bytesRead);
+            var result = Kernel32.WriteProcessMemory(process, baseAddress, buffer, size, ref bytesRead);
             if (!result)
             {
                 throw new Win32Exception();
@@ -105,7 +67,7 @@ namespace Tewls.Windows.Kernel
         {
             MemProtections previous = 0;
 
-            var result = VirtualProtectEx(process, address, size, protection, ref previous);
+            var result = Kernel32.VirtualProtectEx(process, address, size, protection, ref previous);
             if (!result)
             {
                 throw new Win32Exception();
@@ -115,7 +77,7 @@ namespace Tewls.Windows.Kernel
 
         public static IntPtr VirtualQueryEx(IntPtr process, IntPtr address, MemoryBasicInformation buffer)
         {
-            var result = VirtualQueryEx(process, address, buffer, (IntPtr)Marshal.SizeOf(buffer));
+            var result = Kernel32.VirtualQueryEx(process, address, buffer, (IntPtr)Marshal.SizeOf(buffer));
             if (result == IntPtr.Zero)
             {
                 throw new Win32Exception();
@@ -128,7 +90,7 @@ namespace Tewls.Windows.Kernel
             var securityAttributes = new SecurityAttributes { InheritHandle = true };
             uint threadId = 0;
 
-            var result = CreateRemoteThread(process, securityAttributes, stackSize, startAddress, parameter, creationFlags, ref threadId);
+            var result = Kernel32.CreateRemoteThread(process, securityAttributes, stackSize, startAddress, parameter, creationFlags, ref threadId);
             if (result == IntPtr.Zero)
             {
                 throw new Win32Exception();
@@ -140,7 +102,7 @@ namespace Tewls.Windows.Kernel
         public static bool IsWow64Process(IntPtr hProcess)
         {
             var result = false;
-            if (!IsWow64Process(hProcess, ref result))
+            if (!Kernel32.IsWow64Process(hProcess, ref result))
             {
                 throw new Win32Exception();
             }
@@ -149,7 +111,7 @@ namespace Tewls.Windows.Kernel
 
         // Class
 
-        public NativeProcess() : base(GetCurrentProcess(), false)
+        public NativeProcess() : base(Kernel32.GetCurrentProcess(), false)
         {
         }
 
@@ -180,7 +142,7 @@ namespace Tewls.Windows.Kernel
 
         public IntPtr VirtualAllocEx(IntPtr size, MemAllocations allocationType, MemProtections protect, IntPtr address = default)
         {
-            var result = VirtualAllocEx(Handle, address, size, allocationType, protect);
+            var result = Kernel32.VirtualAllocEx(Handle, address, size, allocationType, protect);
             if (result == IntPtr.Zero)
             {
                 throw new Win32Exception();
@@ -328,7 +290,7 @@ namespace Tewls.Windows.Kernel
 
         public void VirtualFreeEx(IntPtr remoteBuffer, MemFreeType freeType = MemFreeType.Release, IntPtr size = default)
         {
-            var result = VirtualFreeEx(Handle, remoteBuffer, size, freeType);
+            var result = Kernel32.VirtualFreeEx(Handle, remoteBuffer, size, freeType);
             if (!result)
             {
                 throw new Win32Exception();
@@ -337,7 +299,7 @@ namespace Tewls.Windows.Kernel
 
         public void VirtualFreeEx(RemoteBuffer remoteBuffer, MemFreeType freeType = MemFreeType.Release, IntPtr size = default)
         {
-            var result = VirtualFreeEx(Handle, remoteBuffer.Buffer, size, freeType);
+            var result = Kernel32.VirtualFreeEx(Handle, remoteBuffer.Buffer, size, freeType);
             if (!result)
             {
                 throw new Win32Exception();
@@ -351,7 +313,7 @@ namespace Tewls.Windows.Kernel
 
         public uint GetProcessId()
         {
-            var result = GetProcessId(Handle);
+            var result = Kernel32.GetProcessId(Handle);
             if (result == 0)
             {
                 throw new Win32Exception();
@@ -368,6 +330,24 @@ namespace Tewls.Windows.Kernel
         public void TerminateProcess(int exitCode = 0)
         {
             TerminateProcess(Handle, exitCode);
+        }
+
+        public TStruct GetProcessInformation<TStruct>()
+            where TStruct : class, IProcessClass, new()
+        {
+            var t = new TStruct();
+            using (var buffer = new HGlobalBuffer<TStruct>(t))
+            {
+                var c = t.GetClass();
+                // This fails for ProcessLeapSecondInfo and ProcessPowerThrottlingState for some reason
+                var result = Kernel32.GetProcessInformation(Handle, c, buffer.Buffer, (uint) buffer.Size);
+                if (!result)
+                {
+                    throw new Win32Exception();
+                }
+
+                return buffer.PtrToStructure(t);
+            }
         }
 
         public override int GetHashCode()
