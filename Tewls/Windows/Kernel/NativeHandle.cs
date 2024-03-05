@@ -56,6 +56,17 @@ namespace Tewls.Windows.Kernel
             return Handle.GetHashCode();
         }
 
+        public NativeHandle DuplicateHandle(IntPtr sourceProcess, IntPtr targetProcess, uint desiredAccess, bool inheritHandle = true, DuplicateOptions options = DuplicateOptions.SameAccess)
+        {
+            IntPtr result = IntPtr.Zero;
+            if (!Kernel32.DuplicateHandle(sourceProcess, Handle, targetProcess, ref result, desiredAccess, inheritHandle, options))
+            {
+                throw new Win32Exception();
+            }
+
+            return new NativeHandle(result);
+        }
+
         ~NativeHandle()
         {
             Dispose(false);
