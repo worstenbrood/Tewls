@@ -9,7 +9,6 @@ namespace Tewls.Windows.Kernel
 {
     public class NativeProcess : NativeHandle
     {
-        
         // Static
 
         public static IntPtr OpenProcess(int processId, ProcessAccessRights desiredAccess, bool inheritHandle = true)
