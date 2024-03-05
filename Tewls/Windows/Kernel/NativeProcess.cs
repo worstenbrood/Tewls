@@ -111,7 +111,7 @@ namespace Tewls.Windows.Kernel
 
         // Class
 
-        public NativeProcess() : base(Kernel32.GetCurrentProcess(), false)
+        public NativeProcess() : base(Kernel32.GetCurrentProcess())
         {
         }
 
