@@ -8,15 +8,6 @@ namespace Tewls.Windows.Advapi
 {
     public class Privileges
     {
-        [DllImport("advapi32.dll", CharSet = CharSet.Auto, SetLastError = true)]
-        private static extern bool LookupPrivilegeValue(string lpSystemName, string lpName, ref Luid lpLuid);
-
-        [DllImport("advapi32.dll", CharSet = CharSet.Auto, SetLastError = true)] 
-        private static extern bool AdjustTokenPrivileges(IntPtr TokenHandle, bool DisableAllPrivileges, ref TokenPrivileges NewState, uint BufferLength, IntPtr PreviousState, ref uint ReturnLength);
-
-        [DllImport("advapi32.dll", CharSet = CharSet.Auto, SetLastError = true)]
-        private static extern bool LogonUser(string lpszUsername, string lpszDomain, string lpszPassword, LogonType dwLogonType, LogonProvider dwLogonProvider,ref IntPtr phToken);
-
         public const string SeTcbPrivilege = "SeTcbPrivilege";
 
         // Static
@@ -24,7 +15,7 @@ namespace Tewls.Windows.Advapi
         public static Luid LookupPrivilege(string name, string systemName = null)
         {
             var luid = new Luid();
-            var result = LookupPrivilegeValue(systemName, name, ref luid);
+            var result = Advapi32.LookupPrivilegeValue(systemName, name, ref luid);
             if (!result)
             {
                 throw new Win32Exception();
@@ -36,7 +27,7 @@ namespace Tewls.Windows.Advapi
         public static void AdjustTokenPrivileges(IntPtr tokenHandle, TokenPrivileges newState, bool disableAllPrivileges = false)
         {
             uint size = 0;
-            var result = AdjustTokenPrivileges(tokenHandle, disableAllPrivileges, ref newState, (uint)Marshal.SizeOf(newState), IntPtr.Zero, ref size);
+            var result = Advapi32.AdjustTokenPrivileges(tokenHandle, disableAllPrivileges, ref newState, (uint)Marshal.SizeOf(newState), IntPtr.Zero, ref size);
             if (!result) 
             {
                 throw new Win32Exception();
@@ -46,7 +37,7 @@ namespace Tewls.Windows.Advapi
         public static NativeToken LogonUser(string username, string domain, string password, LogonType logonType, LogonProvider logonProvider)
         {
             IntPtr token = IntPtr.Zero;
-            var result = LogonUser(username, domain, password, logonType, logonProvider, ref token);
+            var result = Advapi32.LogonUser(username, domain, password, logonType, logonProvider, ref token);
             if (!result)
             {
                 throw new Win32Exception();
