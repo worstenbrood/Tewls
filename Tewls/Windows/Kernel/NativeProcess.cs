@@ -336,17 +336,17 @@ namespace Tewls.Windows.Kernel
             where TStruct : class, IProcessClass, new()
         {
             var t = new TStruct();
-            using (var buffer = new HGlobalBuffer<TStruct>(t))
+            using (var buffer = new HGlobalBuffer<TStruct>(t, false))
             {
-                var c = t.GetClass();
                 // This fails for ProcessLeapSecondInfo and ProcessPowerThrottlingState for some reason
-                var result = Kernel32.GetProcessInformation(Handle, c, buffer.Buffer, (uint) buffer.Size);
+                var result = Kernel32.GetProcessInformation(Handle, t.GetClass(), buffer.Buffer, (uint) buffer.Size);
                 if (!result)
                 {
                     throw new Win32Exception();
                 }
 
                 return buffer.PtrToStructure(t);
+        
             }
         }
 
