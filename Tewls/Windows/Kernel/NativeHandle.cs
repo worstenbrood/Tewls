@@ -1,13 +1,10 @@
 ﻿using System;
 using System.ComponentModel;
-using System.Runtime.InteropServices;
 
 namespace Tewls.Windows.Kernel
 {
     public class NativeHandle : IDisposable
     {
-        
-
         public static implicit operator IntPtr(NativeHandle b) => b.Handle;
         public static implicit operator NativeHandle(IntPtr b) => new NativeHandle(b);
 
