@@ -248,4 +248,11 @@ namespace Tewls.Windows.Kernel
             return ProcessInformationClass.ProcessLeapSecondInfo;
         }
     }
+
+    [Flags]
+    public enum DuplicateOptions : uint 
+    { 
+        CloseSource = 1,
+        SameAccess = 2
+    }
 }
