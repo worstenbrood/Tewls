@@ -40,7 +40,7 @@ namespace Tewls.Windows.Utils
     public class HGlobalBuffer<TStruct> : BufferBase<HGlobalBuffer.Allocator, TStruct>
             where TStruct : class
     {
-        public HGlobalBuffer(TStruct s) : base(s)
+        public HGlobalBuffer(TStruct s, bool copy = true) : base(s, copy)
         {
         }
     }

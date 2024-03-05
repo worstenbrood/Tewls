@@ -169,9 +169,12 @@ namespace Tewls.Windows.Utils
         {
         }
                 
-        protected BufferBase(TStruct s) : base((IntPtr) Marshal.SizeOf(s))
+        protected BufferBase(TStruct s, bool copy = true) : base((IntPtr) Marshal.SizeOf(s))
         {
-            Marshal.StructureToPtr(s, Buffer, false);
+            if (copy)
+            {
+                Marshal.StructureToPtr(s, Buffer, false);
+            }
         }
 
         protected BufferBase(IntPtr size) : base(size)
