@@ -8,24 +8,6 @@ namespace Tewls.Windows.NetApi
 {
     public class NetShare
     {
-        [DllImport("netapi32.dll", CallingConvention = CallingConvention.Winapi, CharSet = CharSet.Unicode, SetLastError = true)]
-        private static extern Error NetShareEnum(string servername, ShareLevel level, ref IntPtr bufptr, int prefmaxlen, ref uint entriesread, ref uint totalentries, IntPtr resume_handle);
-
-        [DllImport("netapi32.dll", CallingConvention = CallingConvention.Winapi, CharSet = CharSet.Unicode, SetLastError = true)]
-        private static extern Error NetShareSetInfo(string servername, string netname, ShareLevel level, IntPtr buf, ref uint parm_err);
-
-        [DllImport("netapi32.dll", CallingConvention = CallingConvention.Winapi, CharSet = CharSet.Unicode, SetLastError = true)]
-        private static extern Error NetShareGetInfo(string servername, string netname, ShareLevel level, ref IntPtr bufptr);
-
-        [DllImport("netapi32.dll", CallingConvention = CallingConvention.Winapi, CharSet = CharSet.Unicode, SetLastError = true)]
-        private static extern Error NetShareAdd(string servername, ShareLevel level, IntPtr buf, ref uint parm_err);
-
-        [DllImport("netapi32.dll", CallingConvention = CallingConvention.Winapi, CharSet = CharSet.Unicode, SetLastError = true)]
-        private static extern Error NetShareDel(string servername, string netname, uint reserved);
-
-        [DllImport("netapi32.dll", CallingConvention = CallingConvention.Winapi, CharSet = CharSet.Unicode, SetLastError = true)]
-        private static extern Error NetShareDelEx(string servername, ShareLevel level, IntPtr buf);
-
         private const int PrefMaxLength = -1;
 
         public static IEnumerable<TStruct> Enum<TStruct>(string servername = null)
@@ -38,7 +20,7 @@ namespace Tewls.Windows.NetApi
                 uint entriesRead = 0;
                 uint totalEntries = 0;
 
-                var result = NetShareEnum(servername, info.GetLevel(), ref buffer.Buffer, PrefMaxLength, ref entriesRead, ref totalEntries, IntPtr.Zero);
+                var result = Netapi32.NetShareEnum(servername, info.GetLevel(), ref buffer.Buffer, PrefMaxLength, ref entriesRead, ref totalEntries, IntPtr.Zero);
                 if (result != Error.Success)
                 {
                     throw new Win32Exception();
@@ -57,7 +39,7 @@ namespace Tewls.Windows.NetApi
             using (var buffer = new NetBuffer())
             {
                 var info = new TStruct();
-                var result = NetShareGetInfo(serverName, netName, info.GetLevel(), ref buffer.Buffer);
+                var result = Netapi32.NetShareGetInfo(serverName, netName, info.GetLevel(), ref buffer.Buffer);
                 if (result != Error.Success)
                 {
                     throw new Win32Exception((int)result);
@@ -74,7 +56,7 @@ namespace Tewls.Windows.NetApi
             {
                 uint paramIndex = 0;
 
-                var result = NetShareSetInfo(serverName, netName, info.GetLevel(), buffer.Buffer, ref paramIndex);
+                var result = Netapi32.NetShareSetInfo(serverName, netName, info.GetLevel(), buffer.Buffer, ref paramIndex);
                 if (result != Error.Success)
                 {
                     throw new Win32Exception((int)result);
@@ -89,7 +71,7 @@ namespace Tewls.Windows.NetApi
             {
                 uint paramIndex = 0;
 
-                var result = NetShareAdd(serverName, info.GetLevel(), buffer.Buffer, ref paramIndex);
+                var result = Netapi32.NetShareAdd(serverName, info.GetLevel(), buffer.Buffer, ref paramIndex);
                 if (result != Error.Success)
                 {
                     throw new Win32Exception((int)result);
@@ -99,7 +81,7 @@ namespace Tewls.Windows.NetApi
 
         public static void Del(string serverName, string netName)
         {
-            var result = NetShareDel(serverName, netName, 0);
+            var result = Netapi32.NetShareDel(serverName, netName, 0);
             if (result != Error.Success)
             {
                 throw new Win32Exception((int)result);
@@ -111,7 +93,7 @@ namespace Tewls.Windows.NetApi
         {
             using (var buffer = new NetBuffer<TStruct>(info))
             {
-                var result = NetShareDelEx(serverName, info.GetLevel(), buffer.Buffer);
+                var result = Netapi32.NetShareDelEx(serverName, info.GetLevel(), buffer.Buffer);
                 if (result != Error.Success)
                 {
                     throw new Win32Exception((int)result);

@@ -8,36 +8,6 @@ namespace Tewls.Windows.NetApi
 {
     public class NetServer
     {
-        [DllImport("netapi32.dll", CallingConvention = CallingConvention.Winapi, CharSet = CharSet.Unicode, SetLastError = true)]
-        private static extern Error NetServerEnum(string servername, InfoLevel level, ref IntPtr bufptr, int prefmaxlen, ref uint entriesread, ref uint totalentries, uint servertype, string domain, IntPtr resume_handle);
-
-        [DllImport("netapi32.dll", CallingConvention = CallingConvention.Winapi, CharSet = CharSet.Unicode, SetLastError = true)]
-        private static extern Error NetServerGetInfo(string servername, InfoLevel level, ref IntPtr bufptr);
-
-        [DllImport("netapi32.dll", CallingConvention = CallingConvention.Winapi, CharSet = CharSet.Unicode, SetLastError = true)]
-        private static extern Error NetServerSetInfo(string servername, InfoLevel level, IntPtr buf,ref uint ParmError);
-
-        [DllImport("netapi32.dll", CallingConvention = CallingConvention.Winapi, CharSet = CharSet.Unicode, SetLastError = true)]
-        private static extern Error NetServerDiskEnum(string servername,InfoLevel level,ref IntPtr bufptr, int prefmaxlen,ref uint entriesread, ref uint totalentries, IntPtr resume_handle);
-
-        [DllImport("netapi32.dll", CallingConvention = CallingConvention.Winapi, CharSet = CharSet.Unicode, SetLastError = true)]
-        private static extern Error NetServerTransportAdd(string servername, TransportLevel level, IntPtr bufptr);
-
-        [DllImport("netapi32.dll", CallingConvention = CallingConvention.Winapi, CharSet = CharSet.Unicode, SetLastError = true)]
-        private static extern Error NetServerTransportAddEx(string servername, TransportLevel level, IntPtr bufptr);
-
-        [DllImport("netapi32.dll", CallingConvention = CallingConvention.Winapi, CharSet = CharSet.Unicode, SetLastError = true)]
-        private static extern Error NetServerTransportDel(string servername, TransportLevel level, IntPtr bufptr);
-
-        [DllImport("netapi32.dll", CallingConvention = CallingConvention.Winapi, CharSet = CharSet.Unicode, SetLastError = true)]
-        private static extern Error NetServerTransportEnum(string servername,TransportLevel level, ref IntPtr bufptr, int prefmaxlen,ref uint entriesread,ref uint totalentries, IntPtr resume_handle);
-
-        [DllImport("netapi32.dll", CallingConvention = CallingConvention.Winapi, CharSet = CharSet.Unicode, SetLastError = true)]
-        private static extern Error NetServerComputerNameAdd(string ServerName, string EmulatedDomainName,string EmulatedServerName);
-
-        [DllImport("netapi32.dll", CallingConvention = CallingConvention.Winapi, CharSet = CharSet.Unicode, SetLastError = true)]
-        private static extern Error NetServerComputerNameDel(string ServerName,string EmulatedServerName);
-
         private const int EntrySize = 3;
         private const int PrefMaxLength = -1;
 
@@ -48,7 +18,7 @@ namespace Tewls.Windows.NetApi
                 uint entriesRead = 0;
                 uint totalEntries = 0;
 
-                var result = NetServerDiskEnum(serverName, 0, ref buffer.Buffer, PrefMaxLength, ref entriesRead, ref totalEntries, IntPtr.Zero);
+                var result = Netapi32.NetServerDiskEnum(serverName, 0, ref buffer.Buffer, PrefMaxLength, ref entriesRead, ref totalEntries, IntPtr.Zero);
                 if (result != Error.Success)
                 {
                     throw new Win32Exception((int)result);
@@ -68,7 +38,7 @@ namespace Tewls.Windows.NetApi
 
         public static void ComputerNameAdd(string serverName, string emulatedDomainName, string emulatedServerName)
         {
-            var result = NetServerComputerNameAdd(serverName, emulatedDomainName, emulatedServerName);
+            var result = Netapi32.NetServerComputerNameAdd(serverName, emulatedDomainName, emulatedServerName);
             if (result != Error.Success)
             {
                 throw new Win32Exception((int)result);
@@ -77,7 +47,7 @@ namespace Tewls.Windows.NetApi
 
         public static void ComputerNameDel(string serverName, string emulatedServerName)
         {
-            var result = NetServerComputerNameDel(serverName, emulatedServerName);
+            var result = Netapi32.NetServerComputerNameDel(serverName, emulatedServerName);
             if (result != Error.Success)
             {
                 throw new Win32Exception((int)result);
@@ -93,7 +63,7 @@ namespace Tewls.Windows.NetApi
                 uint totalEntries = 0;
 
                 var info = new TStruct();
-                var result = NetServerEnum(null, info.GetLevel(), ref buffer.Buffer, PrefMaxLength, ref entriesRead, ref totalEntries, (uint) type, domainName, IntPtr.Zero);
+                var result = Netapi32.NetServerEnum(null, info.GetLevel(), ref buffer.Buffer, PrefMaxLength, ref entriesRead, ref totalEntries, (uint) type, domainName, IntPtr.Zero);
                 if (result != Error.Success)
                 {
                     throw new Win32Exception((int) result);
@@ -112,7 +82,7 @@ namespace Tewls.Windows.NetApi
             using (var buffer = new NetBuffer())
             {
                 var info = new TStruct();
-                var result = NetServerGetInfo(serverName, info.GetLevel(), ref buffer.Buffer);
+                var result = Netapi32.NetServerGetInfo(serverName, info.GetLevel(), ref buffer.Buffer);
                 if (result != Error.Success)
                 {
                     throw new Win32Exception((int) result);
@@ -129,7 +99,7 @@ namespace Tewls.Windows.NetApi
             {
                 uint paramIndex = 0;
 
-                var result = NetServerSetInfo(serverName, info.GetLevel(), buffer.Buffer, ref paramIndex);
+                var result = Netapi32.NetServerSetInfo(serverName, info.GetLevel(), buffer.Buffer, ref paramIndex);
                 if (result != Error.Success)
                 {
                     throw new Win32Exception((int)result);
@@ -142,7 +112,7 @@ namespace Tewls.Windows.NetApi
         {
             using (var buffer = new NetBuffer<TStruct>(info))
             {
-                var result = NetServerTransportAdd(serverName, info.GetLevel(), buffer.Buffer);
+                var result = Netapi32.NetServerTransportAdd(serverName, info.GetLevel(), buffer.Buffer);
                 if (result != Error.Success)
                 {
                     throw new Win32Exception((int)result);
@@ -155,7 +125,7 @@ namespace Tewls.Windows.NetApi
         {
             using (var buffer = new NetBuffer<TStruct>(info))
             {
-                var result = NetServerTransportAddEx(serverName, info.GetLevel(), buffer.Buffer);
+                var result = Netapi32.NetServerTransportAddEx(serverName, info.GetLevel(), buffer.Buffer);
                 if (result != Error.Success)
                 {
                     throw new Win32Exception((int)result);
@@ -168,7 +138,7 @@ namespace Tewls.Windows.NetApi
         {
             using (var buffer = new NetBuffer<TStruct>(info))
             {
-                var result = NetServerTransportDel(serverName, info.GetLevel(), buffer.Buffer);
+                var result = Netapi32.NetServerTransportDel(serverName, info.GetLevel(), buffer.Buffer);
                 if (result != Error.Success)
                 {
                     throw new Win32Exception((int)result);
@@ -185,7 +155,7 @@ namespace Tewls.Windows.NetApi
                 uint totalEntries = 0;
 
                 var info = new TStruct();
-                var result = NetServerTransportEnum(serverName, info.GetLevel(), ref buffer.Buffer, PrefMaxLength, ref entriesRead, ref totalEntries, IntPtr.Zero);
+                var result = Netapi32.NetServerTransportEnum(serverName, info.GetLevel(), ref buffer.Buffer, PrefMaxLength, ref entriesRead, ref totalEntries, IntPtr.Zero);
                 if (result != Error.Success)
                 {
                     throw new Win32Exception((int)result);

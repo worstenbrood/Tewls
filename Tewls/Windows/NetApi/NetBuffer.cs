@@ -1,6 +1,5 @@
 ﻿using System;
 using System.ComponentModel;
-using System.Runtime.InteropServices;
 using Tewls.Windows.Utils;
 
 namespace Tewls.Windows.NetApi
@@ -23,24 +22,12 @@ namespace Tewls.Windows.NetApi
             {
                 return BufferReAllocate(buffer, (uint)size);
             }
-        }
-
-        [DllImport("netapi32.dll", CallingConvention = CallingConvention.Winapi, SetLastError = true)]
-        private static extern Error NetApiBufferAllocate(uint ByteCount, ref IntPtr Buffer);
-
-        [DllImport("netapi32.dll", CallingConvention = CallingConvention.Winapi, SetLastError = true)]
-        private static extern Error NetApiBufferReallocate(IntPtr OldBuffer, uint NewByteCount, ref IntPtr NewBuffer);
-
-        [DllImport("netapi32.dll", CallingConvention = CallingConvention.Winapi, SetLastError = true)]
-        private static extern Error NetApiBufferSize(IntPtr Buffer, ref uint ByteCount);
-
-        [DllImport("netapi32.dll", CallingConvention = CallingConvention.Winapi, SetLastError = true)]
-        private static extern Error NetApiBufferFree(IntPtr Buffer);
+        }       
 
         public static IntPtr BufferAllocate(uint byteCount)
         {
             IntPtr buffer = IntPtr.Zero;
-            var result = NetApiBufferAllocate(byteCount, ref buffer);
+            var result = Netapi32.NetApiBufferAllocate(byteCount, ref buffer);
             if (result == Error.Success)
             {
                 return buffer;
@@ -52,7 +39,7 @@ namespace Tewls.Windows.NetApi
         public static IntPtr BufferReAllocate(IntPtr oldBuffer, uint byteCount)
         {
             IntPtr buffer = IntPtr.Zero;
-            var result = NetApiBufferReallocate(oldBuffer, byteCount, ref buffer);
+            var result = Netapi32.NetApiBufferReallocate(oldBuffer, byteCount, ref buffer);
             if (result == Error.Success)
             {
                 return buffer;
@@ -65,7 +52,7 @@ namespace Tewls.Windows.NetApi
         {
             uint size = 0;
 
-            var result = NetApiBufferSize(buffer, ref size);
+            var result = Netapi32.NetApiBufferSize(buffer, ref size);
             if (result != Error.Success)
             {
                 throw new Win32Exception((int)result);
@@ -76,7 +63,7 @@ namespace Tewls.Windows.NetApi
 
         public static void BufferFree(IntPtr buffer)
         {
-            var result = NetApiBufferFree(buffer);
+            var result = Netapi32.NetApiBufferFree(buffer);
             if (result != Error.Success)
             {
                 throw new Win32Exception((int)result);

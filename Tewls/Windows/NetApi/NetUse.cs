@@ -1,32 +1,19 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
-using System.Runtime.InteropServices;
 using Tewls.Windows.NetApi.Structures;
 
 namespace Tewls.Windows.NetApi
 {
     public class NetUse
     {
-        [DllImport("netapi32.dll", CallingConvention = CallingConvention.Winapi, CharSet = CharSet.Unicode, SetLastError = true)]
-        private static extern Error NetUseAdd(string servername, UseLevel LevelFlags, IntPtr buf, ref uint parm_err);
-
-        [DllImport("netapi32.dll", CallingConvention = CallingConvention.Winapi, CharSet = CharSet.Unicode, SetLastError = true)]
-        private static extern Error NetUseDel(string UncServerName, string UseName, ForceLevel ForceLevelFlags);
-
-        [DllImport("netapi32.dll", CallingConvention = CallingConvention.Winapi, CharSet = CharSet.Unicode, SetLastError = true)]
-        private static extern Error NetUseEnum(string UncServerName, UseLevel LevelFlags,ref IntPtr BufPtr, int PreferedMaximumSize, ref uint EntriesRead, ref uint TotalEntries, IntPtr ResumeHandle);
-
-        [DllImport("netapi32.dll", CallingConvention = CallingConvention.Winapi, CharSet = CharSet.Unicode, SetLastError = true)]
-        private static extern Error NetUseGetInfo(string UncServerName, string UseName, UseLevel LevelFlags, ref IntPtr bufptr);
-
         public void Add<TStruct>(string serverName, TStruct info)
             where TStruct : class, IInfo<UseLevel>
         {
             using (var buffer = new NetBuffer<TStruct>(info)) 
             {
                 uint paramIndex = 0;
-                var result = NetUseAdd(serverName, info.GetLevel(), buffer.Buffer, ref paramIndex);
+                var result = Netapi32.NetUseAdd(serverName, info.GetLevel(), buffer.Buffer, ref paramIndex);
                 if (result != Error.Success)
                 {
                     throw new Win32Exception((int)result);
@@ -36,7 +23,7 @@ namespace Tewls.Windows.NetApi
 
         public void Del(string serverName, string useName, ForceLevel forceLevel)
         {
-            var result = NetUseDel(serverName, useName, forceLevel);
+            var result = Netapi32.NetUseDel(serverName, useName, forceLevel);
             if (result != Error.Success)
             {
                 throw new Win32Exception((int)result);
@@ -54,7 +41,7 @@ namespace Tewls.Windows.NetApi
                 uint totalEntries = 0;
 
                 var info = new TStruct();
-                var result = NetUseEnum(serverName, info.GetLevel(), ref buffer.Buffer, PrefMaxLength, ref entriesRead, ref totalEntries, IntPtr.Zero);
+                var result = Netapi32.NetUseEnum(serverName, info.GetLevel(), ref buffer.Buffer, PrefMaxLength, ref entriesRead, ref totalEntries, IntPtr.Zero);
                 if (result != Error.Success)
                 {
                     throw new Win32Exception((int)result);
@@ -73,7 +60,7 @@ namespace Tewls.Windows.NetApi
             using (var buffer = new NetBuffer())
             {
                 var info = new TStruct();
-                var result = NetUseGetInfo(serverName, useName, info.GetLevel(), ref buffer.Buffer);
+                var result = Netapi32.NetUseGetInfo(serverName, useName, info.GetLevel(), ref buffer.Buffer);
                 if (result != Error.Success)
                 {
                     throw new Win32Exception((int)result);
