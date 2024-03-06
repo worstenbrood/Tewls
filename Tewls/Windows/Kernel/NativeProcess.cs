@@ -36,9 +36,9 @@ namespace Tewls.Windows.Kernel
             return tokenHandle;
         }
 
-        public static IntPtr ReadProcessMemory(IntPtr process, IntPtr baseAddress, IntPtr buffer, IntPtr size)
+        public static uint ReadProcessMemory(IntPtr process, IntPtr baseAddress, IntPtr buffer, uint size)
         {
-            IntPtr bytesRead = IntPtr.Zero;
+            uint bytesRead = 0;
             var result = Kernel32.ReadProcessMemory(process, baseAddress, buffer, size, ref bytesRead);
             if (!result)
             {
@@ -163,20 +163,14 @@ namespace Tewls.Windows.Kernel
             return info;
         }
 
-        public IntPtr ReadProcessMemory(IntPtr remoteBuffer, IntPtr localBuffer, IntPtr size)
+        public uint ReadProcessMemory(IntPtr remoteBuffer, IntPtr localBuffer, uint size)
         {
             return ReadProcessMemory(Handle, remoteBuffer, localBuffer, size);
         }
 
-        public RemoteBuffer ReadProcessMemory(RemoteBuffer remoteBuffer, IntPtr localBuffer, IntPtr size)
-        {
-            ReadProcessMemory(Handle, remoteBuffer.Buffer, localBuffer, size);
-            return remoteBuffer;
-        }
-
         public RemoteBuffer ReadProcessMemory(RemoteBuffer remoteBuffer, IntPtr localBuffer, uint size)
         {
-            ReadProcessMemory(remoteBuffer, localBuffer, (IntPtr)size);
+            ReadProcessMemory(Handle, remoteBuffer.Buffer, localBuffer, size);
             return remoteBuffer;
         }
 
@@ -186,7 +180,7 @@ namespace Tewls.Windows.Kernel
             var query = VirtualQueryEx(remoteBuffer);
             using (var localBuffer = new NativeBuffer<TStruct>(query.RegionSize))
             {
-                ReadProcessMemory(remoteBuffer, localBuffer.Buffer, query.RegionSize);
+                ReadProcessMemory(remoteBuffer, localBuffer.Buffer, (uint) query.RegionSize);
                 if (rebase)
                 {
                     localBuffer.Rebase(remoteBuffer, localBuffer.Buffer);
@@ -250,9 +244,9 @@ namespace Tewls.Windows.Kernel
             }
         }
 
-        public string ReadString(IntPtr remoteBuffer, IntPtr size)
+        public string ReadString(IntPtr remoteBuffer, uint size)
         {
-            using (var localBuffer = new HGlobalBuffer(size))
+            using (var localBuffer = new HGlobalBuffer((IntPtr) size))
             {
                 ReadProcessMemory(remoteBuffer, localBuffer.Buffer, size);
                 return Marshal.PtrToStringAuto(localBuffer.Buffer, (int) size / sizeof(char));
@@ -371,7 +365,10 @@ namespace Tewls.Windows.Kernel
         public LdrModule GetModuleHandle(string name)
         {
             var pbi = QueryProcessInformation<ProcessBasicInformation>();
+            Console.WriteLine("Peb: {0}", pbi.PebBaseAddress.ToString("X"));
+            
             var peb = ReadProcessMemory<Peb>(pbi.PebBaseAddress, false);
+            
             var ldr = ReadProcessMemory<PebLdrData>(peb.Ldr, false);
             var first = ldr.InLoadOrderModuleList.Flink;
             var current = first;
@@ -381,7 +378,7 @@ namespace Tewls.Windows.Kernel
                 var module = ReadProcessMemory<LdrModule>(current, false);
                 if (module.BaseDllName.Buffer != IntPtr.Zero)
                 {
-                    var baseDllName = ReadString(module.BaseDllName.Buffer, (IntPtr) module.BaseDllName.Length);
+                    var baseDllName = ReadString(module.BaseDllName.Buffer, module.BaseDllName.Length);
                     if (baseDllName.Equals(name, StringComparison.OrdinalIgnoreCase))
                     {
                         return module;

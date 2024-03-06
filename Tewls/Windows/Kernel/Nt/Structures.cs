@@ -213,8 +213,8 @@ namespace Tewls.Windows.Kernel.Nt
     {
         public NtStatus ExitStatus;
         public IntPtr PebBaseAddress;
-        public uint AffinityMask;
-        public uint BasePriority;
+        public IntPtr AffinityMask;
+        public IntPtr BasePriority;
         public IntPtr UniqueProcessId;
         public IntPtr InheritedFromUniqueProcessId;
 
