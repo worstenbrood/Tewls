@@ -21,7 +21,7 @@ namespace Tewls.Windows.Kernel.Nt
         }
 
         public static TStruct NtQueryInformationProcess<TStruct>(IntPtr processHandle)
-            where TStruct: class, IProcessInfoClass, new()
+            where TStruct: class, IProcessQueryInfoClass, new()
         {
             var info = new TStruct();
             using (var buffer = new HGlobalBuffer<TStruct>(info))

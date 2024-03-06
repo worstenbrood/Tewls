@@ -163,13 +163,13 @@ namespace Tewls.Windows.Kernel.Nt
         MaxProcessInfoClass,
     }
 
-    public interface IProcessInfoClass
+    public interface IProcessQueryInfoClass
     {
         ProcessInformationClass GetClass();
     }
 
     [StructLayout(LayoutKind.Sequential)]
-    public class ProcessBasicInformation : IProcessInfoClass
+    public class ProcessBasicInformation : IProcessQueryInfoClass
     {
         public IntPtr ExitStatus;
         public IntPtr PebBaseAddress;
