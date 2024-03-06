@@ -18,10 +18,10 @@ namespace Tewls.Windows.Kernel.Nt
             return ((int)status) >= 0;
         }
 
-        public static IntPtr NtOpenProcess(int processId, ProcessAccessRights desiredAccess)
+        public static IntPtr NtOpenProcess(int processId, ProcessAccessRights desiredAccess, ObjectFlags flags = ObjectFlags.Inherit)
         {
             var processHandle = IntPtr.Zero;
-            var attributes = new ObjectAttributes();
+            var attributes = new ObjectAttributes { Attributes = flags};
             var clientId = new ClientId { UniqueProcess = (IntPtr) processId };
             var result = NtOpenProcess(ref processHandle, desiredAccess, attributes, clientId);
             if (!NtSucces(result))

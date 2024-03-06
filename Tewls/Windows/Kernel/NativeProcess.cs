@@ -180,14 +180,17 @@ namespace Tewls.Windows.Kernel
             return remoteBuffer;
         }
 
-        public TStruct ReadProcessMemory<TStruct>(IntPtr remoteBuffer)
+        public TStruct ReadProcessMemory<TStruct>(IntPtr remoteBuffer, bool rebase = true)
             where TStruct : class, new()
         {
             var query = VirtualQueryEx(remoteBuffer);
             using (var localBuffer = new NativeBuffer<TStruct>(query.RegionSize))
             {
                 ReadProcessMemory(remoteBuffer, localBuffer.Buffer, query.RegionSize);
-                localBuffer.Rebase(remoteBuffer, localBuffer.Buffer);
+                if (rebase)
+                {
+                    localBuffer.Rebase(remoteBuffer, localBuffer.Buffer);
+                }
                 return BufferBase.PtrToStructure<TStruct>(localBuffer.Buffer);
             }
         }
@@ -214,12 +217,15 @@ namespace Tewls.Windows.Kernel
             return WriteProcessMemory(remoteBuffer, localBuffer, (IntPtr)size);
         }
 
-        public IntPtr WriteProcessMemory<TStruct>(TStruct structure, IntPtr remoteBuffer)
+        public IntPtr WriteProcessMemory<TStruct>(TStruct structure, IntPtr remoteBuffer, bool rebase = true)
             where TStruct : class
         {
             using (var localBuffer = new NativeBuffer<TStruct>(structure))
             {
-                localBuffer.Rebase(localBuffer.Buffer, remoteBuffer);
+                if (rebase)
+                {
+                    localBuffer.Rebase(localBuffer.Buffer, remoteBuffer);
+                }
                 return WriteProcessMemory(remoteBuffer, localBuffer.Buffer, localBuffer.Size);
             }
         }
@@ -230,14 +236,26 @@ namespace Tewls.Windows.Kernel
             return WriteProcessMemory(structure, remoteBuffer);
         }
 
-        public RemoteBuffer WriteProcessMemory<TStruct>(TStruct structure)
+        public RemoteBuffer WriteProcessMemory<TStruct>(TStruct structure, bool rebase = true)
             where TStruct : class
         {
             using (var localBuffer = new NativeBuffer<TStruct>(structure))
             {
                 var remoteBuffer = new RemoteBuffer(this, localBuffer.Size);
-                localBuffer.Rebase(localBuffer.Buffer, remoteBuffer.Buffer);
+                if (rebase)
+                {
+                    localBuffer.Rebase(localBuffer.Buffer, remoteBuffer.Buffer);
+                }
                 return WriteProcessMemory(remoteBuffer, localBuffer.Buffer, localBuffer.Size);
+            }
+        }
+
+        public string ReadString(IntPtr remoteBuffer, IntPtr size)
+        {
+            using (var localBuffer = new HGlobalBuffer(size))
+            {
+                ReadProcessMemory(remoteBuffer, localBuffer.Buffer, size);
+                return Marshal.PtrToStringAuto(localBuffer.Buffer, (int) size / sizeof(char));
             }
         }
 
@@ -348,6 +366,33 @@ namespace Tewls.Windows.Kernel
             where TStruct : class, IProcessQueryInfoClass, new()
         {
             return NtDll.NtQueryInformationProcess<TStruct>(Handle);
+        }
+
+        public IntPtr GetModuleHandle(string name)
+        {
+            var pbi = QueryProcessInformation<ProcessBasicInformation>();
+            var peb = ReadProcessMemory<Peb>(pbi.PebBaseAddress, false);
+            var ldr = ReadProcessMemory<PebLdrData>(peb.Ldr, false);
+            var first = ldr.InLoadOrderModuleList.Flink;
+            var current = first;
+
+            do
+            {
+                var module = ReadProcessMemory<LdrModule>(current, false);
+                if (module.BaseDllName.Buffer != IntPtr.Zero)
+                {
+                    var baseDllName = ReadString(module.BaseDllName.Buffer, (IntPtr) module.BaseDllName.Length);
+                    if (baseDllName.Equals(name, StringComparison.OrdinalIgnoreCase))
+                    {
+                        return module.BaseAddress;
+                    }
+                }
+
+                current = module.InLoadOrderModuleList.Flink;
+            }
+            while (current != first);
+
+            return IntPtr.Zero;
         }
 
         public override int GetHashCode()

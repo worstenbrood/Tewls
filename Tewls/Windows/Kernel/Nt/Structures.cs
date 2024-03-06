@@ -1,10 +1,12 @@
 ﻿using System;
+using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
+using System.Security.Cryptography;
 
 namespace Tewls.Windows.Kernel.Nt
 {
     [StructLayout(LayoutKind.Sequential)]
-    public class UnicodeString
+    public struct UnicodeString
     {
         public ushort Length;
         public ushort MaximumLength;
@@ -19,16 +21,16 @@ namespace Tewls.Windows.Kernel.Nt
     [StructLayout(LayoutKind.Sequential)]
     public class ObjectAttributes
     {
-        public IntPtr Length;
+        public uint Length;
         public IntPtr RootDirectory;
         public IntPtr ObjectName;
-        public IntPtr Attributes;
+        public ObjectFlags Attributes;
         public IntPtr SecurityDescriptor;
         public IntPtr SecurityQualityOfService;
 
         public ObjectAttributes()
         {
-            Length = (IntPtr) Marshal.SizeOf(typeof(ObjectAttributes));
+            Length = (uint) Marshal.SizeOf(typeof(ObjectAttributes));
         }
     };
 
@@ -45,45 +47,73 @@ namespace Tewls.Windows.Kernel.Nt
     };
 
     [StructLayout(LayoutKind.Sequential)]
-    public class ListEntry
+    public struct ListEntry
     {
-        public ListEntry Flink;
-        public ListEntry Blink;
-    }
-
-    [StructLayout(LayoutKind.Sequential)]
-    public class LDR_DATA_TABLE_ENTRY
-    {
-        public ListEntry InLoadOrderModuleList;
-        public ListEntry InMemoryOrderModuleList;
-        public ListEntry InInitializationOrderModuleList;
-        IntPtr DllBase;
-        IntPtr EntryPoint;
-        ulong SizeOfImage;  // in bytes
-        UnicodeString FullDllName;
-        UnicodeString BaseDllName;
-        public ulong Flags;            // LDR_*
-        public ushort LoadCount;
-        public ushort TlsIndex;
-        public ListEntry HashLinks;
-        public IntPtr SectionPointer;
-        public ulong CheckSum;
-        public ulong TimeDateStamp;
-        //    PVOID			LoadedImports;					// seems they are exist only on XP !!!
-        //    PVOID			EntryPointActivationContext;	// -same-
+        public IntPtr Flink;
+        public IntPtr Blink;
     }
 
     [StructLayout(LayoutKind.Sequential)]
     public class PebLdrData
     {
-        public ulong Length;
+        public uint Length;
         public bool Initialized;
         public IntPtr SsHandle;
         public ListEntry InLoadOrderModuleList; // ref. to PLDR_DATA_TABLE_ENTRY->InLoadOrderModuleList
         public ListEntry InMemoryOrderModuleList; // ref. to PLDR_DATA_TABLE_ENTRY->InMemoryOrderModuleList
         public ListEntry InInitializationOrderModuleList; // ref. to PLDR_DATA_TABLE_ENTRY->InInitializationOrderModuleList
+        public IntPtr DllBase;
+        public IntPtr EntryPoint;
     };
-        
+
+    [StructLayout(LayoutKind.Sequential)]
+    public class Peb
+    {
+        [MarshalAs(UnmanagedType.ByValArray, SizeConst = 2)]
+        public byte []Reserved1;
+        public byte BeingDebugged;
+        public byte Reserved2;
+        [MarshalAs(UnmanagedType.ByValArray, SizeConst = 2)]
+        public IntPtr []Reserved3;
+        public IntPtr Ldr;
+        public IntPtr ProcessParameters;
+        [MarshalAs(UnmanagedType.ByValArray, SizeConst = 3)]
+        public IntPtr []Reserved4;
+        public IntPtr AtlThunkSListPtr;
+        public IntPtr Reserved5;
+        public uint Reserved6;
+        public IntPtr Reserved7;
+        public uint Reserved8;
+        public uint AtlThunkSListPtr32;
+        [MarshalAs(UnmanagedType.ByValArray, SizeConst = 45)]
+        public IntPtr []Reserved9;
+        [MarshalAs(UnmanagedType.ByValArray, SizeConst = 96)]
+        public byte []Reserved10;
+        public IntPtr PostProcessInitRoutine;
+        [MarshalAs(UnmanagedType.ByValArray, SizeConst = 128)]
+        public byte []Reserved11;
+        public IntPtr Reserved12;
+        public uint SessionId;
+    };
+
+    [StructLayout(LayoutKind.Sequential)]
+    public class LdrModule
+    {
+        public ListEntry InLoadOrderModuleList;
+        public ListEntry InMemoryOrderModuleList;
+        public ListEntry InInitializationOrderModuleList;
+        public IntPtr BaseAddress;
+        public IntPtr EntryPoint;
+        public uint SizeOfImage;
+        public UnicodeString FullDllName;
+        public UnicodeString BaseDllName;
+        public uint Flags;
+        public ushort LoadCount;
+        public ushort TlsIndex;
+        public IntPtr HashTableEntry;
+        public uint TimeDateStamp;
+    };
+
     public enum ProcessInformationClass
     {
         ProcessBasicInformation = 0,
@@ -183,4 +213,18 @@ namespace Tewls.Windows.Kernel.Nt
             return ProcessInformationClass.ProcessBasicInformation;
         }
     };
+
+    [Flags]
+    public enum ObjectFlags : uint
+    {
+        Inherit = 0x00000002,
+        Permanent = 0x00000010,
+        Exclusive = 0x00000020,
+        CaseInsensitive = 0x00000040,
+        OpenIf = 0x00000080,
+        OpenLink = 0x00000100,
+        ValidAttributes = 0x000001F2
+    }
+
+    
 }
