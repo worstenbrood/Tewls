@@ -213,10 +213,10 @@ namespace Tewls.Windows.Kernel.Nt
     [StructLayout(LayoutKind.Sequential)]
     public class ProcessBasicInformation : IProcessQueryInfoClass
     {
-        public IntPtr ExitStatus;
+        public NtStatus ExitStatus;
         public IntPtr PebBaseAddress;
-        public IntPtr AffinityMask;
-        public IntPtr BasePriority;
+        public uint AffinityMask;
+        public uint BasePriority;
         public IntPtr UniqueProcessId;
         public IntPtr InheritedFromUniqueProcessId;
 
