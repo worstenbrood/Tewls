@@ -3,6 +3,7 @@ using System.ComponentModel;
 using System.Diagnostics;
 using System.Runtime.InteropServices;
 using Tewls.Windows.Advapi;
+using Tewls.Windows.Kernel.Nt;
 using Tewls.Windows.Utils;
 
 namespace Tewls.Windows.Kernel
@@ -13,12 +14,23 @@ namespace Tewls.Windows.Kernel
 
         public static IntPtr OpenProcess(int processId, ProcessAccessRights desiredAccess, bool inheritHandle = true)
         {
-            var result = Kernel32.OpenProcess(desiredAccess, inheritHandle, processId);
-            if (result == IntPtr.Zero)
+            var processHandle = IntPtr.Zero;
+            
+            var attributes = new ObjectAttributes();
+            var clientId = new ClientId { UniqueProcess = (IntPtr) processId };
+            var result = NtDll.NtOpenProcess(ref processHandle, ProcessAccessRights.StandardRightsRequired, attributes, clientId);
+            if (!NtDll.NtSucces(result))
+            {
+                //throw new Win32Exception((int)result, result.ToString());
+            }
+
+            var result2 = Kernel32.OpenProcess(desiredAccess, inheritHandle, processId);
+            if (result2 == IntPtr.Zero)
             {
                 throw new Win32Exception();
             }
-            return result;
+
+            return result2;
         }
 
         public static void TerminateProcess(IntPtr hProcess, int uExitCode = 0)
@@ -334,19 +346,24 @@ namespace Tewls.Windows.Kernel
         public TStruct GetProcessInformation<TStruct>()
             where TStruct : class, IProcessClass, new()
         {
-            var t = new TStruct();
-            using (var buffer = new HGlobalBuffer<TStruct>(t, false))
+            var info = new TStruct();
+            using (var buffer = new HGlobalBuffer<TStruct>(info))
             {
                 // This fails for ProcessLeapSecondInfo and ProcessPowerThrottlingState for some reason
-                var result = Kernel32.GetProcessInformation(Handle, t.GetClass(), buffer.Buffer, (uint) buffer.Size);
+                var result = Kernel32.GetProcessInformation(Handle, info.GetClass(), buffer.Buffer, (uint) buffer.Size);
                 if (!result)
                 {
                     throw new Win32Exception();
                 }
-
-                return buffer.PtrToStructure(t);
-        
+                                
+                return buffer.PtrToStructure(info);
             }
+        }
+
+        public TStruct QueryProcessInformation<TStruct>()
+            where TStruct : class, IProcessInfoClass, new()
+        {
+            return NtDll.NtQueryInformationProcess<TStruct>(Handle);
         }
 
         public override int GetHashCode()
