@@ -110,7 +110,7 @@ namespace Tewls.Windows.Kernel.Nt
         public uint Flags;
         public ushort LoadCount;
         public ushort TlsIndex;
-        public IntPtr HashTableEntry;
+        public ListEntry HashTableEntry;
         public uint TimeDateStamp;
     };
 

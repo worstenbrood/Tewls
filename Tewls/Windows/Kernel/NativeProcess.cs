@@ -368,7 +368,7 @@ namespace Tewls.Windows.Kernel
             return NtDll.NtQueryInformationProcess<TStruct>(Handle);
         }
 
-        public IntPtr GetModuleHandle(string name)
+        public LdrModule GetModuleHandle(string name)
         {
             var pbi = QueryProcessInformation<ProcessBasicInformation>();
             var peb = ReadProcessMemory<Peb>(pbi.PebBaseAddress, false);
@@ -384,7 +384,7 @@ namespace Tewls.Windows.Kernel
                     var baseDllName = ReadString(module.BaseDllName.Buffer, (IntPtr) module.BaseDllName.Length);
                     if (baseDllName.Equals(name, StringComparison.OrdinalIgnoreCase))
                     {
-                        return module.BaseAddress;
+                        return module;
                     }
                 }
 
@@ -392,7 +392,7 @@ namespace Tewls.Windows.Kernel
             }
             while (current != first);
 
-            return IntPtr.Zero;
+            return null;
         }
 
         public override int GetHashCode()
