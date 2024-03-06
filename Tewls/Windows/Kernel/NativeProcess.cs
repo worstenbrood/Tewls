@@ -14,23 +14,7 @@ namespace Tewls.Windows.Kernel
 
         public static IntPtr OpenProcess(int processId, ProcessAccessRights desiredAccess, bool inheritHandle = true)
         {
-            var processHandle = IntPtr.Zero;
-            
-            var attributes = new ObjectAttributes();
-            var clientId = new ClientId { UniqueProcess = (IntPtr) processId };
-            var result = NtDll.NtOpenProcess(ref processHandle, ProcessAccessRights.StandardRightsRequired, attributes, clientId);
-            if (!NtDll.NtSucces(result))
-            {
-                //throw new Win32Exception((int)result, result.ToString());
-            }
-
-            var result2 = Kernel32.OpenProcess(desiredAccess, inheritHandle, processId);
-            if (result2 == IntPtr.Zero)
-            {
-                throw new Win32Exception();
-            }
-
-            return result2;
+            return NtDll.NtOpenProcess(processId, desiredAccess);
         }
 
         public static void TerminateProcess(IntPtr hProcess, int uExitCode = 0)

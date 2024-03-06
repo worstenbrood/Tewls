@@ -21,7 +21,7 @@ namespace Tewls.Windows.Kernel.Nt
     {
         public IntPtr Length;
         public IntPtr RootDirectory;
-        public UnicodeString ObjectName;
+        public IntPtr ObjectName;
         public IntPtr Attributes;
         public IntPtr SecurityDescriptor;
         public IntPtr SecurityQualityOfService;

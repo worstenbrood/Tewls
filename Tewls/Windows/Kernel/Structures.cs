@@ -237,7 +237,7 @@ namespace Tewls.Windows.Kernel
         }
     };
 
-    [StructLayout(LayoutKind.Sequential, Pack = 1)]
+    [StructLayout(LayoutKind.Sequential)]
     public class ProcessLeapSecondInfo : IGetProcessInfoClass
     {
         public ulong Flags;
