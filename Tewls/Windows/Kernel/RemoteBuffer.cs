@@ -11,7 +11,7 @@ namespace Tewls.Windows.Kernel
 
             public IntPtr Alloc(IntPtr size)
             {
-                return _process.VirtualAllocEx(size, MemAllocations.Commit | MemAllocations.TopDown, MemProtections.ReadWrite);
+                return _process.VirtualAllocEx(size, AllocationType.Commit | AllocationType.TopDown, MemProtections.ReadWrite);
             }
 
             public void Free(IntPtr buffer)

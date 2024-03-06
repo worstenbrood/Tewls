@@ -74,7 +74,7 @@ namespace Tewls.Windows.Kernel
     }
 
     [Flags]
-    public enum MemAllocations : uint
+    public enum AllocationType : uint
     {
         None = 0,
         Commit = 0x00001000,
@@ -84,7 +84,8 @@ namespace Tewls.Windows.Kernel
         ResetUndo = 0x1000000,
         LargePages = 0x20000000,
         Physical = 0x00400000,
-        TopDown = 0x00100000
+        TopDown = 0x00100000,
+        FourMbPages = 0x80000000
     }
 
     [Flags]
@@ -121,8 +122,8 @@ namespace Tewls.Windows.Kernel
         public MemProtections AllocationProtect;
         public short PartitionId;
         public TPointer RegionSize;
-        public MemAllocations State;
-        public MemAllocations Protect;
+        public AllocationType State;
+        public AllocationType Protect;
         public MemType Type;
     };
 

@@ -135,7 +135,7 @@ namespace Tewls.Windows.Kernel
             return new NativeToken(OpenProcessToken(Handle, desiredAccess));
         }
 
-        public IntPtr VirtualAllocEx(IntPtr size, MemAllocations allocationType, MemProtections protect, IntPtr address = default)
+        public IntPtr VirtualAllocEx(IntPtr size, AllocationType allocationType, MemProtections protect, IntPtr address = default)
         {
             var result = Kernel32.VirtualAllocEx(Handle, address, size, allocationType, protect);
             if (result == IntPtr.Zero)
@@ -146,12 +146,12 @@ namespace Tewls.Windows.Kernel
             return result;
         }
 
-        public RemoteBuffer VirtualAllocExBuffer(IntPtr size, MemAllocations allocationType, MemProtections protect, IntPtr address = default)
+        public RemoteBuffer VirtualAllocExBuffer(IntPtr size, AllocationType allocationType, MemProtections protect, IntPtr address = default)
         {
             return new RemoteBuffer(this, VirtualAllocEx(size, allocationType, protect, address), size);
         }
 
-        public RemoteBuffer VirtualAllocExBuffer(uint size, MemAllocations allocationType, MemProtections protect, IntPtr address = default)
+        public RemoteBuffer VirtualAllocExBuffer(uint size, AllocationType allocationType, MemProtections protect, IntPtr address = default)
         {
             return VirtualAllocExBuffer((IntPtr)size, allocationType, protect, address);
         }
@@ -281,7 +281,7 @@ namespace Tewls.Windows.Kernel
         public RemoteBuffer WriteString(string s)
         {
             var size = (s.Length + 1) * sizeof(char);
-            var remoteBuffer = VirtualAllocExBuffer((IntPtr)size, MemAllocations.Commit | MemAllocations.Reserve | MemAllocations.TopDown, MemProtections.ReadWrite);
+            var remoteBuffer = VirtualAllocExBuffer((IntPtr)size, AllocationType.Commit | AllocationType.Reserve | AllocationType.TopDown, MemProtections.ReadWrite);
             return WriteString(remoteBuffer, s);
         }
 
