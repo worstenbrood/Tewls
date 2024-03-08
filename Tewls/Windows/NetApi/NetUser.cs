@@ -64,13 +64,13 @@ namespace Tewls.Windows.NetApi
         }
 
         public static void Add<TStruct>(string serverName, TStruct info)
-           where TStruct : class, IInfo<ShareLevel>
+           where TStruct : class, IInfo<UserLevel>
         {
             using (var buffer = new NetBuffer<TStruct>(info))
             {
                 uint paramIndex = 0;
 
-                var result = Netapi32.NetShareAdd(serverName, info.GetLevel(), buffer.Buffer, ref paramIndex);
+                var result = Netapi32.NetUserAdd(serverName, info.GetLevel(), buffer.Buffer, ref paramIndex);
                 if (result != Error.Success)
                 {
                     throw new Win32Exception((int)result);
