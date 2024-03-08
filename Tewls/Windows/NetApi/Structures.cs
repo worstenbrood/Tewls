@@ -609,6 +609,7 @@ namespace Tewls.Windows.NetApi.Structures
         AccountTypeMask = TempDuplicateAccount | NormalAccount | InterdomainTrustAccount | WorkstationTrustAccount | ServerTrustAccount
     }
 
+    [StructLayout(LayoutKind.Sequential)]
     public class UserInfo1 : IInfo<UserLevel>
     {
         [MarshalAs(UnmanagedType.LPWStr)]
@@ -640,6 +641,7 @@ namespace Tewls.Windows.NetApi.Structures
         Accounts = 8
     }
 
+    [StructLayout(LayoutKind.Sequential)]
     public class UserInfo2 : IInfo<UserLevel>
     {
         [MarshalAs(UnmanagedType.LPWStr)]
@@ -683,6 +685,7 @@ namespace Tewls.Windows.NetApi.Structures
         }
     }
 
+    [StructLayout(LayoutKind.Sequential)]
     public class UserInfo3 : IInfo<UserLevel>
     {
         [MarshalAs(UnmanagedType.LPWStr)]
@@ -733,6 +736,7 @@ namespace Tewls.Windows.NetApi.Structures
         }
     }
 
+    [StructLayout(LayoutKind.Sequential)]
     public class UserInfo10 : IInfo<UserLevel>
     {
 
