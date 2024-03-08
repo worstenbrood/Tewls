@@ -6,8 +6,6 @@ namespace Tewls.Windows.Kernel
 {
     public static class Kernel32
     {
-        
-
         [DllImport(nameof(Kernel32), CharSet = CharSet.Auto, SetLastError = true)]
         public static extern bool ReadProcessMemory(IntPtr hProcess, IntPtr lpBaseAddress, IntPtr lpBuffer, IntPtr nSize, ref IntPtr lpNumberOfBytesRead);
 
