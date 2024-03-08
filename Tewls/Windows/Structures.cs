@@ -30,6 +30,11 @@ namespace Tewls.Windows
         public string Prompt;
     }
 
+    public interface IInfo<T>
+    {
+        T GetLevel();
+    }
+
     public interface IClass<T>
     {
         T GetClass();

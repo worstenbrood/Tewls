@@ -18,12 +18,7 @@ namespace Tewls.Windows.NetApi.Structures
         Info100 = 100,
         Info101 = 101,
         Info102 = 102
-    };
-
-    public interface IInfo<T>
-    {
-        T GetLevel();
-    }
+    };  
 
     [StructLayout(LayoutKind.Sequential)]
     public class ServerInfo100 : IInfo<InfoLevel>
