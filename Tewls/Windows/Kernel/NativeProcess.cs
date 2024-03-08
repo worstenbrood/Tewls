@@ -345,7 +345,7 @@ namespace Tewls.Windows.Kernel
         }
 
         public TStruct GetProcessInformation<TStruct>()
-            where TStruct : class, IGetProcessInfoClass, new()
+            where TStruct : class, IClass<ProcessInformationClass>, new()
         {
             var info = new TStruct();
             using (var buffer = new HGlobalBuffer<TStruct>(info))
@@ -362,7 +362,7 @@ namespace Tewls.Windows.Kernel
         }
 
         public TStruct QueryProcessInformation<TStruct>()
-            where TStruct : class, IProcessQueryInfoClass, new()
+            where TStruct : class, IClass<Nt.ProcessInformationClass>, new()
         {
             return NtDll.NtQueryInformationProcess<TStruct>(Handle);
         }

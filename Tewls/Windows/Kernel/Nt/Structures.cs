@@ -202,14 +202,9 @@ namespace Tewls.Windows.Kernel.Nt
         ProcessEnergyTrackingState = 82,
         MaxProcessInfoClass,
     }
-
-    public interface IProcessQueryInfoClass
-    {
-        ProcessInformationClass GetClass();
-    }
-
+       
     [StructLayout(LayoutKind.Sequential)]
-    public class ProcessBasicInformation : IProcessQueryInfoClass
+    public class ProcessBasicInformation : IClass<ProcessInformationClass>
     {
         public IntPtr ExitStatus;
         public IntPtr PebBaseAddress;

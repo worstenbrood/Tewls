@@ -197,14 +197,9 @@ namespace Tewls.Windows.Kernel
         BelowNormal,
         Normal
     }
-
-    public interface IGetProcessInfoClass
-    {
-        ProcessInformationClass GetClass();
-    }
-
+      
     [StructLayout(LayoutKind.Sequential)]
-    public class MemoryPriorityInformation : IGetProcessInfoClass
+    public class MemoryPriorityInformation : IClass<ProcessInformationClass>
     {
         public MemoryPriority MemoryPriority;
 
@@ -215,7 +210,7 @@ namespace Tewls.Windows.Kernel
     };
 
     [StructLayout(LayoutKind.Sequential)]
-    public class ProcessPowerThrottlingState : IGetProcessInfoClass
+    public class ProcessPowerThrottlingState : IClass<ProcessInformationClass>
     {
         public ulong Version;
         public ulong ControlMask;
@@ -228,7 +223,7 @@ namespace Tewls.Windows.Kernel
     }
 
     [StructLayout(LayoutKind.Sequential)]
-    public class ProcessProtectionLevelInformation : IGetProcessInfoClass
+    public class ProcessProtectionLevelInformation : IClass<ProcessInformationClass>
     {
         public uint ProtectionLevel;
 
@@ -239,7 +234,7 @@ namespace Tewls.Windows.Kernel
     };
 
     [StructLayout(LayoutKind.Sequential)]
-    public class ProcessLeapSecondInfo : IGetProcessInfoClass
+    public class ProcessLeapSecondInfo : IClass<ProcessInformationClass>
     {
         public ulong Flags;
         public ulong Reserved;

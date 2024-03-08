@@ -29,4 +29,9 @@ namespace Tewls.Windows
         [MarshalAs(UnmanagedType.LPWStr)]
         public string Prompt;
     }
+
+    public interface IClass<T>
+    {
+        T GetClass();
+    }    
 }
