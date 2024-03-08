@@ -62,5 +62,29 @@ namespace Tewls.Windows.NetApi
                 }
             }
         }
+
+        public static void Add<TStruct>(string serverName, TStruct info)
+           where TStruct : class, IInfo<GroupLevel>
+        {
+            using (var buffer = new NetBuffer<TStruct>(info))
+            {
+                uint paramIndex = 0;
+
+                var result = Netapi32.NetGroupAdd(serverName, info.GetLevel(), buffer.Buffer, ref paramIndex);
+                if (result != Error.Success)
+                {
+                    throw new Win32Exception((int)result);
+                }
+            }
+        }
+
+        public static void Del(string serverName, string groupName)
+        {
+            var result = Netapi32.NetGroupDel(serverName, groupName);
+            if (result != Error.Success)
+            {
+                throw new Win32Exception((int)result);
+            }
+        }
     }
 }
