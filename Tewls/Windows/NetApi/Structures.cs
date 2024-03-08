@@ -749,4 +749,9 @@ namespace Tewls.Windows.NetApi.Structures
             return UserLevel.User10;
         }
     }
+
+    public enum GroupLevel : uint
+    {
+        Group0
+    }
 }
