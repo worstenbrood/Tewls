@@ -546,7 +546,9 @@ namespace Tewls.Windows.NetApi.Structures
     public enum UserLevel : uint
     {
         User0,
-        User1
+        User1,
+        User2,
+        User3
     };
 
     [Flags]
@@ -620,11 +622,113 @@ namespace Tewls.Windows.NetApi.Structures
         public string Comment;
         public UserFlags Flags;
         [MarshalAs(UnmanagedType.LPWStr)]
-        public string usri1_script_path;
+        public string ScriptPath;
 
         public UserLevel GetLevel()
         {
             return UserLevel.User1;
+        }
+    }
+
+    [Flags]
+    public enum UserOperationFlags : uint
+    {
+        Print = 1,
+        Comm = 2,
+        Server = 4,
+        Accounts = 8
+    }
+
+    public class UserInfo2 : IInfo<UserLevel>
+    {
+        [MarshalAs(UnmanagedType.LPWStr)]
+        public string Name;
+        [MarshalAs(UnmanagedType.LPWStr)]
+        public string Password;
+        public uint PasswordAge;
+        public UserPrivilege Privilege;
+        [MarshalAs(UnmanagedType.LPWStr)]
+        public string HomeDirectory;
+        [MarshalAs(UnmanagedType.LPWStr)]
+        public string Comment;
+        public UserFlags Flags;
+        [MarshalAs(UnmanagedType.LPWStr)]
+        public string ScriptPath;
+        public UserOperationFlags AuthFlags;
+        [MarshalAs(UnmanagedType.LPWStr)]
+        public string Fullname;
+        [MarshalAs(UnmanagedType.LPWStr)]
+        public string UserComment;
+        [MarshalAs(UnmanagedType.LPWStr)]
+        public string Parameters;
+        [MarshalAs(UnmanagedType.LPWStr)]
+        public string Workstations;
+        public uint LastLogon;
+        public uint LastLogoff;
+        public uint AccountExpires;
+        public uint MaxStorage;
+        public uint UnitsPerWeek;
+        public IntPtr LogonHours;
+        public uint BadPasswordCount;
+        public uint NumberLogons;
+        [MarshalAs(UnmanagedType.LPWStr)]
+        public string LogonServer;
+        public uint CountryCode;
+        public uint CodePage;
+
+        public UserLevel GetLevel()
+        {
+            return UserLevel.User2;
+        }
+    }
+
+    public class UserInfo3 : IInfo<UserLevel>
+    {
+        [MarshalAs(UnmanagedType.LPWStr)]
+        public string Name;
+        [MarshalAs(UnmanagedType.LPWStr)]
+        public string Password;
+        public uint PasswordAge;
+        public UserPrivilege Privilege;
+        [MarshalAs(UnmanagedType.LPWStr)]
+        public string HomeDirectory;
+        [MarshalAs(UnmanagedType.LPWStr)]
+        public string Comment;
+        public UserFlags Flags;
+        [MarshalAs(UnmanagedType.LPWStr)]
+        public string ScriptPath;
+        public UserOperationFlags AuthFlags;
+        [MarshalAs(UnmanagedType.LPWStr)]
+        public string Fullname;
+        [MarshalAs(UnmanagedType.LPWStr)]
+        public string UserComment;
+        [MarshalAs(UnmanagedType.LPWStr)]
+        public string Parameters;
+        [MarshalAs(UnmanagedType.LPWStr)]
+        public string Workstations;
+        public uint LastLogon;
+        public uint LastLogoff;
+        public uint AccountExpires;
+        public uint MaxStorage;
+        public uint UnitsPerWeek;
+        public IntPtr LogonHours;
+        public uint BadPasswordCount;
+        public uint NumberLogons;
+        [MarshalAs(UnmanagedType.LPWStr)]
+        public string LogonServer;
+        public uint CountryCode;
+        public uint CodePage;
+        public uint UserId;
+        public uint PrrimaryGroupId;
+        [MarshalAs(UnmanagedType.LPWStr)]
+        public string Profile;
+        [MarshalAs(UnmanagedType.LPWStr)]
+        public string HomeDirDrive;
+        public uint PasswordExpired;
+
+        public UserLevel GetLevel()
+        {
+            return UserLevel.User3;
         }
     }
 }
