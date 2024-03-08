@@ -113,5 +113,11 @@ namespace Tewls.Windows.NetApi
 
         [DllImport(nameof(Netapi32), CallingConvention = CallingConvention.Winapi, CharSet = CharSet.Unicode, SetLastError = true)]
         public static extern Error NetGroupEnum(string servername, GroupLevel level, ref IntPtr bufptr, int prefmaxlen,ref uint entriesread, ref uint totalentries, IntPtr resume_handle);
+
+        [DllImport(nameof(Netapi32), CallingConvention = CallingConvention.Winapi, CharSet = CharSet.Unicode, SetLastError = true)]
+        public static extern Error NetGroupGetInfo(string servername, string groupname, GroupLevel level, ref IntPtr bufptr);
+
+        [DllImport(nameof(Netapi32), CallingConvention = CallingConvention.Winapi, CharSet = CharSet.Unicode, SetLastError = true)]
+        public static extern Error NetGroupSetInfo(string servername, string groupname, GroupLevel level, IntPtr buf, ref uint parm_err);
     }
 }
