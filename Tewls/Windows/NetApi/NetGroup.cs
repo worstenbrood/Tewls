@@ -86,5 +86,23 @@ namespace Tewls.Windows.NetApi
                 throw new Win32Exception((int)result);
             }
         }
+
+        public static void AddUser(string serverName, string groupName, string userName)
+        {
+            var result = Netapi32.NetGroupAddUser(serverName, groupName, userName);
+            if (result != Error.Success)
+            {
+                throw new Win32Exception((int)result);
+            }
+        }
+
+        public static void DelUser(string serverName, string groupName, string userName)
+        {
+            var result = Netapi32.NetGroupDelUser(serverName, groupName, userName);
+            if (result != Error.Success)
+            {
+                throw new Win32Exception((int)result);
+            }
+        }
     }
 }
