@@ -95,5 +95,8 @@ namespace Tewls.Windows.NetApi
 
         [DllImport("netapi32.dll", CallingConvention = CallingConvention.Winapi, CharSet = CharSet.Unicode, SetLastError = true)]
         public static extern Error NetUseGetInfo(string UncServerName, string UseName, UseLevel LevelFlags, ref IntPtr bufptr);
+
+        [DllImport("netapi32.dll", CallingConvention = CallingConvention.Winapi, CharSet = CharSet.Unicode, SetLastError = true)]
+        public static extern Error NetUserEnum(string servername, UserLevel level, NetUserFilter filter, ref IntPtr bufptr, int prefmaxlen, ref uint entriesread, ref uint totalentries, IntPtr resume_handle);
     }
 }

@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Runtime.InteropServices;
 using Tewls.Windows.Kernel;
 
@@ -543,4 +542,89 @@ namespace Tewls.Windows.NetApi.Structures
             return SessionLevel.Session2;
         }
     };
+
+    public enum UserLevel : uint
+    {
+        User0,
+        User1
+    };
+
+    [Flags]
+    public enum NetUserFilter : uint
+    {
+        TempDuplicateAccount = 1,
+        NormalAccount = 2,
+        InterDomainTrustAccount = 8,
+        WorkstationTrustAccount = 16,
+        ServerTrustAccount = 32
+    }
+
+    public class UserInfo0 : IInfo<UserLevel>
+    {
+        [MarshalAs(UnmanagedType.LPWStr)]
+        public string Name;
+
+        public UserLevel GetLevel()
+        {
+            return UserLevel.User0;
+        }
+    };
+
+    public enum UserPrivilege : uint
+    {
+        Guest = 0,
+        User = 1,
+        Admin = 2
+    }
+
+    [Flags]
+    public enum UserFlags : uint
+    {
+        Script = 0x0001,
+        Accountdisable = 0x0002,
+        HomedirRequired = 0x0008,
+        Lockout = 0x0010,
+        PasswdNotreqd = 0x0020,
+        PasswdCantChange = 0x0040,
+        EncryptedTextPasswordAllowed = 0x0080,
+        TempDuplicateAccount = 0x0100,
+        NormalAccount = 0x0200,
+        InterdomainTrustAccount = 0x0800,
+        WorkstationTrustAccount = 0x1000,
+        ServerTrustAccount = 0x2000,
+        DontExpirePasswd = 0x10000,
+        MnsLogonAccount = 0x20000,
+        SmartcardRequired = 0x40000,
+        TrustedForDelegation = 0x80000,
+        NotDelegated = 0x100000,
+        UseDesKeyOnly = 0x200000,
+        DontRequirePreauth = 0x400000,
+        PasswordExpired = 0x800000,
+        TrustedToAuthenticateForDelegation = 0x1000000,
+        NoAuthDataRequired = 0x2000000,
+        MachineAccountMask = InterdomainTrustAccount | WorkstationTrustAccount | ServerTrustAccount,
+        AccountTypeMask = TempDuplicateAccount | NormalAccount | InterdomainTrustAccount | WorkstationTrustAccount | ServerTrustAccount
+    }
+
+    public class UserInfo1 : IInfo<UserLevel>
+    {
+        [MarshalAs(UnmanagedType.LPWStr)]
+        public string Name;
+        [MarshalAs(UnmanagedType.LPWStr)]
+        public string Password;
+        public uint PasswordAge;
+        public UserPrivilege Privilege;
+        [MarshalAs(UnmanagedType.LPWStr)]
+        public string HomeDirectory;
+        [MarshalAs(UnmanagedType.LPWStr)]
+        public string Comment;
+        public UserFlags Flags;
+        [MarshalAs(UnmanagedType.LPWStr)]
+        public string usri1_script_path;
+
+        public UserLevel GetLevel()
+        {
+            return UserLevel.User1;
+        }
+    }
 }
