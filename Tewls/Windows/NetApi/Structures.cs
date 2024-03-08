@@ -548,7 +548,8 @@ namespace Tewls.Windows.NetApi.Structures
         User0,
         User1,
         User2,
-        User3
+        User3,
+        User10 = 10,
     };
 
     [Flags]
@@ -729,6 +730,24 @@ namespace Tewls.Windows.NetApi.Structures
         public UserLevel GetLevel()
         {
             return UserLevel.User3;
+        }
+    }
+
+    public class UserInfo10 : IInfo<UserLevel>
+    {
+
+        [MarshalAs(UnmanagedType.LPWStr)]
+        public string Name;
+        [MarshalAs(UnmanagedType.LPWStr)]
+        public string Comment;
+        [MarshalAs(UnmanagedType.LPWStr)]
+        public string UserComment;
+        [MarshalAs(UnmanagedType.LPWStr)]
+        public string Fullname;
+
+        public UserLevel GetLevel()
+        {
+            return UserLevel.User10;
         }
     }
 }
