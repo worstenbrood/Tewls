@@ -28,7 +28,7 @@ namespace Tewls.Windows.Kernel
         public static IntPtr OpenProcessToken(IntPtr processHandle, TokenAccess desiredAccess)
         {
             IntPtr tokenHandle = IntPtr.Zero;
-            var result = Kernel32.OpenProcessToken(processHandle, desiredAccess, ref tokenHandle);
+            var result = Advapi32.OpenProcessToken(processHandle, desiredAccess, ref tokenHandle);
             if (!result)
             {
                 throw new Win32Exception();

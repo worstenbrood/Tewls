@@ -7,10 +7,10 @@ namespace Tewls.Windows.Kernel.Nt
 {
     public static class NtDll
     {
-        [DllImport("ntdll.dll")]
+        [DllImport(nameof(NtDll))]
         public static extern NtStatus NtOpenProcess(ref IntPtr ProcessHandle, ProcessAccessRights DesiredAccess, ObjectAttributes ObjectAttributes, ClientId ClientId);
 
-        [DllImport("ntdll.dll")]
+        [DllImport(nameof(NtDll))]
         public static extern NtStatus NtQueryInformationProcess(IntPtr ProcessHandle, ProcessInformationClass ProcessInformationClass, IntPtr ProcessInformation, uint ProcessInformationLength, ref uint ReturnLength);
 
         public static bool NtSucces(NtStatus status)
