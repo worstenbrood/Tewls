@@ -121,7 +121,7 @@ namespace Tewls.Windows.Kernel.Nt
         public ushort LoadCount;
         public ushort TlsIndex;
         public ListEntry HashTableEntry;
-        public uint TimeDateStamp;
+        public IntPtr TimeDateStamp;
     };
 
     public enum ProcessInformationClass
@@ -211,7 +211,7 @@ namespace Tewls.Windows.Kernel.Nt
     [StructLayout(LayoutKind.Sequential)]
     public class ProcessBasicInformation : IProcessQueryInfoClass
     {
-        public NtStatus ExitStatus;
+        public IntPtr ExitStatus;
         public IntPtr PebBaseAddress;
         public IntPtr AffinityMask;
         public IntPtr BasePriority;
