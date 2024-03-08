@@ -131,5 +131,8 @@ namespace Tewls.Windows.NetApi
 
         [DllImport(nameof(Netapi32), CallingConvention = CallingConvention.Winapi, CharSet = CharSet.Unicode, SetLastError = true)]
         public static extern Error NetGroupDelUser(string servername, string GroupName, string Username);
+
+        [DllImport(nameof(Netapi32), CallingConvention = CallingConvention.Winapi, CharSet = CharSet.Unicode, SetLastError = true)]
+        public static extern Error NetGroupGetUsers(string servername, string groupname, GroupUsersLevel level, ref IntPtr bufptr, int prefmaxlen,ref uint entriesread, ref uint totalentries, IntPtr ResumeHandle);
     }
 }

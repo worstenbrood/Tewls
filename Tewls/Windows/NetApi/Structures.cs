@@ -754,4 +754,9 @@ namespace Tewls.Windows.NetApi.Structures
     {
         Group0
     }
+
+    public enum GroupUsersLevel : uint
+    {
+        GroupUsers0 = 0,
+    }
 }
