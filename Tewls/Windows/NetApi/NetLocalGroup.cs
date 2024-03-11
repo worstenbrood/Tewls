@@ -29,5 +29,36 @@ namespace Tewls.Windows.NetApi
                 }
             }
         }
+
+        public static TStruct GetInfo<TStruct>(string serverName, string groupName)
+            where TStruct : class, IInfo<LocalGroupLevel>, new()
+        {
+            using (var buffer = new NetBuffer())
+            {
+                var info = new TStruct();
+                var result = Netapi32.NetLocalGroupGetInfo(serverName, groupName, info.GetLevel(), ref buffer.Buffer);
+                if (result != Error.Success)
+                {
+                    throw new Win32Exception((int)result);
+                }
+
+                return buffer.PtrToStructure(info);
+            }
+        }
+
+        public static void SetInfo<TStruct>(string serverName, string groupName, TStruct info)
+          where TStruct : class, IInfo<LocalGroupLevel>
+        {
+            using (var buffer = new NetBuffer<TStruct>(info))
+            {
+                uint paramIndex = 0;
+
+                var result = Netapi32.NetLocalGroupSetInfo(serverName, groupName, info.GetLevel(), buffer.Buffer, ref paramIndex);
+                if (result != Error.Success)
+                {
+                    throw new Win32Exception((int)result);
+                }
+            }
+        }
     }
 }
