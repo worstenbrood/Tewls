@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Runtime.InteropServices;
 using Tewls.Windows.Kernel;
+using Tewls.Windows.Kernel.Nt;
 
 namespace Tewls.Windows.NetApi.Structures
 {
@@ -760,7 +761,8 @@ namespace Tewls.Windows.NetApi.Structures
 
     public enum GroupUsersLevel : uint
     {
-        GroupUsers0 = 0,
+        GroupUsers0,
+        GroupUsers1,
     }
 
     public enum LocalGroupLevel : uint
@@ -824,6 +826,31 @@ namespace Tewls.Windows.NetApi.Structures
         public GroupLevel GetLevel()
         {
             return GroupLevel.Group3;
+        }
+    }
+
+    [StructLayout(LayoutKind.Sequential)]
+    public class GroupUsersInfo0 : IInfo<GroupUsersLevel>
+    {
+        [MarshalAs(UnmanagedType.LPWStr)]
+        public string Name;
+
+        public GroupUsersLevel GetLevel()
+        {
+            return GroupUsersLevel.GroupUsers0;
+        }
+    }
+
+    [StructLayout(LayoutKind.Sequential)]
+    public class GroupUsersInfo1 : IInfo<GroupUsersLevel>
+    {
+        [MarshalAs(UnmanagedType.LPWStr)]
+        public string Name;
+        public SeGroup Attributes;
+
+        public GroupUsersLevel GetLevel()
+        {
+            return GroupUsersLevel.GroupUsers1;
         }
     }
 
@@ -898,5 +925,4 @@ namespace Tewls.Windows.NetApi.Structures
             return MemberLevel.Member1;
         }
     }
-
 }
