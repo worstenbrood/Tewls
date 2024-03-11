@@ -925,4 +925,21 @@ namespace Tewls.Windows.NetApi.Structures
             return MemberLevel.Member1;
         }
     }
+
+    public enum LocalGroupUserLevel : uint
+    {
+        LocalGroupUser0 = 0,
+    }
+
+    [StructLayout(LayoutKind.Sequential)]
+    public class LocalGroupsUserInfo : IInfo<LocalGroupUserLevel>
+    {
+        [MarshalAs(UnmanagedType.LPWStr)]
+        public string Name;
+
+        public LocalGroupUserLevel GetLevel()
+        {
+            return LocalGroupUserLevel.LocalGroupUser0;
+        }
+    }
 }
