@@ -852,4 +852,51 @@ namespace Tewls.Windows.NetApi.Structures
             return LocalGroupLevel.LocalGroup1;
         }
     }
+
+    public enum MemberLevel : uint
+    {
+        Member0,
+        Member1
+    }
+
+    public enum SidType : uint
+    {
+        Null,
+        User,
+        Group,
+        Domain,
+        Alias,
+        WellKnownGroup,
+        DeletedAccount,
+        Invalid,
+        Unknown,
+        Computer,
+        Label
+    }
+
+    [StructLayout(LayoutKind.Sequential)]
+    public class MemberInfo0 : IInfo<MemberLevel>
+    {
+        public IntPtr Sid;
+       
+        public MemberLevel GetLevel()
+        {
+            return MemberLevel.Member0;
+        }
+    }
+
+    [StructLayout(LayoutKind.Sequential)]
+    public class MemberInfo1 : IInfo<MemberLevel>
+    {
+        public IntPtr Sid;
+        public SidType Type;
+        [MarshalAs(UnmanagedType.LPWStr)]
+        public string Name;
+
+        public MemberLevel GetLevel()
+        {
+            return MemberLevel.Member1;
+        }
+    }
+
 }

@@ -60,5 +60,28 @@ namespace Tewls.Windows.NetApi
                 }
             }
         }
+
+        public static IEnumerable<TStruct> GetMembers<TStruct>(string servername, string groupName)
+            where TStruct : class, IInfo<MemberLevel>, new()
+        {
+            using (var buffer = new NetBuffer())
+            {
+                var info = new TStruct();
+
+                uint entriesRead = 0;
+                uint totalEntries = 0;
+
+                var result = Netapi32.NetLocalGroupGetMembers(servername, groupName, info.GetLevel(), ref buffer.Buffer, PrefMaxLength, ref entriesRead, ref totalEntries, IntPtr.Zero);
+                if (result != Error.Success)
+                {
+                    throw new Win32Exception();
+                }
+
+                foreach (var structure in buffer.EnumStructure<TStruct>(totalEntries))
+                {
+                    yield return structure;
+                }
+            }
+        }
     }
 }
