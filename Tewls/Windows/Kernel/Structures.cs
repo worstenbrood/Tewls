@@ -212,9 +212,9 @@ namespace Tewls.Windows.Kernel
     [StructLayout(LayoutKind.Sequential)]
     public class ProcessPowerThrottlingState : IClass<ProcessInformationClass>
     {
-        public ulong Version;
-        public ulong ControlMask;
-        public ulong StateMask;
+        public uint Version;
+        public uint ControlMask;
+        public uint StateMask;
 
         public ProcessInformationClass GetClass()
         {
@@ -236,8 +236,8 @@ namespace Tewls.Windows.Kernel
     [StructLayout(LayoutKind.Sequential)]
     public class ProcessLeapSecondInfo : IClass<ProcessInformationClass>
     {
-        public ulong Flags;
-        public ulong Reserved;
+        public uint Flags;
+        public uint Reserved;
 
         public ProcessInformationClass GetClass()
         {
