@@ -752,7 +752,10 @@ namespace Tewls.Windows.NetApi.Structures
 
     public enum GroupLevel : uint
     {
-        Group0
+        Group0,
+        Group1,
+        Group2,
+        Group3,
     }
 
     public enum GroupUsersLevel : uint
@@ -762,6 +765,91 @@ namespace Tewls.Windows.NetApi.Structures
 
     public enum LocalGroupLevel : uint
     {
-        LocalGroup0 = 0,
+        LocalGroup0,
+        LocalGroup1,
+    }
+
+    [StructLayout(LayoutKind.Sequential)]
+    public class GroupInfo0 : IInfo<GroupLevel>
+    {
+        [MarshalAs(UnmanagedType.LPWStr)]
+        public string Name;
+
+        public GroupLevel GetLevel()
+        {
+            return GroupLevel.Group0;
+        }
+    }
+
+    [StructLayout(LayoutKind.Sequential)]
+    public class GroupInfo1 : IInfo<GroupLevel>
+    {
+        [MarshalAs(UnmanagedType.LPWStr)]
+        public string Name;
+        [MarshalAs(UnmanagedType.LPWStr)]
+        public string Comment;
+        
+        public GroupLevel GetLevel()
+        {
+            return GroupLevel.Group1;
+        }
+    }
+
+    [StructLayout(LayoutKind.Sequential)]
+    public class GroupInfo2 : IInfo<GroupLevel>
+    {
+        [MarshalAs(UnmanagedType.LPWStr)]
+        public string Name;
+        [MarshalAs(UnmanagedType.LPWStr)]
+        public string Comment;
+        public uint GroupId;
+        public uint Attributes;
+
+        public GroupLevel GetLevel()
+        {
+            return GroupLevel.Group2;
+        }
+    }
+
+    [StructLayout(LayoutKind.Sequential)]
+    public class GroupInfo3 : IInfo<GroupLevel>
+    {
+        [MarshalAs(UnmanagedType.LPWStr)]
+        public string Name;
+        [MarshalAs(UnmanagedType.LPWStr)]
+        public string Comment;
+        public IntPtr Sid;
+        public uint Attributes;
+
+        public GroupLevel GetLevel()
+        {
+            return GroupLevel.Group3;
+        }
+    }
+
+    [StructLayout(LayoutKind.Sequential)]
+    public class LocalGroupInfo0 : IInfo<LocalGroupLevel>
+    {
+        [MarshalAs(UnmanagedType.LPWStr)]
+        public string Name;
+
+        public LocalGroupLevel GetLevel()
+        {
+            return LocalGroupLevel.LocalGroup0;
+        }
+    }
+
+    [StructLayout(LayoutKind.Sequential)]
+    public class LocalGroupInfo1 : IInfo<LocalGroupLevel>
+    {
+        [MarshalAs(UnmanagedType.LPWStr)]
+        public string Name;
+        [MarshalAs(UnmanagedType.LPWStr)]
+        public string Comment;
+
+        public LocalGroupLevel GetLevel()
+        {
+            return LocalGroupLevel.LocalGroup1;
+        }
     }
 }
