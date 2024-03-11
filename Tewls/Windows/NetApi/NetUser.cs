@@ -5,10 +5,8 @@ using Tewls.Windows.NetApi.Structures;
 
 namespace Tewls.Windows.NetApi
 {
-    public class NetUser
+    public class NetUser : NetBase
     {
-        private const int PrefMaxLength = -1;
-
         public static IEnumerable<TStruct> Enum<TStruct>(string servername = null, NetUserFilter filter = 0)
             where TStruct : class, IInfo<UserLevel>, new()
         {

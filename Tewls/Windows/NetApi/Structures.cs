@@ -759,4 +759,9 @@ namespace Tewls.Windows.NetApi.Structures
     {
         GroupUsers0 = 0,
     }
+
+    public enum LocalGroupLevel : uint
+    {
+        LocalGroup0 = 0,
+    }
 }

@@ -5,10 +5,8 @@ using Tewls.Windows.NetApi.Structures;
 
 namespace Tewls.Windows.NetApi
 {
-    public class NetConnection
+    public class NetConnection : NetBase
     {
-        private const int PrefMaxLength = -1;
-
         public static IEnumerable<TStruct> Enum<TStruct>(string servername = null, string qualifier = null)
             where TStruct : class, IInfo<ConnectionLevel>, new()
         {

@@ -5,10 +5,8 @@ using Tewls.Windows.NetApi.Structures;
 
 namespace Tewls.Windows.NetApi
 {
-    public class NetSession
+    public class NetSession : NetBase
     {
-        private const int PrefMaxLength = -1;
-
         public static IEnumerable<TStruct> Enum<TStruct>(string servername = null, string uncClientName = null, string username = null)
             where TStruct : class, IInfo<SessionLevel>, new()
         {

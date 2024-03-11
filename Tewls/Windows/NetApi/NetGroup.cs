@@ -5,10 +5,9 @@ using Tewls.Windows.NetApi.Structures;
 
 namespace Tewls.Windows.NetApi
 {
-    public class NetGroup
-    {
-        private const int PrefMaxLength = -1;
 
+    public class NetGroup : NetBase
+    {
         public static IEnumerable<TStruct> Enum<TStruct>(string servername = null)
             where TStruct : class, IInfo<GroupLevel>, new()
         {

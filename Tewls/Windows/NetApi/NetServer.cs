@@ -6,11 +6,10 @@ using Tewls.Windows.NetApi.Structures;
 
 namespace Tewls.Windows.NetApi
 {
-    public class NetServer
+    public class NetServer : NetBase
     {
         private const int EntrySize = 3;
-        private const int PrefMaxLength = -1;
-
+        
         public static string[] GetDiskEnum(string serverName = null)
         {
             using (var buffer = new NetBuffer())

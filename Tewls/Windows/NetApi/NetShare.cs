@@ -1,15 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
-using System.Runtime.InteropServices;
 using Tewls.Windows.NetApi.Structures;
 
 namespace Tewls.Windows.NetApi
 {
-    public class NetShare
+    public class NetShare : NetBase
     {
-        private const int PrefMaxLength = -1;
-
         public static IEnumerable<TStruct> Enum<TStruct>(string servername = null)
             where TStruct : class, IInfo<ShareLevel>, new()
         {

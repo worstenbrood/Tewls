@@ -4,10 +4,8 @@ using Tewls.Windows.NetApi.Structures;
 
 namespace Tewls.Windows.NetApi
 {
-    public class NetRemote
+    public class NetRemote : NetBase
     {
-        
-
         public static Supports ComputerSupports(string serverName = null, Supports optionsRequested = Supports.Any)
         {
             Supports optionsSupported = 0;

@@ -5,7 +5,7 @@ using Tewls.Windows.NetApi.Structures;
 
 namespace Tewls.Windows.NetApi
 {
-    public class NetUse
+    public class NetUse : NetBase
     {
         public void Add<TStruct>(string serverName, TStruct info)
             where TStruct : class, IInfo<UseLevel>
@@ -29,8 +29,6 @@ namespace Tewls.Windows.NetApi
                 throw new Win32Exception((int)result);
             }
         }
-
-        private const int PrefMaxLength = -1;
 
         public static IEnumerable<TStruct> Enum<TStruct>(string serverName = null)
            where TStruct : class, IInfo<UseLevel>, new()
