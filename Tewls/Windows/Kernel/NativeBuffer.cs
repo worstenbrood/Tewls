@@ -1,4 +1,7 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Linq.Expressions;
 using System.Reflection;
 using System.Runtime.InteropServices;
 using Tewls.Windows.Utils;
@@ -90,6 +93,71 @@ namespace Tewls.Windows.Kernel
                 }
             }
         }
+               
+        public static void CopyToBuffer<TStruct>(IEnumerable<TStruct> structures, IntPtr buffer)
+            where TStruct : class
+        {
+            var offset = 0;
+            var list = structures.ToList();
+
+            foreach(var structure in list)
+            {
+                // Copy marshalled structure to our own buffer
+                using (var temp = new HGlobalBuffer<TStruct>(structure))
+                {
+                    Kernel32.CopyMemory(buffer + offset, temp.Buffer, temp.Size);
+                }
+
+                // Next record
+                offset += Marshal.SizeOf(structure);
+            }
+
+            for (int index = 0; index < list.Count; index++)
+            {
+                var structure = list[index];
+                var type = structure.GetType();
+
+                foreach (var field in FieldCache[type])
+                {
+                    // Ref types
+                    if (field.FieldType.IsValueType)
+                    {
+                        continue;
+                    }
+
+                    var value = field.GetValue(list[index]);
+                    if (value == null)
+                    {
+                        continue;
+                    }
+
+                    IntPtr destination = IntPtr.Zero;
+                    int fieldSize = 0;
+
+                    if (field.FieldType == typeof(string))
+                    {
+                        var @string = (string)value;
+                        fieldSize = (@string.Length + 1) * sizeof(char);
+
+                        // Copy string to buffer
+                        destination = IntPtr.Add(buffer, offset);
+                        destination = lstrcpyn(destination, @string);
+                    }
+                    else
+                    {
+                        // Recursive
+                        fieldSize = CopyToBuffer(structure, buffer, offset);
+                        destination = IntPtr.Add(buffer, offset);
+                    }
+
+                    // Update pointer
+                    var fieldOffset = IntPtr.Add(Marshal.OffsetOf(type, field.Name), index * Marshal.SizeOf(structure));
+                    Marshal.WriteIntPtr(buffer + (int) fieldOffset, destination);
+
+                    offset += fieldSize;
+                }
+            }
+        }
 
         public static int CopyToBuffer<TStruct>(TStruct structure, IntPtr buffer, int offset = 0)
             where TStruct: class
@@ -161,6 +229,15 @@ namespace Tewls.Windows.Kernel
             return NativeBuffer.CopyToBuffer(structure, Buffer);
         }
 
+        private void AllocAndCopyCollectionToBuffer(IEnumerable<TStruct> structures)
+        {
+            Size = (IntPtr) structures.Aggregate(0, (s, a) => s + NativeBuffer.GetObjectSize(a));
+            Buffer = Marshal.AllocHGlobal(Size);
+
+            // Build buffer
+            NativeBuffer.CopyToBuffer(structures, Buffer);
+        }
+
         public void Rebase(IntPtr from, IntPtr to)
         {
             NativeBuffer.Rebase(typeof(TStruct), Buffer, from, to);
@@ -173,6 +250,10 @@ namespace Tewls.Windows.Kernel
         public NativeBuffer(TStruct structure) 
         {
             AllocAndCopyToBuffer(structure);
+        }
+        public NativeBuffer(IEnumerable<TStruct> structures)
+        {
+            AllocAndCopyCollectionToBuffer(structures);
         }
     }
 }
