@@ -255,5 +255,4 @@ namespace Tewls.Windows.PE
         public uint AddressOfNames;
         public uint AddressOfNameOrdinals;
     };
-
 }

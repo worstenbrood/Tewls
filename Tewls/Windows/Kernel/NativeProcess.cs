@@ -321,11 +321,7 @@ namespace Tewls.Windows.Kernel
 
         public int ReadInt(uint remoteBuffer)
         {
-            using (var localBuffer = new HGlobalBuffer((IntPtr)Marshal.SizeOf(typeof(int))))
-            {
-                ReadProcessMemory((IntPtr) remoteBuffer, localBuffer.Buffer, localBuffer.Size);
-                return Marshal.ReadInt32(localBuffer.Buffer);
-            }
+            return ReadInt((IntPtr)remoteBuffer);
         }
 
         public short ReadInt16(IntPtr remoteBuffer)
