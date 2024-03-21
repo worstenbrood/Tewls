@@ -427,8 +427,7 @@ namespace Tewls.Windows.Kernel
             var pbi = QueryProcessInformation<ProcessBasicInformation>();
             var peb = ReadProcessMemory<Peb>(pbi.PebBaseAddress);
             var ldr = ReadProcessMemory<PebLdrData>(peb.Ldr);
-            var first = ldr.InLoadOrderModuleList.Flink;
-            var current = first;
+            var current = ldr.InLoadOrderModuleList.Flink;
 
             do
             {
@@ -444,7 +443,7 @@ namespace Tewls.Windows.Kernel
 
                 current = module.InLoadOrderModuleList.Flink;
             }
-            while (current != first);
+            while (current != ldr.InLoadOrderModuleList.Flink);
 
             return null;
         }
