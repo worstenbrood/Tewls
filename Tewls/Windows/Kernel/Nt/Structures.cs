@@ -160,7 +160,7 @@ namespace Tewls.Windows.Kernel.Nt
     };
 
     [StructLayout(LayoutKind.Sequential)]
-    public class Wow64Information : IClass<ProcessInformationClass>
+    public class ProcessWow64Information : IClass<ProcessInformationClass>
     {
         public IntPtr PebBaseAddress;
 

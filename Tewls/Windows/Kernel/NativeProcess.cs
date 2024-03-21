@@ -202,6 +202,12 @@ namespace Tewls.Windows.Kernel
             return ReadProcessMemory<TStruct>(remoteBuffer, (IntPtr)Marshal.SizeOf(typeof(TStruct)), rebase);
         }
 
+        public TStruct ReadProcessMemory<TStruct>(uint remoteBuffer, bool rebase = false)
+            where TStruct : class, new()
+        {
+            return ReadProcessMemory<TStruct>((IntPtr) remoteBuffer, (IntPtr) Marshal.SizeOf(typeof(TStruct)), rebase);
+        }
+
         public TStruct ReadProcessMemory<TStruct>(RemoteBuffer remoteBuffer)
             where TStruct : class, new()
         {
@@ -264,6 +270,11 @@ namespace Tewls.Windows.Kernel
                 ReadProcessMemory(remoteBuffer, localBuffer.Buffer, (IntPtr) size);
                 return Marshal.PtrToStringAuto(localBuffer.Buffer, (int) size / charsize);
             }
+        }
+
+        public string ReadString(uint remoteBuffer, uint size, int charsize = sizeof(char))
+        {
+            return ReadString((IntPtr) remoteBuffer, size, charsize);
         }
 
         public string ReadStringA(IntPtr remoteBuffer, uint size)
