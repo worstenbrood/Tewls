@@ -254,12 +254,21 @@ namespace Tewls.Windows.Kernel
             }
         }
 
-        public string ReadString(IntPtr remoteBuffer, uint size)
+        public string ReadString(IntPtr remoteBuffer, uint size, int charsize = sizeof(char))
         {
             using (var localBuffer = new HGlobalBuffer((IntPtr) size))
             {
                 ReadProcessMemory(remoteBuffer, localBuffer.Buffer, (IntPtr) size);
-                return Marshal.PtrToStringAuto(localBuffer.Buffer, (int) size / sizeof(char));
+                return Marshal.PtrToStringAuto(localBuffer.Buffer, (int) size / charsize);
+            }
+        }
+
+        public string ReadStringA(IntPtr remoteBuffer, uint size)
+        {
+            using (var localBuffer = new HGlobalBuffer((IntPtr)size))
+            {
+                ReadProcessMemory(remoteBuffer, localBuffer.Buffer, (IntPtr)size);
+                return Marshal.PtrToStringAnsi(localBuffer.Buffer);
             }
         }
 
@@ -270,6 +279,33 @@ namespace Tewls.Windows.Kernel
             {
                 ReadProcessMemory(remoteBuffer, localBuffer.Buffer, localBuffer.Size);
                 return Marshal.PtrToStringAuto(localBuffer.Buffer);
+            }
+        }
+
+        public IntPtr ReadIntPtr(IntPtr remoteBuffer)
+        {
+            using (var localBuffer = new HGlobalBuffer((IntPtr) Marshal.SizeOf(typeof(IntPtr))))
+            {
+                ReadProcessMemory(remoteBuffer, localBuffer.Buffer, localBuffer.Size);
+                return Marshal.ReadIntPtr(localBuffer.Buffer);
+            }
+        }
+
+        public int ReadInt(IntPtr remoteBuffer)
+        {
+            using (var localBuffer = new HGlobalBuffer((IntPtr)Marshal.SizeOf(typeof(int))))
+            {
+                ReadProcessMemory(remoteBuffer, localBuffer.Buffer, localBuffer.Size);
+                return Marshal.ReadInt32(localBuffer.Buffer);
+            }
+        }
+
+        public short ReadInt16(IntPtr remoteBuffer)
+        {
+            using (var localBuffer = new HGlobalBuffer((IntPtr)Marshal.SizeOf(typeof(short))))
+            {
+                ReadProcessMemory(remoteBuffer, localBuffer.Buffer, localBuffer.Size);
+                return Marshal.ReadInt16(localBuffer.Buffer);
             }
         }
 
