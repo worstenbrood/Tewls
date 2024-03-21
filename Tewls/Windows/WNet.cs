@@ -76,7 +76,7 @@ namespace Tewls.Windows
         }
 
         [Flags]
-        public enum NetInfo
+        public enum NetInfoFlag
         {
             Dll16 = 1,
             DiskRedirect = 2,
@@ -148,7 +148,7 @@ namespace Tewls.Windows
                 return this;
             }
 
-            public NetInfoStruct GetNetworkInformation()
+            public NetInfo GetNetworkInformation()
             {
                 return WNet.GetNetworkInformation(Provider);
             }
@@ -158,7 +158,7 @@ namespace Tewls.Windows
                 return WNet.GetConnection(LocalName);
             }
 
-            public NetConnectionInfoStruct MultinetGetConnectionPerformance()
+            public NetConnectionInfo MultinetGetConnectionPerformance()
             {
                 return WNet.MultinetGetConnectionPerformance(this);
             }
@@ -180,25 +180,25 @@ namespace Tewls.Windows
         };
 
         [StructLayout(LayoutKind.Sequential, Pack = 1)]
-        public class NetInfoStruct
+        public class NetInfo
         {
             public uint Structure;
             public uint ProviderVersion;
             public Error Status;
-            public NetInfo Characteristics;
+            public NetInfoFlag Characteristics;
             public ulong Handle;
             public short NetType;
             public uint Printers;
             public uint Drives;
 
-            public NetInfoStruct()
+            public NetInfo()
             {
-                Structure = (uint)Marshal.SizeOf(typeof(NetInfoStruct));
+                Structure = (uint)Marshal.SizeOf(typeof(NetInfo));
             }
         };
 
         [StructLayout(LayoutKind.Sequential)]
-        public class NetConnectionInfoStruct
+        public class NetConnectionInfo
         {
             public uint Structure;
             public WnCon Flags;
@@ -206,9 +206,9 @@ namespace Tewls.Windows
             public uint Delay;
             public uint OptDataSize;
 
-            public NetConnectionInfoStruct()
+            public NetConnectionInfo()
             {
-                Structure = (uint)Marshal.SizeOf(typeof(NetConnectionInfoStruct));
+                Structure = (uint)Marshal.SizeOf(typeof(NetConnectionInfo));
             }
         };
 
@@ -359,9 +359,9 @@ namespace Tewls.Windows
             }
         }
 
-        public static NetInfoStruct GetNetworkInformation(string provider)
+        public static NetInfo GetNetworkInformation(string provider)
         {
-            var info = new NetInfoStruct();
+            var info = new NetInfo();
             var result = Mpr.WNetGetNetworkInformation(provider, info);
             var ex = GetLastException(result);
             if (ex != null)
@@ -420,9 +420,9 @@ namespace Tewls.Windows
             }
         }
 
-        public static NetConnectionInfoStruct MultinetGetConnectionPerformance(NetResource resource)
+        public static NetConnectionInfo MultinetGetConnectionPerformance(NetResource resource)
         {
-            var info = new NetConnectionInfoStruct();
+            var info = new NetConnectionInfo();
             var result = Mpr.MultinetGetConnectionPerformance(resource, info);
             var ex = GetLastException(result);
             if (ex != null)

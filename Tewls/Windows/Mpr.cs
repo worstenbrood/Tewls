@@ -25,7 +25,7 @@ namespace Tewls.Windows
         public static extern Error WNetAddConnection2(NetResource lpNetResource, string lpPassword, string lpUserName, uint dwFlags);
 
         [DllImport("Mpr.dll", CallingConvention = CallingConvention.Winapi, CharSet = CharSet.Auto, SetLastError = true)]
-        public static extern Error WNetGetNetworkInformation(string lpProvider, NetInfoStruct lpNetInfoStruct);
+        public static extern Error WNetGetNetworkInformation(string lpProvider, NetInfo lpNetInfoStruct);
 
         [DllImport("Mpr.dll", CallingConvention = CallingConvention.Winapi, CharSet = CharSet.Auto, SetLastError = true)]
         public static extern Error WNetCancelConnection(string lpName, bool fForce);
@@ -37,7 +37,7 @@ namespace Tewls.Windows
         public static extern Error WNetGetConnection(string lpLocalName, IntPtr lpRemoteName, ref uint lpnLength);
 
         [DllImport("Mpr.dll", CallingConvention = CallingConvention.Winapi, CharSet = CharSet.Auto, SetLastError = true)]
-        public static extern Error MultinetGetConnectionPerformance(NetResource lpNetResource, NetConnectionInfoStruct lpNetConnectInfoStruct);
+        public static extern Error MultinetGetConnectionPerformance(NetResource lpNetResource, NetConnectionInfo lpNetConnectInfoStruct);
 
         [DllImport("Mpr.dll", CallingConvention = CallingConvention.Winapi, CharSet = CharSet.Auto, SetLastError = true)]
         public static extern Error WNetGetUser(string lpName, IntPtr lpUserName, ref uint lpnLength);
