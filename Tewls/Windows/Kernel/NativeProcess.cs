@@ -601,7 +601,7 @@ namespace Tewls.Windows.Kernel
                 // Result
                 var address = IntPtr.Add(baseAddress, function);
 
-                var functionName = string.Empty;
+                string functionName = null;
                 if (index < imageExportDirectory.NumberOfNames)
                 {
                     var nameIndex = index * Marshal.SizeOf(typeof(int));
@@ -610,7 +610,7 @@ namespace Tewls.Windows.Kernel
                     var offset = ReadInt(IntPtr.Add(names, nameIndex));
 
                     // Read name
-                    functionName = ReadStringA(IntPtr.Add(baseAddress, offset), 128, false);
+                    functionName = ReadStringA(IntPtr.Add(baseAddress, offset), 255, false);
                 }
 
                 yield return new Export(functionName, ordinal, address);
@@ -662,6 +662,7 @@ namespace Tewls.Windows.Kernel
                 // Result
                 var address = baseAddress + (uint) function;
 
+                string functionName = null;
                 if (index < imageExportDirectory.NumberOfNames)
                 {
                     var nameIndex = index * Marshal.SizeOf(typeof(int));
@@ -670,12 +671,11 @@ namespace Tewls.Windows.Kernel
                     var offset = ReadInt(names + (uint)nameIndex);
 
                     // Read name
-                    var functionName = ReadStringA(baseAddress + (uint)offset, 128);
+                    functionName = ReadStringA(baseAddress + (uint)offset, 255);
+                }
 
-                    yield return new Export(functionName, ordinal, (IntPtr)address);
-                }                    
+                yield return new Export(functionName, ordinal, (IntPtr)address);
             }
-            
         }
 
         public IntPtr GetProcAddress(LdrModule module, string name)
