@@ -563,16 +563,7 @@ namespace Tewls.Windows.Kernel
 
                 for (int index = 0; index < imageExportDirectory.NumberOfFunctions; index++)
                 {
-                    var functionName = string.Empty;
-                    //if (function != 0)
-                    {
-                        // Read offset of name
-                        var offset = ReadInt(table + (uint)(index * Marshal.SizeOf(typeof(int))));
-
-                        // Read name
-                        functionName = ReadStringA(baseAddress + (uint) offset, 128);
-                    }
-
+                    
                     // Calculate address of ordinal
                     var ordinalAddress = baseAddress + imageExportDirectory.AddressOfNameOrdinals + (uint) (index * Marshal.SizeOf(typeof(ushort)));
 
@@ -587,6 +578,16 @@ namespace Tewls.Windows.Kernel
 
                     // Result
                     var address = baseAddress + (uint) function;
+
+                    var functionName = string.Empty;
+                    if (function != 0)
+                    {
+                        // Read offset of name
+                        var offset = ReadInt(table + (uint)(index * Marshal.SizeOf(typeof(int))));
+
+                        // Read name
+                        functionName = ReadStringA(baseAddress + (uint)offset, 128);
+                    }
 
                     yield return new Export(functionName, ordinal, (IntPtr) address);
                 }
