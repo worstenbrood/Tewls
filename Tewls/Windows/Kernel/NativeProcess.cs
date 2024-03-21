@@ -179,19 +179,24 @@ namespace Tewls.Windows.Kernel
             return remoteBuffer;
         }
 
-        public TStruct ReadProcessMemory<TStruct>(IntPtr remoteBuffer, bool rebase = true)
-            where TStruct : class, new()
+        public TStruct ReadProcessMemory<TStruct>(IntPtr remoteBuffer, IntPtr size, bool rebase = true)
+           where TStruct : class, new()
         {
-            var query = VirtualQueryEx(remoteBuffer);
-            using (var localBuffer = new NativeBuffer<TStruct>(query.RegionSize))
+            using (var localBuffer = new NativeBuffer<TStruct>(size))
             {
-                ReadProcessMemory(remoteBuffer, localBuffer.Buffer, query.RegionSize);
+                ReadProcessMemory(remoteBuffer, localBuffer.Buffer, size);
                 if (rebase)
                 {
                     localBuffer.Rebase(remoteBuffer, localBuffer.Buffer);
                 }
                 return BufferBase.PtrToStructure<TStruct>(localBuffer.Buffer);
             }
+        }
+
+        public TStruct ReadProcessMemory<TStruct>(IntPtr remoteBuffer, bool rebase = false)
+            where TStruct : class, new()
+        {
+            return ReadProcessMemory<TStruct>(remoteBuffer, (IntPtr)Marshal.SizeOf(typeof(TStruct)), rebase);
         }
 
         public TStruct ReadProcessMemory<TStruct>(RemoteBuffer remoteBuffer)
@@ -371,14 +376,14 @@ namespace Tewls.Windows.Kernel
         {
             // Needs work to wotk on 64
             var pbi = QueryProcessInformation<ProcessBasicInformation>();
-            var peb = ReadProcessMemory<Peb>(pbi.PebBaseAddress, false);
-            var ldr = ReadProcessMemory<PebLdrData>(peb.Ldr, false);
+            var peb = ReadProcessMemory<Peb>(pbi.PebBaseAddress);
+            var ldr = ReadProcessMemory<PebLdrData>(peb.Ldr);
             var first = ldr.InLoadOrderModuleList.Flink;
             var current = first;
 
             do
             {
-                var module = ReadProcessMemory<LdrModule>(current, false);
+                var module = ReadProcessMemory<LdrModule>(current);
                 if (module.BaseDllName.Buffer != IntPtr.Zero)
                 {
                     var baseDllName = ReadString(module.BaseDllName.Buffer, module.BaseDllName.Length);
@@ -388,7 +393,7 @@ namespace Tewls.Windows.Kernel
                     }
                 }
 
-                current = (IntPtr) module.InLoadOrderModuleList.Flink;
+                current = module.InLoadOrderModuleList.Flink;
             }
             while (current != first);
 

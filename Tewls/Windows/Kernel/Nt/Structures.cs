@@ -3,7 +3,7 @@ using System.Runtime.InteropServices;
 
 namespace Tewls.Windows.Kernel.Nt
 {
-    [StructLayout(LayoutKind.Sequential)]
+    [StructLayout(LayoutKind.Sequential, Pack = 0)]
     public struct UnicodeString
     {
         public ushort Length;
@@ -56,7 +56,7 @@ namespace Tewls.Windows.Kernel.Nt
         }
     };
 
-    [StructLayout(LayoutKind.Sequential)]
+    [StructLayout(LayoutKind.Sequential, Pack = 0)]
     public struct ListEntry
     {
         public IntPtr Flink;
