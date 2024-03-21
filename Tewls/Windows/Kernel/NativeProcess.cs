@@ -505,6 +505,11 @@ namespace Tewls.Windows.Kernel
             }
 
             var wow64info = QueryProcessInformation<ProcessWow64Information>();
+            if (wow64info.PebBaseAddress == IntPtr.Zero)
+            {
+                yield break;
+            }
+
             var peb = ReadProcessMemory<Peb32>(wow64info.PebBaseAddress);
             var ldr = ReadProcessMemory<PebLdrData32>(peb.Ldr);
             var current = ldr.InLoadOrderModuleList.Flink;
@@ -551,8 +556,7 @@ namespace Tewls.Windows.Kernel
         }
 
         public IEnumerable<Export> GetExports(IntPtr baseAddress)
-        {
-                     
+        {  
             var pe = ReadProcessMemory<ImageDosHeader>(baseAddress);
             if (pe.e_magic != ImageSignature.Dos)
             {
