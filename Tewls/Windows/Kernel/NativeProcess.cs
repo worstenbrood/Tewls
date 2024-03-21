@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.Runtime.InteropServices;
-using System.Xml.Linq;
 using Tewls.Windows.Advapi;
 using Tewls.Windows.Kernel.Nt;
 using Tewls.Windows.PE;
@@ -605,7 +604,7 @@ namespace Tewls.Windows.Kernel
 
         public IntPtr GetProcAddressWow64(LdrModule32 module, string name)
         {
-            foreach (var proc in GetExports((IntPtr) module.BaseAddress))
+            foreach (var proc in GetExportsWow64(module.BaseAddress))
             {
                 if (proc.Name.Equals(name, StringComparison.OrdinalIgnoreCase))
                 {
