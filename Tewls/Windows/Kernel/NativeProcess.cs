@@ -610,7 +610,6 @@ namespace Tewls.Windows.Kernel
                 }
 
                 yield return new Export(functionName, ordinal, address);
-              
             }
         }
 
