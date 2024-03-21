@@ -157,18 +157,7 @@ namespace Tewls.Windows.Kernel.Nt
         public byte[] Reserved11;
         public uint Reserved12;
         public uint SessionId;
-    };
-
-    [StructLayout(LayoutKind.Sequential)]
-    public class ProcessWow64Information : IClass<ProcessInformationClass>
-    {
-        public IntPtr PebBaseAddress;
-
-        public ProcessInformationClass GetClass()
-        {
-            return ProcessInformationClass.ProcessWow64Information;
-        }
-    }
+    };  
 
     [StructLayout(LayoutKind.Sequential)]
     public class LdrModule
@@ -300,6 +289,17 @@ namespace Tewls.Windows.Kernel.Nt
             return ProcessInformationClass.ProcessBasicInformation;
         }
     };
+
+    [StructLayout(LayoutKind.Sequential)]
+    public class ProcessWow64Information : IClass<ProcessInformationClass>
+    {
+        public IntPtr PebBaseAddress;
+
+        public ProcessInformationClass GetClass()
+        {
+            return ProcessInformationClass.ProcessWow64Information;
+        }
+    }
 
     public enum SeGroup : uint
     {

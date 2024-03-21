@@ -145,10 +145,9 @@ namespace Tewls.Windows.PE
         HDR_MAGIC =  0x107
     }
 
-    public enum ImageNtSignature : uint
+    public enum ImageNt : uint
     {
-        PE32 = 0x10b,
-        PE64 = 0x20b,
+        Signature = 0x00004550
     }
 
     [StructLayout(LayoutKind.Sequential, Pack = 0)]
@@ -162,7 +161,7 @@ namespace Tewls.Windows.PE
         public uint SizeOfUninitializedData;
         public uint AddressOfEntryPoint;
         public uint BaseOfCode;
-        public IntPtr ImageBase;
+        public ulong ImageBase;
         public uint SectionAlignment;
         public uint FileAlignment;
         public ushort MajorOperatingSystemVersion;
@@ -227,7 +226,7 @@ namespace Tewls.Windows.PE
     [StructLayout(LayoutKind.Sequential, Pack = 0)]
     public class ImageNtHeaders
     {
-        public ImageNtSignature Signature;
+        public ImageNt Signature;
         public ImageFileHeader FileHeader;
         public ImageOptionalHeader OptionalHeader;
     };
@@ -235,7 +234,7 @@ namespace Tewls.Windows.PE
     [StructLayout(LayoutKind.Sequential, Pack = 0)]
     public class ImageNtHeaders32
     {
-        public ImageNtSignature Signature;
+        public ImageNt Signature;
         public ImageFileHeader FileHeader;
         public ImageOptionalHeader32 OptionalHeader;
     };

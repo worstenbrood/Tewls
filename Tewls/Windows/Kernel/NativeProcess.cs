@@ -2,7 +2,10 @@
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
+using System.Linq;
+using System.Linq.Expressions;
 using System.Runtime.InteropServices;
+using System.Xml.Linq;
 using Tewls.Windows.Advapi;
 using Tewls.Windows.Kernel.Nt;
 using Tewls.Windows.PE;
@@ -276,12 +279,24 @@ namespace Tewls.Windows.Kernel
             return ReadString((IntPtr) remoteBuffer, size, charsize);
         }
 
-        public string ReadStringA(IntPtr remoteBuffer, uint size)
+        public string ReadStringA(IntPtr remoteBuffer, uint size, bool c = true)
         {
-            using (var localBuffer = new HGlobalBuffer((IntPtr)size))
+            try
             {
-                ReadProcessMemory(remoteBuffer, localBuffer.Buffer, (IntPtr)size);
-                return Marshal.PtrToStringAnsi(localBuffer.Buffer);
+                using (var localBuffer = new HGlobalBuffer((IntPtr)size))
+                {
+                    ReadProcessMemory(remoteBuffer, localBuffer.Buffer, (IntPtr)size);
+                    return Marshal.PtrToStringAnsi(localBuffer.Buffer);
+                }
+            }
+            catch  
+            { 
+                if (c)
+                {
+                    throw;
+                }
+
+                return string.Empty;
             }
         }
 
@@ -323,16 +338,16 @@ namespace Tewls.Windows.Kernel
             return ReadInt((IntPtr)remoteBuffer);
         }
 
-        public short ReadInt16(IntPtr remoteBuffer)
+        public ushort ReadInt16(IntPtr remoteBuffer)
         {
             using (var localBuffer = new HGlobalBuffer((IntPtr)Marshal.SizeOf(typeof(short))))
             {
                 ReadProcessMemory(remoteBuffer, localBuffer.Buffer, localBuffer.Size);
-                return Marshal.ReadInt16(localBuffer.Buffer);
+                return (ushort) Marshal.ReadInt16(localBuffer.Buffer);
             }
         }
 
-        public short ReadInt16(uint remoteBuffer)
+        public ushort ReadInt16(uint remoteBuffer)
         {
             return ReadInt16((IntPtr)remoteBuffer);
         }
@@ -436,7 +451,19 @@ namespace Tewls.Windows.Kernel
             return NtDll.NtQueryInformationProcess<TStruct>(Handle);
         }
 
-        public LdrModule GetModuleHandle(string name)
+        public class Module
+        {
+            public string Name { get; }
+            public IntPtr Address { get; }
+
+            public Module(string name, IntPtr address)
+            {
+                Name = name;
+                Address = address;
+            }
+        }
+
+        public IEnumerable<Module> GetModules()
         {
             var pbi = QueryProcessInformation<ProcessBasicInformation>();
             var peb = ReadProcessMemory<Peb>(pbi.PebBaseAddress);
@@ -449,21 +476,34 @@ namespace Tewls.Windows.Kernel
                 if (module.BaseDllName.Buffer != IntPtr.Zero)
                 {
                     var baseDllName = ReadString(module.BaseDllName.Buffer, module.BaseDllName.Length);
-                    if (baseDllName.Equals(name, StringComparison.OrdinalIgnoreCase))
-                    {
-                        return module;
-                    }
+                    yield return new Module(baseDllName, module.BaseAddress);
                 }
 
                 current = module.InLoadOrderModuleList.Flink;
             }
             while (current != ldr.InLoadOrderModuleList.Flink);
+        }
 
+        public Module GetModule(string name)
+        {
+            foreach(var module in GetModules())
+            {
+                if (module.Name.Equals(name, StringComparison.OrdinalIgnoreCase))
+                {
+                    return module;
+                }
+            }
+            
             return null;
         }
 
-        public LdrModule32 GetModuleHandleWow64(string name)
+        public IEnumerable<Module> GetModulesWow64()
         {
+            if (!IsWow64Process())
+            {
+                yield break;
+            }
+
             var wow64info = QueryProcessInformation<ProcessWow64Information>();
             var peb = ReadProcessMemory<Peb32>(wow64info.PebBaseAddress);
             var ldr = ReadProcessMemory<PebLdrData32>(peb.Ldr);
@@ -475,15 +515,23 @@ namespace Tewls.Windows.Kernel
                 if (module.BaseDllName.Buffer != 0)
                 {
                     var baseDllName = ReadString(module.BaseDllName.Buffer, module.BaseDllName.Length);
-                    if (baseDllName.Equals(name, StringComparison.OrdinalIgnoreCase))
-                    {
-                        return module;
-                    }
+                    yield return new Module(baseDllName, (IntPtr)module.BaseAddress);
                 }
 
                 current = module.InLoadOrderModuleList.Flink;
             }
             while (current != ldr.InLoadOrderModuleList.Flink);
+        }
+
+        public Module GetModuleWow64(string name)
+        {
+            foreach (var module in GetModulesWow64())
+            {
+                if (module.Name.Equals(name, StringComparison.OrdinalIgnoreCase))
+                {
+                    return module;
+                }
+            }
 
             return null;
         }
@@ -491,10 +539,10 @@ namespace Tewls.Windows.Kernel
         public class Export
         {
             public string Name { get; }
-            public short Ordinal { get; }
+            public ushort Ordinal { get; }
             public IntPtr Address { get; }
 
-            public Export(string name, short ordinal, IntPtr address)
+            public Export(string name, ushort ordinal, IntPtr address)
             {
                 Name = name;
                 Ordinal = ordinal;
@@ -504,89 +552,127 @@ namespace Tewls.Windows.Kernel
 
         public IEnumerable<Export> GetExports(IntPtr baseAddress)
         {
+                     
             var pe = ReadProcessMemory<ImageDosHeader>(baseAddress);
-            if (pe.e_magic == ImageSignature.Dos)
+            if (pe.e_magic != ImageSignature.Dos)
             {
-                var ntheader = ReadProcessMemory<ImageNtHeaders>(baseAddress + pe.e_lfanew);
+                throw new Exception($"Invalid dos header signature: 0x{pe.e_magic:x}");
+            }
 
-                var directoryAddress = IntPtr.Add(baseAddress, (int)ntheader.OptionalHeader.DataDirectory[(int)ImageDirectoryEntry.EXPORT].VirtualAddress);
-                var imageExportDirectory = ReadProcessMemory<ImageExportDirectory>(directoryAddress);
-                var table = IntPtr.Add(baseAddress, (int)imageExportDirectory.AddressOfNames);
+            var ntheader = ReadProcessMemory<ImageNtHeaders>(baseAddress + pe.e_lfanew);
+            if (ntheader.Signature != ImageNt.Signature)
+            {
+                throw new Exception($"Invalid nt header signature: 0x{ntheader.Signature:x}");
+            }
 
-                for (int index = 0; index < imageExportDirectory.NumberOfFunctions; index++)
+            var dataDirectory = ntheader.OptionalHeader.DataDirectory[(int)ImageDirectoryEntry.EXPORT];
+            var directoryAddress = IntPtr.Add(baseAddress, (int)dataDirectory.VirtualAddress);
+            var imageExportDirectory = ReadProcessMemory<ImageExportDirectory>(directoryAddress);
+            var names = IntPtr.Add(baseAddress, (int)imageExportDirectory.AddressOfNames);
+            var ordinals = IntPtr.Add(baseAddress, (int)imageExportDirectory.AddressOfNameOrdinals);
+            var functions = IntPtr.Add(baseAddress, (int)imageExportDirectory.AddressOfFunctions);
+
+            for (int index = 0; index < imageExportDirectory.NumberOfFunctions; index++)
+            {
+                var ordinalIndex = index * Marshal.SizeOf(typeof(short));
+
+                // Calculate address of ordinal
+                var ordinalAddress = IntPtr.Add(ordinals, ordinalIndex);
+
+                // Read ordinal
+                var ordinal = ReadInt16(ordinalAddress);
+                if (ordinal > imageExportDirectory.NumberOfFunctions)
                 {
-                    var functionName = string.Empty;
-                    //if (function != 0)
-                    {
-                        // Read offset of name
-                        var offset = ReadInt(table + (index * Marshal.SizeOf(typeof(int))));
-
-                        // Read name
-                        functionName = ReadStringA(IntPtr.Add(baseAddress, offset), 128);
-                    }
-
-                    // Calculate address of ordinal
-                    var ordinalAddress = IntPtr.Add(baseAddress, (int) imageExportDirectory.AddressOfNameOrdinals + (index * Marshal.SizeOf(typeof(ushort))));
-
-                    // Read ordinal
-                    var ordinal = ReadInt16(ordinalAddress);
-                                        
-                    // Calculate address of function
-                    var functionAddress = IntPtr.Add(baseAddress, (int) imageExportDirectory.AddressOfFunctions + (ordinal * Marshal.SizeOf(typeof(uint))));
-
-                    // Read function offset
-                    var function = ReadInt(functionAddress);
-
-                    // Result
-                    var address = IntPtr.Add(baseAddress, function);
-
-                    yield return new Export(functionName, ordinal, address);
+                    continue;
                 }
+
+                var functionIndex = ordinal * Marshal.SizeOf(typeof(int));
+
+                // Calculate address of function
+                var functionAddress = IntPtr.Add(functions, functionIndex);
+                
+                // Read function offset
+                var function = ReadInt(functionAddress);
+
+                // Result
+                var address = IntPtr.Add(baseAddress, function);
+
+                var functionName = string.Empty;
+                if (index < imageExportDirectory.NumberOfNames)
+                {
+                    var nameIndex = index * Marshal.SizeOf(typeof(int));
+
+                    // Read offset of name
+                    var offset = ReadInt(IntPtr.Add(names, nameIndex));
+
+                    // Read name
+                    functionName = ReadStringA(IntPtr.Add(baseAddress, offset), 128, false);
+                }
+
+                yield return new Export(functionName, ordinal, address);
+              
             }
         }
 
         public IEnumerable<Export> GetExportsWow64(uint baseAddress)
         {
             var pe = ReadProcessMemory<ImageDosHeader>(baseAddress);
-            if (pe.e_magic == ImageSignature.Dos)
+            if (pe.e_magic != ImageSignature.Dos)
             {
-                var ntheader = ReadProcessMemory<ImageNtHeaders32>(baseAddress + (uint) pe.e_lfanew);
-
-                var directoryAddress = baseAddress + ntheader.OptionalHeader.DataDirectory[(int)ImageDirectoryEntry.EXPORT].VirtualAddress;
-                var imageExportDirectory = ReadProcessMemory<ImageExportDirectory>(directoryAddress);
-                var table = baseAddress + imageExportDirectory.AddressOfNames;
-
-                for (int index = 0; index < imageExportDirectory.NumberOfFunctions; index++)
-                {
-                    
-                    // Calculate address of ordinal
-                    var ordinalAddress = baseAddress + imageExportDirectory.AddressOfNameOrdinals + (uint) (index * Marshal.SizeOf(typeof(ushort)));
-
-                    // Read ordinal
-                    var ordinal = ReadInt16(ordinalAddress);
-
-                    // Calculate address of function
-                    var functionAddress = baseAddress + imageExportDirectory.AddressOfFunctions + (uint)(ordinal * Marshal.SizeOf(typeof(uint)));
-
-                    // Read function offset
-                    var function = ReadInt(functionAddress);
-
-                    // Result
-                    var address = baseAddress + (uint) function;
-
-                    var functionName = string.Empty;
-                    if (function != 0)
-                    {
-                        // Read offset of name
-                        var offset = ReadInt(table + (uint)(index * Marshal.SizeOf(typeof(int))));
-
-                        // Read name
-                        functionName = ReadStringA(baseAddress + (uint)offset, 128);
-                    }
-
-                    yield return new Export(functionName, ordinal, (IntPtr) address);
-                }
+                throw new Exception($"Invalid dos header signature: 0x{pe.e_magic:x}");
             }
+
+            var ntheader = ReadProcessMemory<ImageNtHeaders32>(baseAddress + (uint) pe.e_lfanew);
+            if (ntheader.Signature != ImageNt.Signature)
+            {
+                throw new Exception($"Invalid nt header signature: 0x{ntheader.Signature:x}");
+            }
+
+            var directoryAddress = baseAddress + ntheader.OptionalHeader.DataDirectory[(int)ImageDirectoryEntry.EXPORT].VirtualAddress;
+            var imageExportDirectory = ReadProcessMemory<ImageExportDirectory>(directoryAddress);
+            var names = baseAddress + imageExportDirectory.AddressOfNames;
+            var ordinals = baseAddress + imageExportDirectory.AddressOfNameOrdinals;
+            var functions = baseAddress + imageExportDirectory.AddressOfFunctions;
+
+            for (int index = 0; index < imageExportDirectory.NumberOfFunctions; index++)
+            {
+                var ordinalIndex = index * Marshal.SizeOf(typeof(ushort));
+
+                // Calculate address of ordinal
+                var ordinalAddress = ordinals + (uint)ordinalIndex;
+
+                // Read ordinal
+                var ordinal = ReadInt16(ordinalAddress);
+                if (ordinal > imageExportDirectory.NumberOfFunctions)
+                {
+                    continue;
+                }
+
+                var functionIndex = ordinal * Marshal.SizeOf(typeof(uint));
+
+                // Calculate address of function
+                var functionAddress = functions + (uint)functionIndex;
+
+                // Read function offset
+                var function = ReadInt(functionAddress);
+
+                // Result
+                var address = baseAddress + (uint) function;
+
+                if (index < imageExportDirectory.NumberOfNames)
+                {
+                    var nameIndex = index * Marshal.SizeOf(typeof(int));
+
+                    // Read offset of name
+                    var offset = ReadInt(names + (uint)nameIndex);
+
+                    // Read name
+                    var functionName = ReadStringA(baseAddress + (uint)offset, 128);
+
+                    yield return new Export(functionName, ordinal, (IntPtr)address);
+                }                    
+            }
+            
         }
 
         public IntPtr GetProcAddress(LdrModule module, string name)
