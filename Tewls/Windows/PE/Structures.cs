@@ -188,11 +188,56 @@ namespace Tewls.Windows.PE
     };
 
     [StructLayout(LayoutKind.Sequential, Pack = 0)]
+    public struct ImageOptionalHeader32
+    {
+        public ImageNtOptional Magic;
+        public byte MajorLinkerVersion;
+        public byte MinorLinkerVersion;
+        public uint SizeOfCode;
+        public uint SizeOfInitializedData;
+        public uint SizeOfUninitializedData;
+        public uint AddressOfEntryPoint;
+        public uint BaseOfCode;
+        public uint BaseOfData;
+        public uint ImageBase;
+        public uint SectionAlignment;
+        public uint FileAlignment;
+        public ushort MajorOperatingSystemVersion;
+        public ushort MinorOperatingSystemVersion;
+        public ushort MajorImageVersion;
+        public ushort MinorImageVersion;
+        public ushort MajorSubsystemVersion;
+        public ushort MinorSubsystemVersion;
+        public uint Win32VersionValue;
+        public uint SizeOfImage;
+        public uint SizeOfHeaders;
+        public uint CheckSum;
+        public ImageSubsystem Subsystem;
+        public DllCharacteristics DllCharacteristics;
+        public uint SizeOfStackReserve;
+        public uint SizeOfStackCommit;
+        public uint SizeOfHeapReserve;
+        public uint SizeOfHeapCommit;
+        public uint LoaderFlags;
+        public uint NumberOfRvaAndSizes;
+        [MarshalAs(UnmanagedType.ByValArray, SizeConst = 16)]
+        public ImageDataDirectory[] DataDirectory;
+    };
+
+    [StructLayout(LayoutKind.Sequential, Pack = 0)]
     public class ImageNtHeaders
     {
         public ImageNtSignature Signature;
         public ImageFileHeader FileHeader;
         public ImageOptionalHeader OptionalHeader;
+    };
+
+    [StructLayout(LayoutKind.Sequential, Pack = 0)]
+    public class ImageNtHeaders32
+    {
+        public ImageNtSignature Signature;
+        public ImageFileHeader FileHeader;
+        public ImageOptionalHeader32 OptionalHeader;
     };
 
     [StructLayout(LayoutKind.Sequential, Pack = 0)]
