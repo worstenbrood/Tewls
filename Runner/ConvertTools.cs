@@ -10,7 +10,7 @@ namespace Runner
         public static void ConvertCHeaderToEnum(string sourceFile, string outputFile, string pattern = NtStatus)
         {
             var header = File.ReadAllLines(sourceFile);
-            var regex = new Regex(pattern);
+            var regex = new Regex(pattern, RegexOptions.IgnoreCase);
             using (var output = new StreamWriter(File.OpenWrite(outputFile)))
             {
                 for (var x = 0; x < header.Length; x++)
