@@ -179,7 +179,7 @@ namespace Tewls.Windows.Kernel
             return remoteBuffer;
         }
 
-        public TStruct ReadProcessMemory<TStruct>(IntPtr remoteBuffer, IntPtr size, bool rebase = true)
+        public TStruct ReadProcessMemory<TStruct>(IntPtr remoteBuffer, IntPtr size, bool rebase = false)
            where TStruct : class, new()
         {
             using (var localBuffer = new NativeBuffer<TStruct>(size))
@@ -374,7 +374,6 @@ namespace Tewls.Windows.Kernel
 
         public LdrModule GetModuleHandle(string name)
         {
-            // Needs work to wotk on 64
             var pbi = QueryProcessInformation<ProcessBasicInformation>();
             var peb = ReadProcessMemory<Peb>(pbi.PebBaseAddress);
             var ldr = ReadProcessMemory<PebLdrData>(peb.Ldr);
