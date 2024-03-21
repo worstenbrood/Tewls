@@ -11,6 +11,14 @@ namespace Tewls.Windows.Kernel.Nt
         public IntPtr Buffer;
     };
 
+    [StructLayout(LayoutKind.Sequential, Pack = 0)]
+    public struct UnicodeString32
+    {
+        public ushort Length;
+        public ushort MaximumLength;
+        public uint Buffer;
+    };
+
     [Flags]
     public enum ObjectFlags : uint
     {
@@ -58,6 +66,13 @@ namespace Tewls.Windows.Kernel.Nt
         public IntPtr Blink;
     }
 
+    [StructLayout(LayoutKind.Sequential, Pack = 0)]
+    public struct ListEntry32
+    {
+        public uint Flink;
+        public uint Blink;
+    }
+
     [StructLayout(LayoutKind.Sequential)]
     public class PebLdrData
     {
@@ -69,6 +84,19 @@ namespace Tewls.Windows.Kernel.Nt
         public ListEntry InInitializationOrderModuleList; // ref. to PLDR_DATA_TABLE_ENTRY->InInitializationOrderModuleList
         public IntPtr DllBase;
         public IntPtr EntryPoint;
+    };
+
+    [StructLayout(LayoutKind.Sequential)]
+    public class PebLdrData32
+    {
+        public uint Length;
+        public bool Initialized;
+        public uint SsHandle;
+        public ListEntry32 InLoadOrderModuleList; // ref. to PLDR_DATA_TABLE_ENTRY->InLoadOrderModuleList
+        public ListEntry32 InMemoryOrderModuleList; // ref. to PLDR_DATA_TABLE_ENTRY->InMemoryOrderModuleList
+        public ListEntry32 InInitializationOrderModuleList; // ref. to PLDR_DATA_TABLE_ENTRY->InInitializationOrderModuleList
+        public uint DllBase;
+        public uint EntryPoint;
     };
 
     [StructLayout(LayoutKind.Sequential)]
@@ -102,6 +130,47 @@ namespace Tewls.Windows.Kernel.Nt
     };
 
     [StructLayout(LayoutKind.Sequential)]
+    public class Peb32
+    {
+        [MarshalAs(UnmanagedType.ByValArray, SizeConst = 2)]
+        public byte[] Reserved1;
+        public byte BeingDebugged;
+        public byte Reserved2;
+        [MarshalAs(UnmanagedType.ByValArray, SizeConst = 2)]
+        public uint[] Reserved3;
+        public uint Ldr;
+        public uint ProcessParameters;
+        [MarshalAs(UnmanagedType.ByValArray, SizeConst = 3)]
+        public uint[] Reserved4;
+        public uint AtlThunkSListPtr;
+        public uint Reserved5;
+        public uint Reserved6;
+        public uint Reserved7;
+        public uint Reserved8;
+        public uint AtlThunkSListPtr32;
+        [MarshalAs(UnmanagedType.ByValArray, SizeConst = 45)]
+        public uint[] Reserved9;
+        [MarshalAs(UnmanagedType.ByValArray, SizeConst = 96)]
+        public byte[] Reserved10;
+        public uint PostProcessInitRoutine;
+        [MarshalAs(UnmanagedType.ByValArray, SizeConst = 128)]
+        public byte[] Reserved11;
+        public uint Reserved12;
+        public uint SessionId;
+    };
+
+    [StructLayout(LayoutKind.Sequential)]
+    public class Wow64Information : IClass<ProcessInformationClass>
+    {
+        public IntPtr PebBaseAddress;
+
+        public ProcessInformationClass GetClass()
+        {
+            return ProcessInformationClass.ProcessWow64Information;
+        }
+    }
+
+    [StructLayout(LayoutKind.Sequential)]
     public class LdrModule
     {
         public ListEntry InLoadOrderModuleList;
@@ -117,6 +186,24 @@ namespace Tewls.Windows.Kernel.Nt
         public ushort TlsIndex;
         public ListEntry HashTableEntry;
         public IntPtr TimeDateStamp;
+    };
+
+    [StructLayout(LayoutKind.Sequential)]
+    public class LdrModule32
+    {
+        public ListEntry32 InLoadOrderModuleList;
+        public ListEntry32 InMemoryOrderModuleList;
+        public ListEntry32 InInitializationOrderModuleList;
+        public uint BaseAddress;
+        public uint EntryPoint;
+        public uint SizeOfImage;
+        public UnicodeString32 FullDllName;
+        public UnicodeString32 BaseDllName;
+        public uint Flags;
+        public ushort LoadCount;
+        public ushort TlsIndex;
+        public ListEntry32 HashTableEntry;
+        public uint TimeDateStamp;
     };
 
     public enum ProcessInformationClass

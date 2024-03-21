@@ -1,9 +1,12 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.Runtime.InteropServices;
+using System.Xml.Linq;
 using Tewls.Windows.Advapi;
 using Tewls.Windows.Kernel.Nt;
+using Tewls.Windows.PE;
 using Tewls.Windows.Utils;
 
 namespace Tewls.Windows.Kernel
@@ -433,6 +436,76 @@ namespace Tewls.Windows.Kernel
             while (current != first);
 
             return null;
+        }
+
+        public class Export
+        {
+            public string Name { get; }
+            public short Ordinal { get; }
+            public IntPtr Address { get; }
+
+            public Export(string name, short ordinal, IntPtr address)
+            {
+                Name = name;
+                Ordinal = ordinal;
+                Address = address;
+            }
+        }
+
+        public IEnumerable<Export> GetExports(LdrModule module)
+        {
+            var pe = ReadProcessMemory<ImageDosHeader>(module.BaseAddress);
+            if (pe.e_magic == ImageSignature.Dos)
+            {
+                var ntheader = ReadProcessMemory<ImageNtHeaders>(module.BaseAddress + pe.e_lfanew);
+
+                var directoryAddress = IntPtr.Add(module.BaseAddress, (int)ntheader.OptionalHeader.DataDirectory[(int)ImageDirectoryEntry.EXPORT].VirtualAddress);
+                var imageExportDirectory = ReadProcessMemory<ImageExportDirectory>(directoryAddress);
+                var table = IntPtr.Add(module.BaseAddress, (int)imageExportDirectory.AddressOfNames);
+
+                for (int index = 0; index < imageExportDirectory.NumberOfFunctions; index++)
+                {
+                    // Calculate address of ordinal
+                    var ordinalAddress = IntPtr.Add(module.BaseAddress, (int) imageExportDirectory.AddressOfNameOrdinals + (index * Marshal.SizeOf(typeof(ushort))));
+
+                    // Read ordinal
+                    var ordinal = ReadInt16(ordinalAddress);
+
+                    // Calculate address of function
+                    var functionAddress = IntPtr.Add(module.BaseAddress, (int) imageExportDirectory.AddressOfFunctions + (ordinal * Marshal.SizeOf(typeof(uint))));
+
+                    // Read function offset
+                    var function = ReadInt(functionAddress);
+
+                    // Result
+                    var address = IntPtr.Add(module.BaseAddress, function);
+
+                    var functionName = string.Empty;
+                    if (function != 0)
+                    {
+                        // Read offset of name
+                        var offset = ReadInt(table + (index * Marshal.SizeOf(typeof(int))));
+
+                        // Read name
+                        functionName = ReadStringA(IntPtr.Add(module.BaseAddress, offset), 128);
+                    }
+
+                    yield return new Export(functionName, ordinal, address);
+                }
+            }
+        }
+
+        public IntPtr GetProcAddress(LdrModule module, string name)
+        {
+            foreach(var proc in GetExports(module))
+            { 
+                if (proc.Name.Equals(name, StringComparison.OrdinalIgnoreCase))
+                {
+                    return proc.Address;
+                }
+            }
+
+            return IntPtr.Zero;
         }
 
         public override int GetHashCode()
