@@ -9,11 +9,6 @@ namespace Tewls.Windows.Kernel.Nt
         public ushort Length;
         public ushort MaximumLength;
         public IntPtr Buffer;
-
-        public override string ToString()
-        {
-            return Marshal.PtrToStringUni(Buffer, Length);
-        }
     };
 
     [Flags]
