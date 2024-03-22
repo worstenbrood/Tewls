@@ -569,6 +569,7 @@ namespace Tewls.Windows.Kernel
             var dataDirectory = ntheader.OptionalHeader.DataDirectory[(int)ImageDirectoryEntry.EXPORT];
             var directoryAddress = IntPtr.Add(baseAddress, (int)dataDirectory.VirtualAddress);
             var imageExportDirectory = ReadProcessMemory<ImageExportDirectory>(directoryAddress);
+
             var names = IntPtr.Add(baseAddress, (int)imageExportDirectory.AddressOfNames);
             var ordinals = IntPtr.Add(baseAddress, (int)imageExportDirectory.AddressOfNameOrdinals);
             var functions = IntPtr.Add(baseAddress, (int)imageExportDirectory.AddressOfFunctions);
@@ -630,6 +631,7 @@ namespace Tewls.Windows.Kernel
 
             var directoryAddress = baseAddress + ntheader.OptionalHeader.DataDirectory[(int)ImageDirectoryEntry.EXPORT].VirtualAddress;
             var imageExportDirectory = ReadProcessMemory<ImageExportDirectory>(directoryAddress);
+
             var names = baseAddress + imageExportDirectory.AddressOfNames;
             var ordinals = baseAddress + imageExportDirectory.AddressOfNameOrdinals;
             var functions = baseAddress + imageExportDirectory.AddressOfFunctions;

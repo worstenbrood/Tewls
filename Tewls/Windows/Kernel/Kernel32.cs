@@ -65,5 +65,11 @@ namespace Tewls.Windows.Kernel
 
         [DllImport(nameof(Kernel32), CharSet = CharSet.Auto, SetLastError = true)]
         public static extern bool DuplicateHandle(IntPtr hSourceProcessHandle, IntPtr hSourceHandle, IntPtr hTargetProcessHandle, ref IntPtr lpTargetHandle, uint dwDesiredAccess, bool bInheritHandle, DuplicateOptions dwOptions);
+
+        [DllImport(nameof(Kernel32), CharSet = CharSet.Auto, SetLastError = true)]
+        public static extern IntPtr GetModuleHandle(string lpModuleName);
+
+        [DllImport(nameof(Kernel32), CharSet = CharSet.Ansi, SetLastError = true)]
+        public static extern IntPtr GetProcAddress(IntPtr hModule, string lpProcName);
     }
 }
