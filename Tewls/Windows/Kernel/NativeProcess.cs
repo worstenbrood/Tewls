@@ -452,11 +452,13 @@ namespace Tewls.Windows.Kernel
         {
             public string Name { get; }
             public IntPtr Address { get; }
+            public uint Size { get; }
 
-            public Module(string name, IntPtr address)
+            public Module(string name, IntPtr address, uint size)
             {
                 Name = name;
                 Address = address;
+                Size = size;
             }
         }
 
@@ -473,7 +475,7 @@ namespace Tewls.Windows.Kernel
                 if (module.BaseDllName.Buffer != IntPtr.Zero)
                 {
                     var baseDllName = ReadString(module.BaseDllName.Buffer, module.BaseDllName.Length);
-                    yield return new Module(baseDllName, module.BaseAddress);
+                    yield return new Module(baseDllName, module.BaseAddress, module.SizeOfImage);
                 }
 
                 current = module.InLoadOrderModuleList.Flink;
@@ -517,7 +519,7 @@ namespace Tewls.Windows.Kernel
                 if (module.BaseDllName.Buffer != 0)
                 {
                     var baseDllName = ReadString(module.BaseDllName.Buffer, module.BaseDllName.Length);
-                    yield return new Module(baseDllName, (IntPtr)module.BaseAddress);
+                    yield return new Module(baseDllName, (IntPtr)module.BaseAddress, module.SizeOfImage);
                 }
 
                 current = module.InLoadOrderModuleList.Flink;
