@@ -276,24 +276,12 @@ namespace Tewls.Windows.Kernel
             return ReadString((IntPtr) remoteBuffer, size, charsize);
         }
 
-        public string ReadStringA(IntPtr remoteBuffer, uint size, bool c = true)
+        public string ReadStringA(IntPtr remoteBuffer, uint size)
         {
-            try
+            using (var localBuffer = new HGlobalBuffer((IntPtr)size))
             {
-                using (var localBuffer = new HGlobalBuffer((IntPtr)size))
-                {
-                    ReadProcessMemory(remoteBuffer, localBuffer.Buffer, (IntPtr)size);
-                    return Marshal.PtrToStringAnsi(localBuffer.Buffer);
-                }
-            }
-            catch  
-            { 
-                if (c)
-                {
-                    throw;
-                }
-
-                return string.Empty;
+                ReadProcessMemory(remoteBuffer, localBuffer.Buffer, (IntPtr)size);
+                return Marshal.PtrToStringAnsi(localBuffer.Buffer);
             }
         }
 
@@ -618,7 +606,7 @@ namespace Tewls.Windows.Kernel
                     var offset = ReadInt(IntPtr.Add(names, nameIndex));
 
                     // Read name
-                    functionName = ReadStringA(IntPtr.Add(baseAddress, offset), 255, false);
+                    functionName = ReadStringA(IntPtr.Add(baseAddress, offset), 255);
                 }
 
                 yield return new Export(functionName, ordinal, address);
