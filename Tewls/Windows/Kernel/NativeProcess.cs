@@ -421,7 +421,7 @@ namespace Tewls.Windows.Kernel
             {
                 return IsWow64Process(Handle);
             }
-            catch 
+            catch (EntryPointNotFoundException)
             { 
                 return false; 
             }
