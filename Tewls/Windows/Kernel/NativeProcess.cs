@@ -1,11 +1,8 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
 using System.Diagnostics;
-using System.Linq;
-using System.Linq.Expressions;
+using System.ComponentModel;
+using System.Collections.Generic;
 using System.Runtime.InteropServices;
-using System.Xml.Linq;
 using Tewls.Windows.Advapi;
 using Tewls.Windows.Kernel.Nt;
 using Tewls.Windows.PE;
