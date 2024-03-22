@@ -60,8 +60,7 @@ namespace Tewls.Windows.Kernel
         {
             using (var localBuffer = new HGlobalBuffer(bytes))
             {
-                Size = localBuffer.Size;
-                Buffer = Alloc(Size);
+                Set(Alloc(localBuffer.Size), localBuffer.Size);
                 process.WriteProcessMemory(Buffer, localBuffer.Buffer, Size);
             }
         }
