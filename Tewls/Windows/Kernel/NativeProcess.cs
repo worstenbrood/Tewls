@@ -417,7 +417,14 @@ namespace Tewls.Windows.Kernel
 
         public bool IsWow64Process()
         {
-            return IsWow64Process(Handle);
+            try
+            {
+                return IsWow64Process(Handle);
+            }
+            catch 
+            { 
+                return false; 
+            }
         }
 
         public void TerminateProcess(int exitCode = 0)
