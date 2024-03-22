@@ -421,6 +421,7 @@ namespace Tewls.Windows.Kernel
             {
                 return IsWow64Process(Handle);
             }
+            // Native method not found
             catch (EntryPointNotFoundException)
             { 
                 return false; 
