@@ -586,16 +586,18 @@ namespace Tewls.Windows.Kernel
 
                 // Read ordinal
                 var ordinal = ReadInt16(ordinalAddress);
+
                 if (ordinal > imageExportDirectory.NumberOfFunctions)
                 {
+                    // Forward
                     continue;
                 }
 
                 var functionIndex = ordinal * Marshal.SizeOf(typeof(int));
 
                 // Calculate address of function
-                var functionAddress = IntPtr.Add(functions, functionIndex);
-                
+                var functionAddress = IntPtr.Add(functions, functionIndex);              
+
                 // Read function offset
                 var function = ReadInt(functionAddress);
 
@@ -656,6 +658,7 @@ namespace Tewls.Windows.Kernel
                 var ordinal = ReadInt16(ordinalAddress);
                 if (ordinal > imageExportDirectory.NumberOfFunctions)
                 {
+                    // Forward
                     continue;
                 }
 
