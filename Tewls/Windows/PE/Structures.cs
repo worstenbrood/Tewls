@@ -67,6 +67,26 @@ namespace Tewls.Windows.PE
         Cee = 0xC0EE,
     }
 
+    [Flags]
+    public enum ImageFileCharacteristics : ushort
+    {
+        RelocsStripped = 0x0001,
+        ExecutableImage = 0x0002,
+        LineNumsStripped = 0x0004,
+        LocalSymsStripped = 0x0008,
+        AggresiveWsTrim = 0x0010,
+        LargeAddressAware = 0x0020,
+        BytesReserverLo = 0x0040,
+        Machine32Bit = 0x0100,
+        DebugStripped = 0x0200,
+        RemovableRunFromSwap = 0x0400,
+        NetRunFromSwap = 0x0800,
+        System = 0x1000,
+        Dll = 0x2000,
+        UpSystemOnly = 0x4000,
+        BytesReversedHi = 0x8000
+    }
+
     [StructLayout(LayoutKind.Sequential, Pack = 0)]
     public struct ImageFileHeader
     {
@@ -76,7 +96,7 @@ namespace Tewls.Windows.PE
         public uint PointerToSymbolTable;
         public uint NumberOfSymbols;
         public ushort SizeOfOptionalHeader;
-        public ushort Characteristics;
+        public ImageFileCharacteristics Characteristics;
     }
 
     [StructLayout(LayoutKind.Sequential, Pack = 0)]
