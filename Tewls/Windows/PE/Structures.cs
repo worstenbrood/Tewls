@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Runtime.InteropServices;
-using static Tewls.Windows.WNet;
 
 namespace Tewls.Windows.PE
 {
@@ -9,7 +8,7 @@ namespace Tewls.Windows.PE
         Dos = 0x5A4D
     }
 
-    [StructLayout(LayoutKind.Sequential, Pack = 0)]
+    [StructLayout(LayoutKind.Sequential)]
     public class ImageDosHeader
     {
         public ImageSignature e_magic;
@@ -74,7 +73,7 @@ namespace Tewls.Windows.PE
         ExecutableImage = 0x0002,
         LineNumsStripped = 0x0004,
         LocalSymsStripped = 0x0008,
-        AggresiveWsTrim = 0x0010,
+        AggressiveWsTrim = 0x0010,
         LargeAddressAware = 0x0020,
         BytesReserverLo = 0x0040,
         Machine32Bit = 0x0100,
@@ -87,7 +86,7 @@ namespace Tewls.Windows.PE
         BytesReversedHi = 0x8000
     }
 
-    [StructLayout(LayoutKind.Sequential, Pack = 0)]
+    [StructLayout(LayoutKind.Sequential)]
     public struct ImageFileHeader
     {
         public ImageFileMachine Machine;
@@ -99,7 +98,7 @@ namespace Tewls.Windows.PE
         public ImageFileCharacteristics Characteristics;
     }
 
-    [StructLayout(LayoutKind.Sequential, Pack = 0)]
+    [StructLayout(LayoutKind.Sequential)]
     public struct ImageDataDirectory
     {
         public uint VirtualAddress;
@@ -171,7 +170,7 @@ namespace Tewls.Windows.PE
         Signature = 0x00004550
     }
 
-    [StructLayout(LayoutKind.Sequential, Pack = 0)]
+    [StructLayout(LayoutKind.Sequential)]
     public struct ImageOptionalHeader
     {
         public ImageNtOptional Magic;
@@ -207,7 +206,7 @@ namespace Tewls.Windows.PE
         public ImageDataDirectory []DataDirectory;
     };
 
-    [StructLayout(LayoutKind.Sequential, Pack = 0)]
+    [StructLayout(LayoutKind.Sequential)]
     public struct ImageOptionalHeader32
     {
         public ImageNtOptional Magic;
@@ -244,7 +243,7 @@ namespace Tewls.Windows.PE
         public ImageDataDirectory[] DataDirectory;
     };
 
-    [StructLayout(LayoutKind.Sequential, Pack = 0)]
+    [StructLayout(LayoutKind.Sequential)]
     public class ImageNtHeaders
     {
         public ImageNt Signature;
@@ -252,7 +251,7 @@ namespace Tewls.Windows.PE
         public ImageOptionalHeader OptionalHeader;
     };
 
-    [StructLayout(LayoutKind.Sequential, Pack = 0)]
+    [StructLayout(LayoutKind.Sequential)]
     public class ImageNtHeaders32
     {
         public ImageNt Signature;
@@ -260,7 +259,7 @@ namespace Tewls.Windows.PE
         public ImageOptionalHeader32 OptionalHeader;
     };
 
-    [StructLayout(LayoutKind.Sequential, Pack = 0)]
+    [StructLayout(LayoutKind.Sequential)]
     public class ImageExportDirectory
     {
         public uint Characteristics;
@@ -275,4 +274,46 @@ namespace Tewls.Windows.PE
         public uint AddressOfNames;
         public uint AddressOfNameOrdinals;
     };
+    
+    public enum ImageSectionCharacteristics : uint
+    {
+        TypeNoPad = 0x00000008,
+        CntCode = 0x00000020,
+        CntInitializedData = 0x00000040,
+        CntUninitializedData = 0x00000080,
+        LnkOther = 0x00000100,
+        LnkInfo = 0x00000200,
+        LnkRemove = 0x00000800,
+        LnkComdat = 0x00001000,
+        Align1bytes = 0x00100000,
+        Align2bytes = 0x00200000,
+        Align4bytes = 0x00300000,
+        Align8bytes = 0x00400000,
+        Align16bytes = 0x00500000,
+        Align32bytes = 0x00600000,
+        Align64bytes = 0x00700000,
+        MemDiscardable = 0x02000000,
+        MemNotCached = 0x04000000,
+        MemNotPaged = 0x08000000,
+        MemShared = 0x10000000,
+        MemExecute = 0x20000000,
+        MemRead = 0x40000000,
+    }
+
+    [StructLayout(LayoutKind.Sequential)]
+    public class ImageSectionHeader
+    {
+        [MarshalAs(UnmanagedType.LPStr, SizeConst = 8)]
+        public string Name;
+        public uint PhysicalAddress;
+        public uint VirtualSize;
+        public uint VirtualAddress;
+        public uint SizeOfRawData;
+        public uint PointerToRawData;
+        public uint PointerToRelocations;
+        public uint PointerToLinenumbers;
+        public ushort NumberOfRelocations;
+        public ushort NumberOfLinenumbers;
+        public ImageSectionCharacteristics Characteristics;
+    }
 }

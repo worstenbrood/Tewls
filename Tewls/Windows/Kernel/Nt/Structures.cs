@@ -3,7 +3,7 @@ using System.Runtime.InteropServices;
 
 namespace Tewls.Windows.Kernel.Nt
 {
-    [StructLayout(LayoutKind.Sequential, Pack = 0)]
+    [StructLayout(LayoutKind.Sequential)]
     public struct UnicodeString
     {
         public ushort Length;
@@ -11,7 +11,7 @@ namespace Tewls.Windows.Kernel.Nt
         public IntPtr Buffer;
     };
 
-    [StructLayout(LayoutKind.Sequential, Pack = 0)]
+    [StructLayout(LayoutKind.Sequential)]
     public struct UnicodeString32
     {
         public ushort Length;
