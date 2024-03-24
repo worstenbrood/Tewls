@@ -638,7 +638,7 @@ namespace Tewls.Windows.Kernel
                 yield break;
             }
 
-            var directoryAddress = baseAddress + ntheader.OptionalHeader.DataDirectory[ImageDirectoryEntry.Export].VirtualAddress;
+            var directoryAddress = baseAddress + dataDirectory.VirtualAddress;
             var imageExportDirectory = ReadProcessMemory<ImageExportDirectory>(directoryAddress);
 
             var names = baseAddress + imageExportDirectory.AddressOfNames;
