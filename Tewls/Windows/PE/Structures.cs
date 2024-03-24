@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Runtime.InteropServices;
+using static Tewls.Windows.WNet;
 
 namespace Tewls.Windows.PE
 {
@@ -88,61 +89,61 @@ namespace Tewls.Windows.PE
     [Flags]
     public enum DllCharacteristics : ushort
     {
-        HIGH_ENTROPY_VA = 0x0020,
-        DYNAMIC_BASE = 0x0040,
-        FORCE_INTEGRITY = 0x0080,
-        NX_COMPAT = 0x0100,
-        NO_ISOLATION = 0x0200,
-        NO_SEH = 0x0400,
-        NO_BIND = 0x0800,
-        APPCONTAINER = 0x1000,
-        WDM_DRIVER = 0x2000,
-        GUARD_CF = 0x4000,
-        TERMINAL_SERVER_AWARE = 0x8000
+        HighEntropyVA = 0x0020,
+        DynamicBase = 0x0040,
+        ForceIntegrity = 0x0080,
+        NxCompat = 0x0100,
+        NoIsolation = 0x0200,
+        NoSeh = 0x0400,
+        NoBind = 0x0800,
+        AppContainer = 0x1000,
+        WdmDriver = 0x2000,
+        GuardFc = 0x4000,
+        TerminalServerAware = 0x8000
     }
 
     public enum ImageSubsystem : ushort
     {
-        UNKNOWN,		
-        NATIVE,			
-        WINDOWS_GUI,	
-        WINDOWS_CUI,		
-        OS2_CUI = 5,			
-        POSIX_CUI = 7,		
-        NATIVE_WINDOWS,	
-        WINDOWS_CE_GUI,	
-        EFI_APPLICATION,	
-        EFI_BOOT_SERVICE_DRIVER,
-        EFI_RUNTIME_DRIVER,
-        EFI_ROM,
-        XBOX,	
-        WINDOWS_BOOT_APPLICATION = 16
+        Unknown,		
+        Natvie,			
+        WindowsGui,	
+        WindowsCui,		
+        Os2Cui = 5,			
+        PosixCui = 7,		
+        NativeWindows,	
+        WindowsCegui,	
+        EfiApplication,	
+        EfiBootServiceDriver,
+        EfiRuntimeDriver,
+        EfiRom,
+        Xbox,	
+        WindowsBootApplication = 16
     }
 
-    public enum ImageDirectoryEntry : int
+    public static class ImageDirectoryEntry
     {
-        EXPORT,		
-        IMPORT,		
-        RESOURCE,	
-        EXCEPTION,	
-        SECURITY,	
-        BASERELOC,	
-        DEBUG,		
-        COPYRIGHT,	
-        GLOBALPTR,	 
-        TLS,		
-        LOAD_CONFIG,
-        BOUND_IMPORT,	
-        IAT,	
-        DELAY_IMPORT,
-        COM_DESCRIPTOR,
+        public const int Export = 0;
+        public const int Import = 1;
+        public const int Resource = 2;
+        public const int Exception = 3;
+        public const int Security = 4;
+        public const int BaseReloc = 5;
+        public const int Debug = 6;
+        public const int Copyright = 7;
+        public const int GlobalPtr = 8;
+        public const int Tls = 9;
+        public const int LoadConfig = 10;
+        public const int BoundImport = 11;
+        public const int Iat = 12;
+        public const int DelayImport = 13;
+        public const int ComDescriptor = 14;
     }
 
     public enum ImageNtOptional : ushort
     {
-        HDR32_MAGIC = 0x10b,
-        HDR64_MAGIC = 0x20b,
-        HDR_MAGIC =  0x107
+        Hdr32Magic = 0x10b,
+        Hdr64Magic = 0x20b,
+        HdrMagic =  0x107
     }
 
     public enum ImageNt : uint

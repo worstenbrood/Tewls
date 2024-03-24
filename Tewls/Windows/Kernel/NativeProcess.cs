@@ -564,7 +564,7 @@ namespace Tewls.Windows.Kernel
                 throw new Exception($"Invalid nt header signature: 0x{ntheader.Signature:x}");
             }
 
-            var dataDirectory = ntheader.OptionalHeader.DataDirectory[(int)ImageDirectoryEntry.EXPORT];
+            var dataDirectory = ntheader.OptionalHeader.DataDirectory[ImageDirectoryEntry.Export];
             var directoryAddress = IntPtr.Add(baseAddress, (int)dataDirectory.VirtualAddress);
             var imageExportDirectory = ReadProcessMemory<ImageExportDirectory>(directoryAddress);
 
@@ -627,7 +627,7 @@ namespace Tewls.Windows.Kernel
                 throw new Exception($"Invalid nt header signature: 0x{ntheader.Signature:x}");
             }
 
-            var directoryAddress = baseAddress + ntheader.OptionalHeader.DataDirectory[(int)ImageDirectoryEntry.EXPORT].VirtualAddress;
+            var directoryAddress = baseAddress + ntheader.OptionalHeader.DataDirectory[ImageDirectoryEntry.Export].VirtualAddress;
             var imageExportDirectory = ReadProcessMemory<ImageExportDirectory>(directoryAddress);
 
             var names = baseAddress + imageExportDirectory.AddressOfNames;
