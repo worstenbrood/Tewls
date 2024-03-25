@@ -106,9 +106,8 @@ namespace IlDasm_CSharp
                 + $"Imm:    [{ImmOffset}+{ImmSize}] 0x{Imm:X}\r\n";
         }
 
-        public ILDasm(byte[] buffer, bool is64)
+        public ILDasm(byte[] buffer, bool is64, int index = 0)
         {
-            int index = 0;
             bool pr_67 = false;
             bool pr_66 = false;
             RFlag flag = RFlag.None;
