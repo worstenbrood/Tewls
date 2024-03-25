@@ -311,4 +311,12 @@ namespace IlDasm_CSharp
                 IFlag |= IFlags.Invalid;
         }
     }
+
+    public static class ILDasmExtensions
+    {
+        public static ILDasm GetILDasm(this byte[] b, bool is64Bit, int index = 0)
+        {
+            return new ILDasm(b, is64Bit, index);
+        }
+    }
 }
