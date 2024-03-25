@@ -301,7 +301,7 @@ namespace IlDasm_CSharp
                     IFlag |= IFlags.Relative;
 
                 for (int i = 0; i < ImmSize; ++i)
-                    Imm |= ((uint)buffer[ImmOffset + i] << (i * 8));
+                    Imm |= (ulong)buffer[ImmOffset + i] << (i * 8);
             }
 
             #endregion
