@@ -337,6 +337,17 @@ namespace Tewls.Windows.Kernel
             return ReadInt16((IntPtr)remoteBuffer);
         }
 
+        public byte[] ReadBytes(IntPtr remoteBuffer, int size)
+        {
+            using (var localBuffer = new HGlobalBuffer((IntPtr) size))
+            {
+                ReadProcessMemory(remoteBuffer, localBuffer.Buffer, localBuffer.Size);
+                var result = new byte[size];
+                Marshal.Copy(localBuffer.Buffer, result, 0, size);
+                return result;
+            }
+        }
+
         public RemoteBuffer WriteString(RemoteBuffer remoteBuffer, string s)
         {
             using (var localBuffer = new HGlobalBuffer(remoteBuffer.Size))
