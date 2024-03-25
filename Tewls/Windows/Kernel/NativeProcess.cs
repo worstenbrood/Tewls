@@ -364,6 +364,14 @@ namespace Tewls.Windows.Kernel
             return WriteString(remoteBuffer, s);
         }
 
+        public void WriteBytes(IntPtr remoteBuffer, byte[] bytes)
+        {
+            using (var localBuffer = new HGlobalBuffer(bytes))
+            {
+                WriteProcessMemory(remoteBuffer, localBuffer.Buffer, localBuffer.Size);
+            }
+        }
+
         public MemProtections VirtualProtectEx(IntPtr remoteBuffer, IntPtr size, MemProtections protection)
         {
             return VirtualProtectEx(Handle, remoteBuffer, size, protection);
