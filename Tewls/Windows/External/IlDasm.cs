@@ -314,9 +314,23 @@ namespace IlDasm_CSharp
 
     public static class ILDasmExtensions
     {
-        public static ILDasm GetILDasm(this byte[] b, bool is64Bit, int index = 0)
+        public static ILDasm GetILDasm(this byte[] b, bool is64Bit = false, int index = 0)
         {
             return new ILDasm(b, is64Bit, index);
+        }
+
+        public static int GetILDasmLength(this byte[] b, bool is64Bit = false, int requiredLen = 0, int index = 0)
+        {
+            var length = index;
+            var maxLength = requiredLen != 0 ? requiredLen : b.Length;
+            do
+            {
+                var d = b.GetILDasm(is64Bit, length);
+                length += d.Length;
+            }
+            while (length < maxLength);
+
+            return length;
         }
     }
 }
