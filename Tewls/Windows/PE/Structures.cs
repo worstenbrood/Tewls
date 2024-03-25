@@ -124,7 +124,7 @@ namespace Tewls.Windows.PE
     public enum ImageSubsystem : ushort
     {
         Unknown,		
-        Natvie,			
+        Native,			
         WindowsGui,	
         WindowsCui,		
         Os2Cui = 5,			
@@ -274,7 +274,8 @@ namespace Tewls.Windows.PE
         public uint AddressOfNames;
         public uint AddressOfNameOrdinals;
     };
-    
+
+    [Flags]
     public enum ImageSectionCharacteristics : uint
     {
         TypeNoPad = 0x00000008,
