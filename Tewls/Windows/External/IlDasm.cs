@@ -319,7 +319,7 @@ namespace IlDasm_CSharp
             return new ILDasm(b, is64Bit, index);
         }
 
-        public static int GetILDasmLength(this byte[] b, bool is64Bit = false, int requiredLen = 0, int index = 0)
+        public static int GetASMLength(this byte[] b, bool is64Bit = false, int requiredLen = 0, int index = 0)
         {
             var length = index;
             var maxLength = requiredLen != 0 ? requiredLen : b.Length;
