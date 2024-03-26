@@ -106,7 +106,7 @@ namespace IlDasm_CSharp
                 + $"Imm:    [{ImmOffset}+{ImmSize}] 0x{Imm:X}\r\n";
         }
 
-        public ILDasm(byte[] buffer, bool is64, int index = 0)
+        public ILDasm(byte[] buffer, int index, bool is64)
         {
             bool pr_67 = false;
             bool pr_66 = false;
@@ -314,18 +314,18 @@ namespace IlDasm_CSharp
 
     public static class ILDasmExtensions
     {
-        public static ILDasm GetILDasm(this byte[] b, bool is64Bit = false, int index = 0)
+        public static ILDasm GetILDasm(this byte[] b, int index = 0, bool is64Bit = false)
         {
-            return new ILDasm(b, is64Bit, index);
+            return new ILDasm(b, index, is64Bit);
         }
 
-        public static int GetASMLength(this byte[] b, bool is64Bit = false, int requiredLen = 0, int index = 0)
+        public static int GetASMLength(this byte[] b, int index, int requiredLen, bool is64Bit = false)
         {
             var length = index;
             var maxLength = requiredLen != 0 ? requiredLen : b.Length;
             do
             {
-                var d = b.GetILDasm(is64Bit, length);
+                var d = b.GetILDasm(length, is64Bit);
                 length += d.Length;
             }
             while (length < maxLength);
