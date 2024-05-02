@@ -387,6 +387,11 @@ namespace Tewls.Windows.NetApi.Structures
         {
             return ShareLevel.Share2;
         }
+
+        public override string ToString()
+        {
+            return $"NetName: {Netname}, Type: {Type}, Path: {Path}";
+        }
     };
 
     [StructLayout(LayoutKind.Sequential)]
