@@ -55,7 +55,7 @@ namespace Tewls.Windows.Advapi
             using (var buffer = new CredBuffer())
             {
                 uint count = 0;
-                var result = Advapi32.CredEnumerate(filter, 0, ref count, ref buffer.Buffer);
+                var result = Advapi32.CredEnumerate(filter, CredEnumFlags.AllCredentials, ref count, ref buffer.Buffer);
                 if (!result)
                 {
                     throw new Win32Exception();
