@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Runtime.InteropServices;
+using Tewls.Windows.Kernel;
 
 namespace Tewls.Windows.Utils
 {
@@ -31,9 +32,22 @@ namespace Tewls.Windows.Utils
         {
         }
 
+        public HGlobalBuffer(int size) : base((IntPtr) size)
+        {
+        }
+
+        public HGlobalBuffer(uint size) : base((IntPtr)size)
+        {
+        }
+
         public HGlobalBuffer(byte[] bytes) : base((IntPtr) bytes.Length)
         {
             Marshal.Copy(bytes, 0, Buffer, bytes.Length);
+        }
+
+        public HGlobalBuffer(string s) : base((IntPtr)((s.Length + 1) * sizeof(char)))
+        {
+            NativeBuffer.lstrcpyn(Buffer, s);
         }
     }
 
