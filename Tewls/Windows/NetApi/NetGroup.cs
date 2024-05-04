@@ -5,7 +5,6 @@ using Tewls.Windows.NetApi.Structures;
 
 namespace Tewls.Windows.NetApi
 {
-
     public class NetGroup : NetBase
     {
         public static IEnumerable<TStruct> Enum<TStruct>(string servername = null)

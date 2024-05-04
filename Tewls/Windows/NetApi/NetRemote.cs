@@ -1,5 +1,4 @@
-﻿using System;
-using System.ComponentModel;
+﻿using System.ComponentModel;
 using Tewls.Windows.NetApi.Structures;
 
 namespace Tewls.Windows.NetApi
