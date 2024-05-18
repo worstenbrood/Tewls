@@ -94,7 +94,7 @@ namespace Tewls.Windows.Kernel
             }
         }
                
-        public static void CopyToBuffer<TStruct>(IEnumerable<TStruct> structures, IntPtr buffer)
+        public static void CopyCollectionToBuffer<TStruct>(IEnumerable<TStruct> structures, IntPtr buffer)
             where TStruct : class
         {
             var offset = 0;
@@ -231,11 +231,12 @@ namespace Tewls.Windows.Kernel
 
         private void AllocAndCopyCollectionToBuffer(IEnumerable<TStruct> structures)
         {
-            Size = (IntPtr) structures.Aggregate(0, (s, a) => s + NativeBuffer.GetObjectSize(a));
+            var list = structures.ToList();
+            Size = (IntPtr)list.Aggregate(0, (s, a) => s + NativeBuffer.GetObjectSize(a));
             Buffer = Marshal.AllocHGlobal(Size);
 
             // Build buffer
-            NativeBuffer.CopyToBuffer(structures, Buffer);
+            NativeBuffer.CopyCollectionToBuffer(list, Buffer);
         }
 
         public void Rebase(IntPtr from, IntPtr to)

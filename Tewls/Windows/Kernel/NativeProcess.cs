@@ -245,7 +245,8 @@ namespace Tewls.Windows.Kernel
         public RemoteBuffer WriteProcessMemory<TStruct>(TStruct structure, RemoteBuffer remoteBuffer)
             where TStruct : class
         {
-            return WriteProcessMemory(structure, remoteBuffer);
+            WriteProcessMemory(structure, remoteBuffer.Buffer);
+            return remoteBuffer;
         }
 
         public RemoteBuffer WriteProcessMemory<TStruct>(TStruct structure, bool rebase = true)
