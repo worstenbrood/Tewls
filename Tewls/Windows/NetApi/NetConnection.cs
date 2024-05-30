@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel;
 using Tewls.Windows.NetApi.Structures;
 
 namespace Tewls.Windows.NetApi
@@ -10,24 +9,8 @@ namespace Tewls.Windows.NetApi
         public static IEnumerable<TStruct> Enum<TStruct>(string servername = null, string qualifier = null)
             where TStruct : class, IInfo<ConnectionLevel>, new()
         {
-            using (var buffer = new NetBuffer())
-            {
-                var info = new TStruct();
-
-                uint entriesRead = 0;
-                uint totalEntries = 0;
-
-                var result = Netapi32.NetConnectionEnum(servername, qualifier, info.GetLevel(), ref buffer.Buffer, PrefMaxLength, ref entriesRead, ref totalEntries, IntPtr.Zero);
-                if (result != Error.Success)
-                {
-                    throw new Win32Exception();
-                }
-
-                foreach (var structure in buffer.EnumStructure<TStruct>(totalEntries))
-                {
-                    yield return structure;
-                }
-            }
+            return Enum<NetBuffer, TStruct>((i, b, r, t) => Netapi32.NetConnectionEnum(servername,
+                qualifier, i.GetLevel(), ref b.Buffer, PrefMaxLength, ref r, ref t, IntPtr.Zero));
         }
     }
 }
