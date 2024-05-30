@@ -17,9 +17,9 @@ namespace Runner
 
         static void Main(string[] args)
         {
-            foreach (var connection in NetConnection.Enum<ConnectionInfo0>())
+            foreach (var info in NetGroup.Enum<GroupInfo0>())
             {
-                Console.WriteLine($"{connection.Id}");
+                Console.WriteLine($"{info.Name}");
             }
 
             foreach (var cred in Cred.Enumerate())
