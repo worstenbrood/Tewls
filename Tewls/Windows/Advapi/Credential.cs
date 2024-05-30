@@ -44,7 +44,7 @@ namespace Tewls.Windows.Advapi
                 using (var buffer = new HGlobalBuffer(entropy))
                 {
                     var entropyBlob = new DataBlob(buffer.Buffer, (uint)buffer.Size);
-                    return Crypt.UnprotectData(dataBlob, entropyBlob);
+                    return Crypt.UnprotectData(dataBlob, 0, entropyBlob);
                 }
             }
             catch(Exception)
