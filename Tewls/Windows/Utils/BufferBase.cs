@@ -28,7 +28,22 @@ namespace Tewls.Windows.Utils
 
             return resource;
         }
-                
+
+        public IEnumerable<TStruct> EnumStructure<TStruct>(uint entries, TStruct structure = null)
+            where TStruct : class, new()
+        {
+            if (structure == null)
+            {
+                structure = new TStruct();
+            }
+
+            for (var i = 0; i < entries; i++)
+            {
+                Marshal.PtrToStructure(Buffer + (Marshal.SizeOf(typeof(TStruct)) * i), structure);
+                yield return structure;
+            }
+        }
+
         public virtual IntPtr Alloc(IntPtr size)
         {
             return Memory.Alloc(size);
@@ -116,22 +131,7 @@ namespace Tewls.Windows.Utils
         {
             return PtrToStructure(Buffer, resource);
         }
-
-        public IEnumerable<TStruct> EnumStructure<TStruct>(uint entries, TStruct structure = null)
-            where TStruct : class, new()
-        {
-            if (structure == null)
-            {
-                structure = new TStruct();
-            }
-
-            for (var i = 0; i < entries; i++)
-            {
-                Marshal.PtrToStructure(Buffer + (Marshal.SizeOf(typeof(TStruct)) * i), structure);
-                yield return structure;
-            }
-        }
-
+        
         protected BufferBase()
         {
         }
