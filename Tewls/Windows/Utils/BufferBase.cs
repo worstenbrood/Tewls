@@ -125,18 +125,18 @@ namespace Tewls.Windows.Utils
                 structure = new TStruct();
             }
 
-            for (int i = 0; i < entries; i++)
+            for (var i = 0; i < entries; i++)
             {
                 Marshal.PtrToStructure(Buffer + (Marshal.SizeOf(typeof(TStruct)) * i), structure);
                 yield return structure;
             }
         }
 
-        public BufferBase()
+        protected BufferBase()
         {
         }
 
-        public BufferBase(IntPtr size) : base(size)
+        protected BufferBase(IntPtr size) : base(size)
         {
         }
     }
@@ -145,7 +145,7 @@ namespace Tewls.Windows.Utils
         where TMemory : class, IMemory, new()
         where TStruct : class
     {
-        protected readonly static Type Type = typeof(TStruct);
+        protected static readonly Type Type = typeof(TStruct);
 
         public override void Free()
         {
