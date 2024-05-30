@@ -71,5 +71,8 @@ namespace Tewls.Windows.Kernel
 
         [DllImport(nameof(Kernel32), CharSet = CharSet.Ansi, SetLastError = true)]
         public static extern IntPtr GetProcAddress(IntPtr hModule, string lpProcName);
+
+        [DllImport(nameof(Kernel32), CharSet = CharSet.Ansi, SetLastError = true)]
+        public static extern void GetSystemInfo(SystemInfo lpSystemInfo);
     }
 }

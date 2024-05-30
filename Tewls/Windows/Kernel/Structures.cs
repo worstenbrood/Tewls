@@ -47,14 +47,11 @@ namespace Tewls.Windows.Kernel
         public uint AllocationGranularity;
         public short ProcessorLevel;
         public short ProcessorRevision;
-
-        [DllImport("kernel32.dll", CharSet = CharSet.Auto, SetLastError = true)]
-        private static extern void GetSystemInfo(SystemInfo lpSystemInfo);
-
+        
         public static SystemInfo GetSystemInfo()
         {
             var info = new SystemInfo();
-            GetSystemInfo(info);
+            Kernel32.GetSystemInfo(info);
             return info;
         }
     };
