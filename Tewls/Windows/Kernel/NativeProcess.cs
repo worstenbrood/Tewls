@@ -735,6 +735,11 @@ namespace Tewls.Windows.Kernel
             return IntPtr.Zero;
         }
 
+        public override string ToString()
+        {
+            return $"ProcessId: {GetProcessId()}";
+        }
+
         public override int GetHashCode()
         {
             return (int)GetProcessId();
