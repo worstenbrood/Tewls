@@ -2,6 +2,7 @@
 using System.Diagnostics;
 using System.ComponentModel;
 using System.Collections.Generic;
+using System.Linq;
 using System.Runtime.InteropServices;
 using Tewls.Windows.Advapi;
 using Tewls.Windows.Kernel.Nt;
@@ -501,15 +502,8 @@ namespace Tewls.Windows.Kernel
 
         public Module GetModule(string name)
         {
-            foreach(var module in GetModules())
-            {
-                if (module.Name.Equals(name, StringComparison.OrdinalIgnoreCase))
-                {
-                    return module;
-                }
-            }
-            
-            return null;
+            return GetModules()
+                .FirstOrDefault(module => module.Name.Equals(name, StringComparison.OrdinalIgnoreCase));
         }
 
         public IEnumerable<Module> GetModulesWow64()
@@ -519,13 +513,13 @@ namespace Tewls.Windows.Kernel
                 yield break;
             }
 
-            var wow64info = QueryProcessInformation<ProcessWow64Information>();
-            if (wow64info.PebBaseAddress == IntPtr.Zero)
+            var wow64Info = QueryProcessInformation<ProcessWow64Information>();
+            if (wow64Info.PebBaseAddress == IntPtr.Zero)
             {
                 yield break;
             }
 
-            var peb = ReadProcessMemory<Peb32>(wow64info.PebBaseAddress);
+            var peb = ReadProcessMemory<Peb32>(wow64Info.PebBaseAddress);
             var ldr = ReadProcessMemory<PebLdrData32>(peb.Ldr);
             var current = ldr.InLoadOrderModuleList.Flink;
 
@@ -545,15 +539,8 @@ namespace Tewls.Windows.Kernel
 
         public Module GetModuleWow64(string name)
         {
-            foreach (var module in GetModulesWow64())
-            {
-                if (module.Name.Equals(name, StringComparison.OrdinalIgnoreCase))
-                {
-                    return module;
-                }
-            }
-
-            return null;
+            return GetModulesWow64()
+                .FirstOrDefault(module => module.Name.Equals(name, StringComparison.OrdinalIgnoreCase));
         }
 
         public class Export
@@ -597,7 +584,7 @@ namespace Tewls.Windows.Kernel
             var ordinals = IntPtr.Add(baseAddress, (int)imageExportDirectory.AddressOfNameOrdinals);
             var functions = IntPtr.Add(baseAddress, (int)imageExportDirectory.AddressOfFunctions);
 
-            for (int index = 0; index < imageExportDirectory.NumberOfFunctions; index++)
+            for (var index = 0; index < imageExportDirectory.NumberOfFunctions; index++)
             {
                 var ordinalIndex = index * Marshal.SizeOf(typeof(short));
 
@@ -667,7 +654,7 @@ namespace Tewls.Windows.Kernel
             var ordinals = baseAddress + imageExportDirectory.AddressOfNameOrdinals;
             var functions = baseAddress + imageExportDirectory.AddressOfFunctions;
 
-            for (int index = 0; index < imageExportDirectory.NumberOfFunctions; index++)
+            for (var index = 0; index < imageExportDirectory.NumberOfFunctions; index++)
             {
                 var ordinalIndex = index * Marshal.SizeOf(typeof(ushort));
 

@@ -1,7 +1,6 @@
 ﻿using IlDasm_CSharp;
 using System;
 using System.Linq;
-using System.Runtime.InteropServices;
 using Tewls.Windows;
 using Tewls.Windows.Advapi;
 using Tewls.Windows.Kernel;
@@ -17,6 +16,9 @@ namespace Runner
 
         static void Main(string[] args)
         {
+            var sys = SystemInfo.GetSystemInfo();
+
+
             foreach (var info in NetGroup.Enum<GroupInfo0>())
             {
                 Console.WriteLine($"{info.Name}");
@@ -47,7 +49,7 @@ namespace Runner
 
             //Console.ReadKey();
 
-            if (Environment.Is64BitProcess)
+            /*if (Environment.Is64BitProcess)
             {
                 // 32 (Wow64). Only need to do this if we are 64bit and the process is 32bit.
                 foreach (var module in process.GetModulesWow64().Skip(1))
@@ -61,7 +63,7 @@ namespace Runner
                             len);
                     }
                 }
-            }
+            }*/
 
             Console.WriteLine("Time: {0}", (DateTime.Now - start).TotalMilliseconds);
             Console.ReadKey();
