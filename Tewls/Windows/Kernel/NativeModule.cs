@@ -29,7 +29,7 @@ namespace Tewls.Windows.Kernel
 
         public override string ToString()
         {
-            return $"PID: {Process.GetProcessId()} - Name: {Name} - Address: 0x{Address.ToInt64():X}";
+            return $"PID: {Process.ProcessId} - Name: {Name} - Address: 0x{Address.ToInt64():X}";
         }
     }
 }

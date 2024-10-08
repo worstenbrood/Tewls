@@ -132,6 +132,7 @@ namespace Tewls.Windows.Kernel
         public NativeProcess(int processId, ProcessAccessRights accessRights)
         {
             Handle = OpenProcess(processId, accessRights);
+            _processId = (uint)processId;
         }
 
         public NativeProcess(IntPtr processHandle, bool dispose = false) : base(processHandle, dispose)
@@ -412,6 +413,10 @@ namespace Tewls.Windows.Kernel
         {
             return new NativeToken(CreateRemoteThread(Handle, stackSize, startAddress, parameter));
         }
+
+        private uint _processId;
+
+        public uint ProcessId => _processId > 0 ? _processId : _processId = GetProcessId();
 
         public uint GetProcessId()
         {
@@ -701,12 +706,12 @@ namespace Tewls.Windows.Kernel
 
         public override string ToString()
         {
-            return $"ProcessId: {GetProcessId()}";
+            return $"ProcessId: {ProcessId}";
         }
 
         public override int GetHashCode()
         {
-            return (int)GetProcessId();
+            return (int)ProcessId;
         }
     }
 }
