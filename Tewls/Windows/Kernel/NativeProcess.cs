@@ -470,12 +470,14 @@ namespace Tewls.Windows.Kernel
             public string Name { get; }
             public IntPtr Address { get; }
             public uint Size { get; }
+            public bool Is64Bit { get; set; }
 
-            public Module(string name, IntPtr address, uint size)
+            public Module(string name, IntPtr address, uint size, bool is64Bit)
             {
                 Name = name;
                 Address = address;
                 Size = size;
+                Is64Bit = is64Bit;
             }
         }
 
@@ -492,7 +494,7 @@ namespace Tewls.Windows.Kernel
                 if (module.BaseDllName.Buffer != IntPtr.Zero)
                 {
                     var baseDllName = ReadString(module.BaseDllName.Buffer, module.BaseDllName.Length);
-                    yield return new Module(baseDllName, module.BaseAddress, module.SizeOfImage);
+                    yield return new Module(baseDllName, module.BaseAddress, module.SizeOfImage, Environment.Is64BitProcess);
                 }
 
                 current = module.InLoadOrderModuleList.Flink;
@@ -529,7 +531,7 @@ namespace Tewls.Windows.Kernel
                 if (module.BaseDllName.Buffer != 0)
                 {
                     var baseDllName = ReadString(module.BaseDllName.Buffer, module.BaseDllName.Length);
-                    yield return new Module(baseDllName, (IntPtr)module.BaseAddress, module.SizeOfImage);
+                    yield return new Module(baseDllName, (IntPtr)module.BaseAddress, module.SizeOfImage, false);
                 }
 
                 current = module.InLoadOrderModuleList.Flink;
@@ -541,6 +543,11 @@ namespace Tewls.Windows.Kernel
         {
             return GetModulesWow64()
                 .FirstOrDefault(module => module.Name.Equals(name, StringComparison.OrdinalIgnoreCase));
+        }
+
+        public IEnumerable<Module> GetAllModules()
+        {
+            return GetModules().Skip(1).Concat(GetModulesWow64().Skip(1));
         }
 
         public class Export
