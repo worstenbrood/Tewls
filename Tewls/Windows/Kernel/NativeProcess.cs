@@ -465,25 +465,7 @@ namespace Tewls.Windows.Kernel
             return NtDll.NtQueryInformationProcess<TStruct>(Handle);
         }
 
-        public class Module
-        {
-            public string Name { get; }
-            public IntPtr Address { get; }
-            public uint Size { get; }
-            public bool Is64Bit { get; }
-            public bool IsWow64 { get; }
-
-            public Module(string name, IntPtr address, uint size, bool is64Bit, bool isWow64)
-            {
-                Name = name;
-                Address = address;
-                Size = size;
-                Is64Bit = is64Bit;
-                IsWow64 = isWow64;
-            }
-        }
-
-        public IEnumerable<Module> GetModules()
+        public IEnumerable<NativeModule> GetModules()
         {
             var pbi = QueryProcessInformation<ProcessBasicInformation>();
             var peb = ReadProcessMemory<Peb>(pbi.PebBaseAddress);
@@ -496,7 +478,7 @@ namespace Tewls.Windows.Kernel
                 if (module.BaseDllName.Buffer != IntPtr.Zero)
                 {
                     var baseDllName = ReadString(module.BaseDllName.Buffer, module.BaseDllName.Length);
-                    yield return new Module(baseDllName, module.BaseAddress, module.SizeOfImage, Environment.Is64BitProcess, false);
+                    yield return new NativeModule(this, baseDllName, module.BaseAddress, module.SizeOfImage, Environment.Is64BitProcess, false);
                 }
 
                 current = module.InLoadOrderModuleList.Flink;
@@ -504,13 +486,13 @@ namespace Tewls.Windows.Kernel
             while (current != ldr.InLoadOrderModuleList.Flink);
         }
 
-        public Module GetModule(string name)
+        public NativeModule GetModule(string name)
         {
             return GetModules()
                 .FirstOrDefault(module => module.Name.Equals(name, StringComparison.OrdinalIgnoreCase));
         }
 
-        public IEnumerable<Module> GetModulesWow64()
+        public IEnumerable<NativeModule> GetModulesWow64()
         {
             if (!IsWow64Process())
             {
@@ -533,7 +515,7 @@ namespace Tewls.Windows.Kernel
                 if (module.BaseDllName.Buffer != 0)
                 {
                     var baseDllName = ReadString(module.BaseDllName.Buffer, module.BaseDllName.Length);
-                    yield return new Module(baseDllName, (IntPtr)module.BaseAddress, module.SizeOfImage, false, true);
+                    yield return new NativeModule(this, baseDllName, (IntPtr)module.BaseAddress, module.SizeOfImage, false, true);
                 }
 
                 current = module.InLoadOrderModuleList.Flink;
@@ -541,32 +523,18 @@ namespace Tewls.Windows.Kernel
             while (current != ldr.InLoadOrderModuleList.Flink);
         }
 
-        public Module GetModuleWow64(string name)
+        public NativeModule GetModuleWow64(string name)
         {
             return GetModulesWow64()
                 .FirstOrDefault(module => module.Name.Equals(name, StringComparison.OrdinalIgnoreCase));
         }
 
-        public IEnumerable<Module> GetAllModules()
+        public IEnumerable<NativeModule> GetAllModules()
         {
             return GetModules().Skip(1).Concat(GetModulesWow64().Skip(1));
         }
-
-        public class Export
-        {
-            public string Name { get; }
-            public ushort Ordinal { get; }
-            public IntPtr Address { get; }
-
-            public Export(string name, ushort ordinal, IntPtr address)
-            {
-                Name = name;
-                Ordinal = ordinal;
-                Address = address;
-            }
-        }
-
-        public IEnumerable<Export> GetExports(IntPtr baseAddress)
+        
+        public IEnumerable<NativeExport> GetExports(IntPtr baseAddress)
         {  
             var pe = ReadProcessMemory<ImageDosHeader>(baseAddress);
             if (pe.e_magic != ImageSignature.Dos)
@@ -632,11 +600,11 @@ namespace Tewls.Windows.Kernel
                     functionName = ReadStringA(IntPtr.Add(baseAddress, offset), 255);
                 }
 
-                yield return new Export(functionName, ordinal, address);
+                yield return new NativeExport(functionName, ordinal, address);
             }
         }
 
-        public IEnumerable<Export> GetExportsWow64(uint baseAddress)
+        public IEnumerable<NativeExport> GetExportsWow64(uint baseAddress)
         {
             var pe = ReadProcessMemory<ImageDosHeader>(baseAddress);
             if (pe.e_magic != ImageSignature.Dos)
@@ -701,7 +669,7 @@ namespace Tewls.Windows.Kernel
                     functionName = ReadStringA(baseAddress + (uint)offset, 255);
                 }
 
-                yield return new Export(functionName, ordinal, (IntPtr)address);
+                yield return new NativeExport(functionName, ordinal, (IntPtr)address);
             }
         }
 
