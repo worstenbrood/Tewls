@@ -18,7 +18,7 @@ namespace Tewls.Windows.Kernel
         public override string ToString()
         {
             var name = string.IsNullOrEmpty(Name) ? Ordinal.ToString() : Name;
-            return $"Name: {Name} - Address: 0x{Address.ToInt64():X}";
+            return $"Name: {name} - Address: 0x{Address.ToInt64():X}";
         }
     }
 }
