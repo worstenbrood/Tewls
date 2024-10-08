@@ -470,14 +470,16 @@ namespace Tewls.Windows.Kernel
             public string Name { get; }
             public IntPtr Address { get; }
             public uint Size { get; }
-            public bool Is64Bit { get; set; }
+            public bool Is64Bit { get; }
+            public bool IsWow64 { get; }
 
-            public Module(string name, IntPtr address, uint size, bool is64Bit)
+            public Module(string name, IntPtr address, uint size, bool is64Bit, bool isWow64)
             {
                 Name = name;
                 Address = address;
                 Size = size;
                 Is64Bit = is64Bit;
+                IsWow64 = isWow64;
             }
         }
 
@@ -494,7 +496,7 @@ namespace Tewls.Windows.Kernel
                 if (module.BaseDllName.Buffer != IntPtr.Zero)
                 {
                     var baseDllName = ReadString(module.BaseDllName.Buffer, module.BaseDllName.Length);
-                    yield return new Module(baseDllName, module.BaseAddress, module.SizeOfImage, Environment.Is64BitProcess);
+                    yield return new Module(baseDllName, module.BaseAddress, module.SizeOfImage, Environment.Is64BitProcess, false);
                 }
 
                 current = module.InLoadOrderModuleList.Flink;
@@ -531,7 +533,7 @@ namespace Tewls.Windows.Kernel
                 if (module.BaseDllName.Buffer != 0)
                 {
                     var baseDllName = ReadString(module.BaseDllName.Buffer, module.BaseDllName.Length);
-                    yield return new Module(baseDllName, (IntPtr)module.BaseAddress, module.SizeOfImage, false);
+                    yield return new Module(baseDllName, (IntPtr)module.BaseAddress, module.SizeOfImage, false, true);
                 }
 
                 current = module.InLoadOrderModuleList.Flink;
