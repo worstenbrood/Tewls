@@ -18,7 +18,7 @@ namespace Tewls.Windows.Kernel
         }
 
         protected bool Disposed = false;
-        public IntPtr Handle;
+        public readonly IntPtr Handle;
 
         protected NativeHandle() 
         { 

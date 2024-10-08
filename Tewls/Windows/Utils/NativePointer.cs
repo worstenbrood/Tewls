@@ -4,7 +4,7 @@ namespace Tewls.Windows.Utils
 {
     public class NativePointer : IDisposable
     {
-        public IntPtr Pointer;
+        public readonly IntPtr Pointer;
         protected bool Disposed = false;
 
         public static implicit operator IntPtr(NativePointer b) => b.Pointer;
@@ -26,11 +26,13 @@ namespace Tewls.Windows.Utils
 
         public void Dispose()
         {
-            if (!Disposed)
+            if (Disposed)
             {
-                Dispose(true);
-                Disposed = true;
+                return;
             }
+
+            Dispose(true);
+            Disposed = true;
         }
 
         public override int GetHashCode()
@@ -40,11 +42,13 @@ namespace Tewls.Windows.Utils
 
         ~NativePointer()
         {
-            if (!Disposed)
+            if (Disposed)
             {
-                Dispose(false);
-                Disposed = true;
+                return;
             }
+
+            Dispose(false);
+            Disposed = true;
         }
     }
 }
