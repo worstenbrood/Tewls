@@ -113,12 +113,7 @@ namespace Tewls.Windows.Kernel
         }
 
         // Class
-
-        public NativeProcess() : base(Kernel32.GetCurrentProcess(), false)
-        {
-        }
-
-        public NativeProcess(string name, ProcessAccessRights accessRights)
+        public static NativeProcess Open(string name, ProcessAccessRights accessRights)
         {
             var processes = Process.GetProcessesByName(name);
             if (processes.Length == 0)
@@ -126,12 +121,16 @@ namespace Tewls.Windows.Kernel
                 throw new Exception($"Process {name} not found.");
             }
 
-            Handle = OpenProcess(processes[0].Id, accessRights);
+            return new NativeProcess(processes[0].Id, accessRights);
+
         }
 
-        public NativeProcess(int processId, ProcessAccessRights accessRights)
+        public NativeProcess() : base(Kernel32.GetCurrentProcess(), false)
         {
-            Handle = OpenProcess(processId, accessRights);
+        }
+        
+        public NativeProcess(int processId, ProcessAccessRights accessRights) : base(OpenProcess(processId, accessRights))
+        {
             _processId = (uint)processId;
         }
 
