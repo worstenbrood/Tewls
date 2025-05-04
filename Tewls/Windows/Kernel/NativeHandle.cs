@@ -43,7 +43,7 @@ namespace Tewls.Windows.Kernel
 
         private void Dispose(bool disposing)
         {
-            if (!Disposed)
+            if (!Disposed && Handle != IntPtr.Zero)
             {
                 Close();
             }

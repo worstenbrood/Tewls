@@ -22,11 +22,8 @@ namespace Tewls.Windows.Utils
         {
             if (!Disposed)
             {
-                if (Handle != null) 
-                { 
-                    Handle.Free();
-                }
-
+                
+                Handle.Free();    
                 Disposed = true;
             }
         }

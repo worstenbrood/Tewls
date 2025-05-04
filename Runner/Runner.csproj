@@ -50,6 +50,10 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\TewlKit\TewlKit.csproj">
+      <Project>{27ad7a23-03f5-4fd0-9139-aba90b310ca4}</Project>
+      <Name>TewlKit</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Tewls\Tewls.csproj">
       <Project>{3e1b71aa-84e0-435f-aca9-69e546903a37}</Project>
       <Name>Tewls</Name>
