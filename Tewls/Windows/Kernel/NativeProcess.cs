@@ -479,7 +479,7 @@ namespace Tewls.Windows.Kernel
             do
             {
                 var module = ReadProcessMemory<LdrModule>(current);
-                if (module.BaseDllName.Buffer != IntPtr.Zero)
+                if (module.BaseDllName.Buffer != IntPtr.Zero && module.BaseDllName.Length > 0)
                 {
                     var baseDllName = ReadString(module.BaseDllName.Buffer, module.BaseDllName.Length);
                     yield return new NativeModule(this, baseDllName, module.BaseAddress, module.SizeOfImage, Environment.Is64BitProcess, false);

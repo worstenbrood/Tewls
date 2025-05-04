@@ -29,7 +29,7 @@ namespace Runner
                 Console.WriteLine($"{cred.UserName} : {cred.TargetName} : {cred.GetPassword()}");
             }
 
-            var process = new NativeProcess("jusched", ProcessAccessRights.AllAccess);
+            var process = NativeProcess.Open("AsusScreenXpertReunion", ProcessAccessRights.AllAccess);
             Console.WriteLine("Process ID: {0}", process.GetProcessId());
 
             var start = DateTime.Now;
