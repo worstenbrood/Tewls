@@ -1,32 +1,20 @@
 ﻿using System;
-using System.Diagnostics;
 using System.Linq;
 using IlDasm_CSharp;
-using Tewls.Windows.Kernel;
 
 namespace TewlKit.Core
 {
+    /// <summary>
+    /// Core Engine
+    /// </summary>
     public class Engine
     {
-        public static void EnumProcesses(Action<Process, NativeProcess> action)
-        {
-            foreach (var process in Process.GetProcesses())
-            {
-                try
-                {
-                    var nativeProcess = new NativeProcess(process.Id, ProcessAccessRights.AllAccess);
-                    action.Invoke(process, nativeProcess);
-                }
-                catch (Exception e)
-                {
-                    Console.WriteLine(e);
-                }
-            }
-        }
-
+        /// <summary>
+        /// Print stuff about all processes
+        /// </summary>
         public static void Print()
         {
-            EnumProcesses((p, n) =>
+            Tools.Enum((p, n) =>
             {
                 Console.WriteLine("Process ID: {0}", n.GetProcessId());
 

@@ -74,5 +74,18 @@ namespace Tewls.Windows.Kernel
 
         [DllImport(nameof(Kernel32), CharSet = CharSet.Ansi, SetLastError = true)]
         public static extern void GetSystemInfo(SystemInfo lpSystemInfo);
+
+        [DllImport(nameof(Kernel32), CharSet = CharSet.Ansi, SetLastError = true)]
+        public static extern IntPtr OpenThread(ThreadAccess dwDesiredAccess, bool bInheritHandle, int dwThreadId);
+
+        [DllImport(nameof(Kernel32), CharSet = CharSet.Ansi, SetLastError = true)]
+        public static extern uint SuspendThread(IntPtr hThread);
+
+        [DllImport(nameof(Kernel32), CharSet = CharSet.Ansi, SetLastError = true)]
+        public static extern uint ResumeThread(IntPtr hThread);
+
+
+
+
     }
 }
