@@ -25,7 +25,7 @@ namespace Runner
                 Console.WriteLine($"{cred.UserName} : {cred.TargetName} : {cred.GetPassword()}");
             }
 
-            Engine.Print();
+            Engine.Start();
         }
     }
 }

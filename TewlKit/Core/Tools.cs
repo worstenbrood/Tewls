@@ -1,7 +1,9 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
 using Tewls.Windows.Kernel;
+using static System.Collections.Specialized.BitVector32;
 
 namespace TewlKit.Core
 {
@@ -21,18 +23,50 @@ namespace TewlKit.Core
             {
                 try
                 {
-                    var nativeProcess = new NativeProcess(process.Id, rights);
-                    action.Invoke(process, nativeProcess);
+                    using (var nativeProcess = new NativeProcess(process.Id, rights))
+                    {
+                        action.Invoke(process, nativeProcess);
+                    }
                 }
                 catch (Exception e)
                 {
                     Console.WriteLine(e);
                 }
+                finally
+                {
+                    process.Dispose();
+                }
             }
         }
 
         /// <summary>
-        /// Same as <see cref="Enum"/> but all processes are suspended first and resumed after
+        /// 
+        /// </summary>
+        /// <param name="rights"></param>
+        /// <returns></returns>
+        public static IEnumerable<NativeProcess> Enum(ProcessAccessRights rights = ProcessAccessRights.AllAccess)
+        {
+            foreach (var process in Process.GetProcesses())
+            {
+                NativeProcess nativeProcess;
+                try
+                {
+                    nativeProcess = new NativeProcess(process.Id, rights);
+                }
+                catch 
+                {
+                    process.Dispose();
+                    continue; 
+                }
+
+                yield return nativeProcess;
+                nativeProcess.Dispose();
+                process.Dispose();
+            }
+        }
+
+        /// <summary>
+        /// Same as <see cref="EnumSuspended"/> but all processes are suspended first and resumed after
         /// </summary>
         /// <param name="action">>Delegate executed for every <see cref="Process"/> and <see cref="NativeProcess"/> pair.</param>
         public static void EnumSuspended(Action<Process, NativeProcess> action)
@@ -44,6 +78,31 @@ namespace TewlKit.Core
             {
                 // Execute action for every process
                 Enum(action);
+            }
+            finally
+            {
+                // Resume all processes
+                Enum((p, n) => p.ResumeProcess());
+            }
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="rights"></param>
+        /// <returns></returns>
+        public static IEnumerable<NativeProcess> EnumSuspended(ProcessAccessRights rights = ProcessAccessRights.AllAccess)
+        {
+            // First suspend all threads in all processes
+            Enum((p, n) => p.SuspendProcess());
+
+            try
+            {
+                // Execute action for every process
+                foreach(var process in Enum(rights))
+                {
+                    yield return process;
+                }
             }
             finally
             {

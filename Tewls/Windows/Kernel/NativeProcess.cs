@@ -571,15 +571,23 @@ namespace Tewls.Windows.Kernel
 
                 // Calculate address of ordinal
                 var ordinalAddress = IntPtr.Add(ordinals, ordinalIndex);
-
-                // Read ordinal
-                var ordinal = ReadInt16(ordinalAddress);
-
-                if (ordinal > imageExportDirectory.NumberOfFunctions)
+                ushort ordinal;
+                try
                 {
-                    // Forward
+                    // Read ordinal
+                    ordinal = ReadInt16(ordinalAddress);
+
+                    if (ordinal > imageExportDirectory.NumberOfFunctions)
+                    {
+                        // Forward
+                        continue;
+                    }
+                }
+                catch
+                {
                     continue;
                 }
+               
 
                 var functionIndex = ordinal * Marshal.SizeOf(typeof(int));
 
