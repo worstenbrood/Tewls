@@ -2,8 +2,7 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
-using System.Linq.Expressions;
-using IlDasm_CSharp;
+using TewlKit.Hooks;
 using Tewls.Windows.Kernel;
 
 namespace TewlKit.Core
@@ -13,10 +12,9 @@ namespace TewlKit.Core
     /// </summary>
     public class Engine
     {
-        private static Hook[] _hookTable = new[]
+        private static IHook[] _hookTable = new[]
         {
-            new Hook("kernel32.dll", "OpenProcess"),
-            new Hook("ntdll.dll", "NtOpenProcess")
+            new OpenProcess(),
         };
 
         private static Dictionary<string, NativeModule> GetModules(NativeProcess nativeProcess)
@@ -42,6 +40,7 @@ namespace TewlKit.Core
 
         private static void Inject(NativeProcess nativeProcess)
         {
+            Console.WriteLine("[Process] {0}", nativeProcess.ProcessId);
             foreach (var module in GetModules(nativeProcess))
             {
                 Console.WriteLine("[Module] {0}: {1}", module.Key, module.Value.Address.ToString("X"));
@@ -60,8 +59,6 @@ namespace TewlKit.Core
             var currentProcess = Process.GetCurrentProcess();
             foreach(var process in Tools.Enum().Where(p => p.ProcessId != currentProcess.Id))
             {
-                Console.WriteLine("[Process] {0}", process.ProcessId);
-
                 Inject(process);
             }
         }

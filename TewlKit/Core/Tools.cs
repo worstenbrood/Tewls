@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
 using Tewls.Windows.Kernel;
-using static System.Collections.Specialized.BitVector32;
 
 namespace TewlKit.Core
 {
