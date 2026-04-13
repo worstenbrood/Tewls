@@ -4,11 +4,12 @@ namespace TewlKit.Asm
     /// <summary>
     /// ASM opcodes used for generating stubs and hooks.
     /// </summary>
-    public enum OpCodes : ushort
+    public static class OpCodes 
     {
-        RelativeJump = 0xE9,
-        IndirectJump = 0x25FF,
-        MovRax = 0xB848,
-        JmpRax = 0xE0FF,
+        public const byte RelativeJump = 0xE9;
+        public const ushort IndirectJump = 0x25FF;
+        public const ushort MovRax = 0xB848;
+        public const byte MovEax = 0xB8;
+        public const ushort JmpEaxRax = 0xE0FF;
     }
 }

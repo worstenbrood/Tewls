@@ -3,19 +3,19 @@
 namespace TewlKit.Asm.Stubs
 {
     /// <summary>
-    /// Relative jump stub for 32-bit architecture.
+    /// Relative jump stub for 32/64-bit architecture.
     /// </summary>
-    public class RelativeJumpStub32 : IStubGenerator
+    public class RelativeJumpStub : StubGeneratorBase<RelativeJumpStub>
     {
         /// <inheritdoc />
-        public int Size => 5;
+        public override int Size => 5;
 
         /// <inheritdoc />
-        public byte[] GetStub(IntPtr address)
+        public override byte[] GetBuffer(IntPtr address)
         {
-            using var stub = new Stub(Size);
+            using var stub = GetWriter();
             // Opcode for JMP rel32 is 0xE9
-            stub.Write((char)OpCodes.RelativeJump);
+            stub.Write(OpCodes.RelativeJump);
             // Set the jump distance
             stub.Write(address.ToInt32());
             // Return the generated stub as a byte array

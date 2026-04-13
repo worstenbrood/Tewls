@@ -16,6 +16,6 @@ namespace TewlKit.Asm
         /// Get the stub bytes.
         /// </summary>
         /// <returns></returns>
-        byte[] GetStub(IntPtr address);
+        byte[] GetBuffer(IntPtr address);
     }
 }

@@ -264,18 +264,18 @@ namespace Tewls.Windows.Kernel
             }
         }
 
-        public string ReadString(IntPtr remoteBuffer, uint size, int charsize = sizeof(char))
+        public string ReadString(IntPtr remoteBuffer, uint size, int charSize = sizeof(char))
         {
             using (var localBuffer = new HGlobalBuffer((IntPtr) size))
             {
                 ReadProcessMemory(remoteBuffer, localBuffer.Buffer, (IntPtr) size);
-                return Marshal.PtrToStringAuto(localBuffer.Buffer, (int) size / charsize);
+                return Marshal.PtrToStringAuto(localBuffer.Buffer, (int) size / charSize);
             }
         }
 
-        public string ReadString(uint remoteBuffer, uint size, int charsize = sizeof(char))
+        public string ReadString(uint remoteBuffer, uint size, int charSize = sizeof(char))
         {
-            return ReadString((IntPtr) remoteBuffer, size, charsize);
+            return ReadString((IntPtr) remoteBuffer, size, charSize);
         }
 
         public string ReadStringA(IntPtr remoteBuffer, uint size)

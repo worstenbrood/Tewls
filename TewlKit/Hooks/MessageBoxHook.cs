@@ -1,5 +1,6 @@
 ﻿using System;
 using TewlKit.Core;
+using TewlKit.Hooking;
 
 namespace TewlKit.Hooks
 {
@@ -14,7 +15,7 @@ namespace TewlKit.Hooks
 
         public MessageBoxHook(IntPtr procAddr) : base("kernel32.dll", "OpenProcess")
         {
-            Trampoline = new Trampoline<MessageBox>(procAddr, new MessageBox(HookedMessageBox));
+            Trampoline = new Trampoline<MessageBox>(procAddr, 0, new MessageBox(HookedMessageBox));
         }
     }
 }
