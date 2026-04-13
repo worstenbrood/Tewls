@@ -1,12 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Linq;
-using TewlKit.Core.Functions;
-using TewlKit.Hooks;
-using Tewls.Windows.Kernel;
-
-namespace TewlKit.Core
+﻿namespace TewlKit.Core
 {
     /// <summary>
     /// Core Engine

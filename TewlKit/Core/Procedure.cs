@@ -1,14 +1,6 @@
 ﻿using System;
 using System.Runtime.InteropServices;
 
-<<<<<<< TODO: Unmerged change from project 'TewlKit (net8.0)', Before:
-=======
-using TewlKit;
-using TewlKit.Core;
-using TewlKit.Core;
-using TewlKit.Core.Functions;
->>>>>>> After
-
 namespace TewlKit.Core
 {
     /// <summary>
