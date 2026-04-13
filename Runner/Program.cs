@@ -40,6 +40,19 @@ namespace Runner
             
             var hook = new MessageBoxHook();
             hook.Install(nativeProcess, module, procs);
+            var st = nativeProcess.ReadBytes(hook.Trampoline.Stub.Address, 16);
+            foreach ( var b in st)
+            {
+                Console.Write($"{b:X2} ");
+            }
+            var p = nativeProcess.VirtualQueryEx(hook.Trampoline.Stub.Address);
+            Console.WriteLine($"BaseAddress: {p.BaseAddress}, RegionSize: {p.RegionSize}, State: {p.State}, Protect: {p.Protect}");
+            st = nativeProcess.ReadBytes(hook.Trampoline.Stub.Address, 16);
+            foreach (var b in st)
+            {
+                Console.Write($"{b:X2} ");
+            }
+
             var result = hook.Trampoline.Original.Method(IntPtr.Zero, "test", "test", 0);
         }
     }

@@ -19,8 +19,9 @@ namespace TewlKit.Hooks
         {
             Console.WriteLine($"MessageBoxA called with text: {text}, caption: {caption}, type: {type}");
             Console.WriteLine($"Stub: {Trampoline.Stub.Address:X}");
+            
             //return 0;
-            return Trampoline.Stub.Method.Invoke(hwnd, text, "HOOKED: " + caption, type);
+            return Stub(hwnd, text, "HOOKED: " + caption, type);
         }
 
         protected override MessageBox Replacement => HookedMessageBox;

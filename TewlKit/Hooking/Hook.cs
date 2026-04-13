@@ -20,7 +20,7 @@ namespace TewlKit.Hooking
         where T : Delegate
     {
         /// <summary>
-        /// GCHandle to prevent the delegate from being garbage collected. Freed in the finalizer.
+        /// GCHandle to prevent the hook from being garbage collected. Freed in the finalizer.
         /// </summary>
         protected GCHandle Handle;
 
@@ -43,6 +43,11 @@ namespace TewlKit.Hooking
         /// Replacement method and delegate.
         /// </summary>
         protected abstract T Replacement { get; }
+
+        /// <summary>
+        /// Stub method
+        /// </summary>
+        protected T Stub => Trampoline.Stub.Method;
 
         /// <param name="moduleName"></param>
         /// <param name="procName"></param>
@@ -84,7 +89,7 @@ namespace TewlKit.Hooking
             }
 
             // Allocate memory for the trampoline, which will contain the original method, the stub, and the replacement method.
-            var remote = process.VirtualAllocEx((IntPtr)length + IndirectJumpRaxStub.Instance.Size, AllocationType.TopDown | AllocationType.Reserve | AllocationType.Commit, MemProtections.ExecuteReadWrite);
+            var remote = process.VirtualAllocEx((IntPtr)length + IndirectJumpRaxStub.Instance.Size, AllocationType.Commit, MemProtections.ExecuteReadWrite);
 
             // Set trampoline.
             Trampoline = new Trampoline<T>(export.Address, remote, Replacement);
