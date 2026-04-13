@@ -2,18 +2,11 @@
 
 namespace Tewls.Windows.Kernel
 {
-    public class NativeExport
+    public class NativeExport(string name, ushort ordinal, IntPtr address)
     {
-        public string Name { get; }
-        public ushort Ordinal { get; }
-        public IntPtr Address { get; }
-
-        public NativeExport(string name, ushort ordinal, IntPtr address)
-        {
-            Name = name;
-            Ordinal = ordinal;
-            Address = address;
-        }
+        public string Name { get; } = name;
+        public ushort Ordinal { get; } = ordinal;
+        public IntPtr Address { get; } = address;
 
         public override string ToString()
         {

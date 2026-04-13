@@ -1,5 +1,4 @@
 ﻿using System;
-using TewlKit.Core;
 using TewlKit.Hooking;
 
 namespace TewlKit.Hooks
@@ -8,14 +7,30 @@ namespace TewlKit.Hooks
     {
         public delegate int MessageBox(IntPtr hwnd, string text, string caption, int type);
 
+        /// <summary>
+        /// Replacement for MessageBoxA. Modifies the caption to indicate it was hooked.
+        /// </summary>
+        /// <param name="hwnd"></param>
+        /// <param name="text"></param>
+        /// <param name="caption"></param>
+        /// <param name="type"></param>
+        /// <returns></returns>
         public int HookedMessageBox(IntPtr hwnd, string text, string caption, int type)
         {
-            return Trampoline.Original.Method.Invoke(hwnd, text, "HOOKED: " + caption, type);
+            Console.WriteLine($"MessageBoxA called with text: {text}, caption: {caption}, type: {type}");
+            Console.WriteLine($"Stub: {Trampoline.Stub.Address:X}");
+            //return 0;
+            return Trampoline.Stub.Method.Invoke(hwnd, text, "HOOKED: " + caption, type);
         }
 
-        public MessageBoxHook(IntPtr procAddr) : base("kernel32.dll", "OpenProcess")
+        protected override MessageBox Replacement => HookedMessageBox;
+
+        /// <summary>
+        /// 
+        /// </summary>
+        public MessageBoxHook() : base("user32.dll", "MessageBoxA")
         {
-            Trampoline = new Trampoline<MessageBox>(procAddr, 0, new MessageBox(HookedMessageBox));
+           
         }
     }
 }

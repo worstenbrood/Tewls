@@ -1,14 +1,9 @@
 ﻿using System;
-using Tewls.Windows.Advapi;
 using Tewls.Windows.Kernel;
-using Tewls.Windows.NetApi;
-using Tewls.Windows.NetApi.Structures;
 using TewlKit.Asm.Stubs;
-using System.Threading;
 using System.Diagnostics;
 using System.Linq;
 using TewlKit.Hooks;
-using IlDasm_CSharp;
 
 namespace Runner
 {
@@ -40,19 +35,12 @@ namespace Runner
             var currentProcess = Process.GetCurrentProcess();
             var nativeProcess = new NativeProcess(currentProcess.Id, ProcessAccessRights.AllAccess);
             var module = nativeProcess.GetModule("user32.dll");
-            var proc = nativeProcess.GetExports(module.Address).First(f => f.Name == "MessageBoxA");
-            var buffer = nativeProcess.ReadBytes(proc.Address, 16);
+            var procs = nativeProcess.GetExports(module.Address)
+                .ToList();
             
-            var length = buffer.GetASMLength(0, 12, module.Is64Bit);
-            Console.WriteLine($"Length: {length}");
-            var remote = nativeProcess.VirtualAllocEx((IntPtr)length, AllocationType.TopDown|AllocationType.Commit, MemProtections.ExecuteReadWrite);
-            nativeProcess.WriteBytes(remote, buffer.Take(length).ToArray());
-            Console.WriteLine($"Remote Address: {remote.ToInt64():X}");
-            Console.WriteLine($"Original Address: {proc.Address.ToInt64():X}");
-            Console.WriteLine($"Distance: {proc.Address.ToInt64() - remote.ToInt64():X}");
-
-            var hook = new MessageBoxHook(proc.Address);
-            var handle = hook.Trampoline.Replacement.Method(IntPtr.Zero, "test", "test", 0);
+            var hook = new MessageBoxHook();
+            hook.Install(nativeProcess, module, procs);
+            var result = hook.Trampoline.Original.Method(IntPtr.Zero, "test", "test", 0);
         }
     }
 }
