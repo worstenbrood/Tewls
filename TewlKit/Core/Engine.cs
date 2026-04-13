@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using TewlKit.Core.Functions;
 using TewlKit.Hooks;
 using Tewls.Windows.Kernel;
 
@@ -12,9 +13,10 @@ namespace TewlKit.Core
     /// </summary>
     public class Engine
     {
+        /*
         private static IHook[] _hookTable = new[]
         {
-            new OpenProcess(),
+            new OpenProcessHook(),
         };
 
         private static Dictionary<string, NativeModule> GetModules(NativeProcess nativeProcess)
@@ -47,6 +49,9 @@ namespace TewlKit.Core
                 foreach(var function in GetFunctions(module.Value))
                 {
                     Console.WriteLine("[Function] {0}: {1}", function.Key, function.Value.Address.ToString("X"));
+                    var hook = new Procedure<OpenProcessHook.OpenProcess>(function.Value.Address);
+                    
+                    //var test = hook..Invoke(0, true, 0);
                 }
             }
         }
@@ -61,6 +66,6 @@ namespace TewlKit.Core
             {
                 Inject(process);
             }
-        }
+        }*/
     }
 }

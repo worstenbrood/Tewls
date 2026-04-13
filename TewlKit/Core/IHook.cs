@@ -1,9 +1,10 @@
-﻿namespace TewlKit.Core
+﻿using System;
+
+namespace TewlKit.Core
 {
-    public interface IHook<TFunction>
+    public interface IHook
     {
         string ModuleName { get; }
-        TFunction Original { get; }
         string ProcName { get; }
     }
 }
