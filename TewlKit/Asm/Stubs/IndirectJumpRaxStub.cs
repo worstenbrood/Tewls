@@ -19,7 +19,7 @@ namespace TewlKit.Asm.Stubs
             // Opcode for MOV RAX, imm64 is 0x48B8
             stub.Write(OpCodes.MovRax);
             // Write the 64-bit address to jump to
-            stub.Write((UInt64)address.ToInt64());
+            stub.Write(address.ToInt64());
             // Opcode for JMP RAX is 0xFFE0
             stub.Write(OpCodes.JmpEaxRax);
             // Return the generated stub as a byte array

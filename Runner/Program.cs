@@ -24,14 +24,6 @@ namespace Runner
             }*/
 
             //Engine.Start();
-            var addr = new IntPtr(0x11223344);
-            var stub = IndirectJumpEaxStub.Instance.GetBuffer(addr);
-            foreach (var b in stub)
-            {
-                Console.Write($"{b:X2} ");
-            }
-            Console.WriteLine();
-
             var currentProcess = Process.GetCurrentProcess();
             var nativeProcess = new NativeProcess(currentProcess.Id, ProcessAccessRights.AllAccess);
             var module = nativeProcess.GetModule("user32.dll");
@@ -40,18 +32,20 @@ namespace Runner
             
             var hook = new MessageBoxHook();
             hook.Install(nativeProcess, module, procs);
-            var st = nativeProcess.ReadBytes(hook.Trampoline.Stub.Address, 16);
+            var st = nativeProcess.ReadBytes(hook.Trampoline.Stub.Address, 24);
             foreach ( var b in st)
             {
                 Console.Write($"{b:X2} ");
             }
+            Console.WriteLine();
             var p = nativeProcess.VirtualQueryEx(hook.Trampoline.Stub.Address);
-            Console.WriteLine($"BaseAddress: {p.BaseAddress}, RegionSize: {p.RegionSize}, State: {p.State}, Protect: {p.Protect}");
-            st = nativeProcess.ReadBytes(hook.Trampoline.Stub.Address, 16);
+            Console.WriteLine($"BaseAddress: {p.BaseAddress:X8}, RegionSize: {p.RegionSize}, State: {p.State}, Protect: {p.Protect}");
+            st = nativeProcess.ReadBytes(hook.Trampoline.Stub.Address, 24);
             foreach (var b in st)
             {
                 Console.Write($"{b:X2} ");
             }
+            Console.WriteLine();
 
             var result = hook.Trampoline.Original.Method(IntPtr.Zero, "test", "test", 0);
         }

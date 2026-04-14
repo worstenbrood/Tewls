@@ -13,6 +13,9 @@ namespace Tewls.Windows.Kernel.Nt
         [DllImport(nameof(NtDll))]
         public static extern NtStatus NtQueryInformationProcess(IntPtr ProcessHandle, ProcessInformationClass ProcessInformationClass, IntPtr ProcessInformation, uint ProcessInformationLength, ref uint ReturnLength);
 
+        [DllImport(nameof(NtDll))]
+        public static extern NtStatus NtFlushInstructionCache(IntPtr ProcessHandle, IntPtr BaseAddress, IntPtr RegionSize);
+
         public static bool NtSucces(NtStatus status)
         {
             return ((int)status) >= 0;

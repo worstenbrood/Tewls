@@ -71,6 +71,8 @@ namespace TewlKit.Hooking
                 return HookResult.Empty;
             }
 
+            var mbi = process.VirtualQueryEx(export.Address);
+
             // Read the first 16 bytes of the original method to create the trampoline.
             var buffer = process.ReadBytes(export.Address, 16);
 
@@ -82,7 +84,7 @@ namespace TewlKit.Hooking
             }
 
             // Allocate memory for the trampoline, which will contain the original method, the stub, and the replacement method.
-            var remote = process.VirtualAllocEx((IntPtr)length + stubGenerator.Size, AllocationType.Commit, MemProtections.ExecuteReadWrite);
+            var remote = process.VirtualAllocEx((IntPtr)length + stubGenerator.Size, AllocationType.Commit|AllocationType.TopDown, MemProtections.ExecuteReadWrite);
 
             // Set trampoline.
             Trampoline = new Trampoline<T>(export.Address, remote, Replacement);
@@ -93,7 +95,7 @@ namespace TewlKit.Hooking
             // Write the stub to the trampoline, which will jump original method.
             var stub = stubGenerator.GetBuffer(export.Address + length);
             process.WriteBytes(remote + length, stub);
-            process.VirtualProtectEx(remote, (IntPtr)(IntPtr)length + stubGenerator.Size, MemProtections.Execute);
+            process.VirtualProtectEx(remote, (IntPtr)length + stubGenerator.Size, MemProtections.Execute);
 
             // Change protection
             var prevProtection = process.VirtualProtectEx(export.Address, (IntPtr)stubGenerator.Size, MemProtections.ExecuteReadWrite);
