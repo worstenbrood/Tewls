@@ -1,7 +1,7 @@
 ﻿using System.ComponentModel;
 using System.Runtime.InteropServices;
 
-namespace Tewls.ZydisSharp
+namespace Tewls.Shared
 {
     internal class Library() : HashSet<string>(StringComparer.OrdinalIgnoreCase)
     {

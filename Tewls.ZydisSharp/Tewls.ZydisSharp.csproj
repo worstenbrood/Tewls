@@ -24,6 +24,10 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\Tewls.Shared\Tewls.Shared.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
     <None Update="arm64\Zydis.dll">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>

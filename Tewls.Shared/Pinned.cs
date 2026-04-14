@@ -1,6 +1,6 @@
 ﻿using System.Runtime.InteropServices;
 
-namespace Tewls.ZydisSharp
+namespace Tewls.Shared
 {
     public class Pinned<T>(T value) : IDisposable
     {

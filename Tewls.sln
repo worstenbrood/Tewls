@@ -11,6 +11,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TewlKit", "TewlKit\TewlKit.
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Tewls.ZydisSharp", "Tewls.ZydisSharp\Tewls.ZydisSharp.csproj", "{D8095C52-04CF-41E2-BC51-02D6C8BB27F8}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Tewls.Shared", "Tewls.Shared\Tewls.Shared.csproj", "{C3814952-EE64-4360-A6BA-4286C28DD711}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -33,6 +35,10 @@ Global
 		{D8095C52-04CF-41E2-BC51-02D6C8BB27F8}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{D8095C52-04CF-41E2-BC51-02D6C8BB27F8}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{D8095C52-04CF-41E2-BC51-02D6C8BB27F8}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C3814952-EE64-4360-A6BA-4286C28DD711}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C3814952-EE64-4360-A6BA-4286C28DD711}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C3814952-EE64-4360-A6BA-4286C28DD711}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C3814952-EE64-4360-A6BA-4286C28DD711}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

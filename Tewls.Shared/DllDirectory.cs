@@ -1,7 +1,7 @@
 ﻿using System.ComponentModel;
 using System.Runtime.InteropServices;
 
-namespace Tewls.ZydisSharp
+namespace Tewls.Shared
 {
     [Flags]
     public enum LoadLibrarySearch : uint
