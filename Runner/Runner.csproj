@@ -2,22 +2,13 @@
 
 	<PropertyGroup>
 		<OutputType>Exe</OutputType>
-		<TargetFrameworks>netstandard2.0;net8.0</TargetFrameworks>
+		<TargetFrameworks>netstandard2.0-windows;net8.0-windows</TargetFrameworks>
 		<LangVersion>12.0</LangVersion>
-		<StartupObject>Runner.Program</StartupObject>
 	</PropertyGroup>
 
-	<PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Debug|netstandard2.0|AnyCPU'">
-	  <Optimize>False</Optimize>
-	</PropertyGroup>
-
-	<PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Debug|net8.0|AnyCPU'">
-	  <Optimize>False</Optimize>
-	</PropertyGroup>
-
-  <ItemGroup>
-    <ProjectReference Include="..\Tewls\Tewls.csproj" />
-    <ProjectReference Include="..\TewlKit\TewlKit.csproj" />
-  </ItemGroup>
+	<ItemGroup>
+	  <ProjectReference Include="..\TewlKit\TewlKit.csproj" />
+	  <ProjectReference Include="..\Tewls\Tewls.csproj" />
+	</ItemGroup>
 
 </Project>

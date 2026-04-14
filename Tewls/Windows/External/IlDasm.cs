@@ -22,7 +22,7 @@ namespace IlDasm_CSharp
         };
 
         [Flags]
-        public enum IFlags : byte
+        public enum IFlags : ushort
         {
             Invalid = 0x01,
             Prefix = 0x02,
@@ -31,7 +31,8 @@ namespace IlDasm_CSharp
             Sib = 0x10,
             Disp = 0x20,
             Imm = 0x40,
-            Relative = 0x80,
+            RipRelativeMemory = 0x80,
+            RelativeBranch = 0x100,
         };
 
         #region flags_table
@@ -239,8 +240,7 @@ namespace IlDasm_CSharp
                             if (rm == 5)
                             {
                                 DispSize = 4;
-                                if (is64)
-                                    IFlag |= IFlags.Relative;
+                                IFlag |= IFlags.RipRelativeMemory;
                             }
                         }
                         else if (pr_67)
@@ -298,7 +298,7 @@ namespace IlDasm_CSharp
                 IFlag |= IFlags.Imm;
 
                 if ((flag & RFlag.Relative) != 0)
-                    IFlag |= IFlags.Relative;
+                    IFlag |= IFlags.RelativeBranch;
 
                 for (int i = 0; i < ImmSize; ++i)
                     Imm |= (ulong)buffer[ImmOffset + i] << (i * 8);

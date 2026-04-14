@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Runtime.InteropServices;
 using TewlKit.Hooking;
 
 namespace TewlKit.Hooks
@@ -16,6 +17,7 @@ namespace TewlKit.Hooks
         /// <param name="caption"></param>
         /// <param name="type"></param>
         /// <returns></returns>
+        [UnmanagedFunctionPointer(CallingConvention.Winapi, CharSet = CharSet.Ansi, SetLastError = true)]
         public delegate int MessageBox(IntPtr hwnd, string text, string caption, int type);
 
         /// <summary>
@@ -29,7 +31,7 @@ namespace TewlKit.Hooks
         public int HookedMessageBox(IntPtr hwnd, string text, string caption, int type)
         {
             Console.WriteLine($"MessageBoxA called with text: {text}, caption: {caption}, type: {type}");
-            Console.WriteLine($"Stub: {Trampoline.Stub.Address:X8}");
+            Console.WriteLine($"Stub: {(long)Trampoline.Stub.Address:X8}");
             
             //return 0;
             return Stub(hwnd, text, "HOOKED: " + caption, type);

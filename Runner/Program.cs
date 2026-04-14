@@ -39,7 +39,7 @@ namespace Runner
             }
             Console.WriteLine();
             var p = nativeProcess.VirtualQueryEx(hook.Trampoline.Stub.Address);
-            Console.WriteLine($"BaseAddress: {p.BaseAddress:X8}, RegionSize: {p.RegionSize}, State: {p.State}, Protect: {p.Protect}");
+            Console.WriteLine($"BaseAddress: {p.BaseAddress.ToInt64():X8}, RegionSize: {p.RegionSize}, State: {p.State}, Protect: {p.Protect}");
             st = nativeProcess.ReadBytes(hook.Trampoline.Stub.Address, 24);
             foreach (var b in st)
             {

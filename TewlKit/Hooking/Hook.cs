@@ -6,6 +6,7 @@ using TewlKit.Asm;
 using TewlKit.Asm.Stubs;
 using TewlKit.Utils;
 using Tewls.Windows.Kernel;
+using Tewls.Windows.Kernel.Nt;
 
 namespace TewlKit.Hooking
 {
@@ -73,42 +74,59 @@ namespace TewlKit.Hooking
 
             var mbi = process.VirtualQueryEx(export.Address);
 
-            // Read the first 16 bytes of the original method to create the trampoline.
-            var buffer = process.ReadBytes(export.Address, 16);
-
-            // Calculate the length of the instructions to overwrite, which should be at least the size of the stub.
-            var length = buffer.GetASMLength(0, stubGenerator.Size);
-            if (length < stubGenerator.Size)
-            {
-                return HookResult.Empty;
-            }
-
-            // Allocate memory for the trampoline, which will contain the original method, the stub, and the replacement method.
-            var remote = process.VirtualAllocEx((IntPtr)length + stubGenerator.Size, AllocationType.Commit|AllocationType.TopDown, MemProtections.ExecuteReadWrite);
-
-            // Set trampoline.
-            Trampoline = new Trampoline<T>(export.Address, remote, Replacement);
-
-            // Write the original method to the trampoline.
-            process.WriteBytes(remote, [.. buffer.Take(length)]);
-
-            // Write the stub to the trampoline, which will jump original method.
-            var stub = stubGenerator.GetBuffer(export.Address + length);
-            process.WriteBytes(remote + length, stub);
-            process.VirtualProtectEx(remote, (IntPtr)length + stubGenerator.Size, MemProtections.Execute);
-
             // Change protection
-            var prevProtection = process.VirtualProtectEx(export.Address, (IntPtr)stubGenerator.Size, MemProtections.ExecuteReadWrite);
+            var prevProtection = process.VirtualProtectEx(mbi.BaseAddress, mbi.RegionSize, MemProtections.ExecuteReadWrite);
+            process.FlushInstructionCache(mbi.BaseAddress, mbi.RegionSize);
 
-            // Write the jump to the replacement method to the original method.
-            var jump = stubGenerator.GetBuffer(Trampoline.Replacement.Address);
-            process.WriteBytes(export.Address, jump);
+            Console.WriteLine($"[+] Protection: {prevProtection}");
 
-            // Restore protection
-            process.VirtualProtectEx(export.Address, (IntPtr)stubGenerator.Size, prevProtection);
+            try
+            {
+                Console.WriteLine($"[+] Hooking {ModuleName}!{ProcName} at address 0x{export.Address.ToInt64():X}");   
+                
+                // Read the first 16 bytes of the original method to create the trampoline.
+                var buffer = process.ReadBytes(export.Address, 16);
 
-            // Return result struct containing the original method address, the trampoline address, and the stub size.
-            return new HookResult(export.Address, remote, stubGenerator.Size);
+                // Calculate the length of the instructions to overwrite, which should be at least the size of the stub.
+                var length = buffer.GetASMLength(0, stubGenerator.Size);
+                if (length < stubGenerator.Size)
+                {
+                    return HookResult.Empty;
+                }
+
+                Console.WriteLine($"[+] ASM length: {length}");
+
+                // Allocate memory for the trampoline, which will contain the original method, the stub, and the replacement method.
+                var remote = process.VirtualAllocEx((IntPtr)length + stubGenerator.Size, AllocationType.Commit, MemProtections.ExecuteReadWrite);
+
+                Console.WriteLine($"[+] Remote stub address: 0x{remote.ToInt64():X}");
+                Console.WriteLine($"[+] Distance: 0x{(ulong)export.Address.ToInt64() - (ulong)remote.ToInt64():X}");
+
+                // Set trampoline.
+                Trampoline = new Trampoline<T>(export.Address, remote, Replacement);
+
+                // Write the original method to the trampoline.
+                process.WriteBytes(remote, [.. buffer.Take(length)]);
+
+                // Write the stub to the trampoline, which will jump original method.
+                var stub = stubGenerator.GetBuffer(export.Address + length);
+                process.WriteBytes(remote + length, stub);
+                
+                // Write the jump to the replacement method to the original method.
+                var jump = stubGenerator.GetBuffer(Trampoline.Replacement.Address);
+                process.WriteBytes(export.Address, jump);
+
+                // Return result struct containing the original method address, the trampoline address, and the stub size.
+                return new HookResult(export.Address, remote, stubGenerator.Size);
+            }
+            finally
+            {
+                // Restore protection
+                process.VirtualProtectEx(mbi.BaseAddress, mbi.RegionSize, prevProtection);
+
+                // Flush cache
+                process.FlushInstructionCache(mbi.BaseAddress, mbi.RegionSize);
+            }
         }
 
         /// <summary>

@@ -711,6 +711,11 @@ namespace Tewls.Windows.Kernel
             return IntPtr.Zero;
         }
 
+        public bool FlushInstructionCache(IntPtr address, IntPtr size)
+        {
+            return NtDll.NtFlushInstructionCache(Handle, address, size) == NtStatus.Success;
+        }
+
         public override string ToString()
         {
             return $"ProcessId: {ProcessId}";
