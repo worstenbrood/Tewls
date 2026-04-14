@@ -8,6 +8,7 @@
 
 	<ItemGroup>
 	  <ProjectReference Include="..\TewlKit\TewlKit.csproj" />
+	  <ProjectReference Include="..\Tewls.ZydisSharp\Tewls.ZydisSharp.csproj" />
 	  <ProjectReference Include="..\Tewls\Tewls.csproj" />
 	</ItemGroup>
 

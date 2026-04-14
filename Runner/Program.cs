@@ -1,9 +1,11 @@
 ﻿using System;
-using Tewls.Windows.Kernel;
-using TewlKit.Asm.Stubs;
 using System.Diagnostics;
 using System.Linq;
+using System.Runtime.InteropServices;
+using TewlKit.Asm.Stubs;
 using TewlKit.Hooks;
+using Tewls.Windows.Kernel;
+using Tewls.ZydisSharp;
 
 namespace Runner
 {
@@ -11,6 +13,15 @@ namespace Runner
     {
         static void Main(string[] args)
         {
+            Console.WriteLine($"Zydis Version: {Zydis.GetVersion()}");
+            Console.WriteLine(Marshal.SizeOf<ZydisDecoder>());
+            var decoder = Zydis.CreateDecoder(ZydisMachineMode.ZYDIS_MACHINE_MODE_LONG_COMPAT_32, ZydisStackWidth.ZYDIS_STACK_WIDTH_32);
+            Console.WriteLine($"Decoder Machine Mode: {decoder.MachineMode}, Stack Width: {decoder.StackWidth}");
+            var b = new byte[] { 0x44, 0x39, 0x1D, 0x76, 0x3F, 0x04, 0x00 };
+
+            var instruction = Zydis.DecodeInstruction(ref decoder, b);
+            Console.WriteLine($"Decoded Instruction: {instruction.Length}");
+
             /*var sys = SystemInfo.GetSystemInfo();
             Thread.Sleep(1000);
             foreach (var info in NetGroup.Enum<GroupInfo0>())
@@ -24,7 +35,7 @@ namespace Runner
             }*/
 
             //Engine.Start();
-            var currentProcess = Process.GetCurrentProcess();
+            /*var currentProcess = Process.GetCurrentProcess();
             var nativeProcess = new NativeProcess(currentProcess.Id, ProcessAccessRights.AllAccess);
             var module = nativeProcess.GetModule("user32.dll");
             var procs = nativeProcess.GetExports(module.Address)
@@ -47,7 +58,7 @@ namespace Runner
             }
             Console.WriteLine();
 
-            var result = hook.Trampoline.Original.Method(IntPtr.Zero, "test", "test", 0);
+            var result = hook.Trampoline.Original.Method(IntPtr.Zero, "test", "test", 0);*/
         }
     }
 }

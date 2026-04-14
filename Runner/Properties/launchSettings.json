@@ -1,0 +1,9 @@
+{
+  "profiles": {
+    "Runner": {
+      "commandName": "Project",
+      "workingDirectory": ".",
+      "nativeDebugging": true
+    }
+  }
+}
