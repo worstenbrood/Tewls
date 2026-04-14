@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Runtime.InteropServices;
+using TewlKit.Utils;
 
 namespace TewlKit.Core
 {
@@ -7,7 +8,7 @@ namespace TewlKit.Core
     /// 
     /// </summary>
     /// <typeparam name="T"></typeparam>
-    public class Procedure<T>
+    public class Procedure<T> : GCHandled 
         where T : Delegate
     {
         /// <summary>

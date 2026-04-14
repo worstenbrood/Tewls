@@ -65,7 +65,7 @@ namespace TewlKit.Core
         }
 
         /// <summary>
-        /// Same as <see cref="EnumSuspended"/> but all processes are suspended first and resumed after
+        /// Same as <see cref="Enum(ProcessAccessRights)"/> but all processes are suspended first and resumed after
         /// </summary>
         /// <param name="action">>Delegate executed for every <see cref="Process"/> and <see cref="NativeProcess"/> pair.</param>
         public static void EnumSuspended(Action<Process, NativeProcess> action)

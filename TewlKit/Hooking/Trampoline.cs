@@ -1,5 +1,6 @@
 ﻿using System;
 using TewlKit.Core;
+using TewlKit.Utils;
 
 namespace TewlKit.Hooking
 {
@@ -13,7 +14,7 @@ namespace TewlKit.Hooking
     /// <param name="stub"></param>
     /// <param name="replacement"></param>
 
-    public class Trampoline<TFunction>(nint original, nint stub, TFunction replacement)
+    public class Trampoline<TFunction>(nint original, nint stub, TFunction replacement) : GCHandled
         where TFunction : Delegate
     {
         /// <summary>
