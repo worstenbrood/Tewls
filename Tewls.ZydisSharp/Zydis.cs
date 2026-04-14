@@ -36,14 +36,15 @@ namespace Tewls.ZydisSharp
         }
 
         [DllImport(LibraryName, CallingConvention = CallingConvention.Cdecl, ExactSpelling = true)]
-        internal static extern int ZydisDecoderDecodeFull(ref ZydisDecoder decoder, IntPtr buffer, nuint length, ref ZydisDecodedInstruction instruction, ZydisDecodedOperand[] operands);
+        internal static extern int ZydisDecoderDecodeFull(ref ZydisDecoder decoder, IntPtr buffer, uint length, ref ZydisDecodedInstruction instruction, IntPtr operands);
 
         public static ZydisDecodedInstruction DecodeInstruction(ref ZydisDecoder decoder, byte[] buffer)
         {
             var instruction = new ZydisDecodedInstruction();
             var operands = new ZydisDecodedOperand[ZYDIS_MAX_OPERAND_COUNT];
             using var bufferPin = new Pinned<byte[]>(buffer);
-            ZyanStatus.ThrowIfFailed(ZydisDecoderDecodeFull(ref decoder, bufferPin.AddressOfPinnedObject, (nuint)buffer.Length, ref instruction, operands),
+            using var opsPin = new Pinned<ZydisDecodedOperand[]>(operands);
+            ZyanStatus.ThrowIfFailed(ZydisDecoderDecodeFull(ref decoder, bufferPin.Address, (uint)buffer.Length, ref instruction, opsPin.Address),
                 nameof(ZydisDecoderDecodeFull));
             return instruction;
         }

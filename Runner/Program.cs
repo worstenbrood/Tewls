@@ -1,25 +1,23 @@
 ﻿using System;
-using System.Diagnostics;
-using System.Linq;
-using System.Runtime.InteropServices;
-using TewlKit.Asm.Stubs;
-using TewlKit.Hooks;
-using Tewls.Windows.Kernel;
 using Tewls.ZydisSharp;
 
 namespace Runner
 {
-    public class Program
+    internal class Program
     {
         static void Main(string[] args)
         {
+                      
             Console.WriteLine($"Zydis Version: {Zydis.GetVersion()}");
-            Console.WriteLine(Marshal.SizeOf<ZydisDecoder>());
-            var decoder = Zydis.CreateDecoder(ZydisMachineMode.ZYDIS_MACHINE_MODE_LONG_COMPAT_32, ZydisStackWidth.ZYDIS_STACK_WIDTH_32);
+           
+            var decoder = Zydis.CreateDecoder(ZydisMachineMode.ZYDIS_MACHINE_MODE_LONG_64, ZydisStackWidth.ZYDIS_STACK_WIDTH_64);
             Console.WriteLine($"Decoder Machine Mode: {decoder.MachineMode}, Stack Width: {decoder.StackWidth}");
-            var b = new byte[] { 0x44, 0x39, 0x1D, 0x76, 0x3F, 0x04, 0x00 };
+            byte[] test2 =
+{
+    0x44, 0x39, 0x1D, 0x76, 0x3F, 0x04, 0x00 // cmp dword ptr [rip+43F76h], r11d
+};
 
-            var instruction = Zydis.DecodeInstruction(ref decoder, b);
+            var instruction = Zydis.DecodeInstruction(ref decoder, test2);
             Console.WriteLine($"Decoded Instruction: {instruction.Length}");
 
             /*var sys = SystemInfo.GetSystemInfo();

@@ -6,7 +6,7 @@ namespace Tewls.ZydisSharp
     {
         private GCHandle _handle = GCHandle.Alloc(value, GCHandleType.Pinned);
 
-        public IntPtr AddressOfPinnedObject => _handle.AddrOfPinnedObject();
+        public IntPtr Address => _handle.AddrOfPinnedObject();
 
         public void Dispose() => _handle.Free();
     }
