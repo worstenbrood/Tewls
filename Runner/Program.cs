@@ -10,15 +10,10 @@ namespace Runner
                       
             Console.WriteLine($"Zydis Version: {Zydis.GetVersion()}");
            
-            var decoder = Zydis.CreateDecoder(ZydisMachineMode.ZYDIS_MACHINE_MODE_LONG_64, ZydisStackWidth.ZYDIS_STACK_WIDTH_64);
-            Console.WriteLine($"Decoder Machine Mode: {decoder.MachineMode}, Stack Width: {decoder.StackWidth}");
-            byte[] test2 =
-{
-    0x44, 0x39, 0x1D, 0x76, 0x3F, 0x04, 0x00 // cmp dword ptr [rip+43F76h], r11d
-};
-
-            var instruction = Zydis.DecodeInstruction(ref decoder, test2);
-            Console.WriteLine($"Decoded Instruction: {instruction.Length}");
+            var decoder = ZDecoder.Create(ZydisMachineMode.ZYDIS_MACHINE_MODE_LONG_64, ZydisStackWidth.ZYDIS_STACK_WIDTH_64);
+            byte[] test2 = { 0x44, 0x39, 0x1D, 0x76, 0x3F, 0x04, 0x00 };
+            var result = decoder.DecodeFull(test2);
+            Console.WriteLine($"Decoded Instruction: {result.Instruction.Length}");
 
             /*var sys = SystemInfo.GetSystemInfo();
             Thread.Sleep(1000);
