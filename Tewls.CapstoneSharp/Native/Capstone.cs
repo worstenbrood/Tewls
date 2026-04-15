@@ -10,6 +10,9 @@ namespace Tewls.CapstoneSharp.Native
         static Capstone()
         {
             NativeLoader.Load<Capstone>(LibraryName);
+#if DEBUG
+            Console.WriteLine($"Capstone version: {GetVersion()}");
+#endif
         }
 
         [DllImport(LibraryName, CallingConvention = CallingConvention.Cdecl)]

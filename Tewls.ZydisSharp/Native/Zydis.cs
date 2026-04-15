@@ -11,6 +11,9 @@ namespace Tewls.ZydisSharp.Native
         static Zydis()
         {
             NativeLoader.Load<Zydis>(LibraryName);
+#if DEBUG
+            Console.WriteLine($"Zydis version: {GetVersion()}");
+#endif
         }
 
         [DllImport(LibraryName, CallingConvention = CallingConvention.Cdecl)]
