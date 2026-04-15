@@ -10,12 +10,17 @@ namespace Tewls.Runner
         {
                       
             var decoder = ZDecoder.Create64();
-            byte[] test2 = [0x44, 0x39, 0x1D, 0x76, 0x3F, 0x04, 0x00];
-            var result = decoder.DecodeFull(test2);
+            byte[] jumpCode =
+            [
+                0x48, 0xB8, // MOV RAX, imm64
+                0x55, 0x44, 0x33, 0x22, 0x11, 0x00, 0x00, 0x00, // 0x1122334455 (little-endian)
+                0xFF, 0xE0  // JMP RAX
+            ];
+            var result = decoder.DecodeFull(jumpCode);
             Console.WriteLine($"Decoded Instruction: {result.Instruction.Length}");
 
             var cd = CDecoder.Create64();
-            var r = cd.Disassemble(test2);
+            var r = cd.Disassemble(jumpCode);
             foreach (var entry in r)
             {
                 Console.WriteLine($"Disassembled Instruction: {entry.Instruction.Text}");

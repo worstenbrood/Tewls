@@ -8,7 +8,7 @@ namespace Tewls.ZydisSharp.Native
     using ZydisElementType = UInt32;
     using ZydisElementSize = UInt32;
 
-    [StructLayout(LayoutKind.Sequential)]
+    [StructLayout(LayoutKind.Sequential, Pack = 8)]
     public struct ZydisDecoder
     {
         public ZydisMachineMode MachineMode;
@@ -16,7 +16,7 @@ namespace Tewls.ZydisSharp.Native
         public ZydisDecoderMode DecoderMode;
     }
 
-    [StructLayout(LayoutKind.Sequential)]
+    [StructLayout(LayoutKind.Sequential, Pack = 8)]
     public struct ZydisDecodedOperandMemDisp
     {
         public long Value;
@@ -24,7 +24,7 @@ namespace Tewls.ZydisSharp.Native
         public byte Size;
     }
 
-    [StructLayout(LayoutKind.Sequential)]
+    [StructLayout(LayoutKind.Sequential, Pack = 8)]
     public struct ZydisDecodedOperandMem
     {
         public ZydisMemoryOperandType Type;
@@ -33,21 +33,17 @@ namespace Tewls.ZydisSharp.Native
         public ZydisRegister Index;
         public byte Scale;
         
-        // padding verwacht voor alignment naar de nested disp struct
-        private byte _pad0;
-        private byte _pad1;
-        private byte _pad2;
-        
+        // padding verwacht voor alignment naar de nested disp struct      
         public ZydisDecodedOperandMemDisp Disp;
     }
 
-    [StructLayout(LayoutKind.Sequential)]
+    [StructLayout(LayoutKind.Sequential, Pack = 8)]
     public struct ZydisDecodedOperandImmValue
     {
         public ulong U;
     }
 
-    [StructLayout(LayoutKind.Sequential)]
+    [StructLayout(LayoutKind.Sequential, Pack = 8)]
     public struct ZydisDecodedOperandImm
     {
         public byte IsSigned;
@@ -72,13 +68,13 @@ namespace Tewls.ZydisSharp.Native
         private byte _pad10;
     }
 
-    [StructLayout(LayoutKind.Sequential)]
+    [StructLayout(LayoutKind.Sequential, Pack = 8)]
     public struct ZydisDecodedOperandReg
     {
         public ZydisRegister Value;
     }
 
-    [StructLayout(LayoutKind.Sequential)]
+    [StructLayout(LayoutKind.Sequential, Pack = 8)]
     public struct ZydisDecodedOperandPtr
     {
         public ushort Segment; // ZyanU16
@@ -94,7 +90,7 @@ namespace Tewls.ZydisSharp.Native
         [FieldOffset(0)] public ZydisDecodedOperandImm Imm;
     }
 
-    [StructLayout(LayoutKind.Sequential)]
+    [StructLayout(LayoutKind.Sequential, Pack = 8)]
     public struct ZydisDecodedOperand
     {
         public byte Id;
@@ -110,7 +106,7 @@ namespace Tewls.ZydisSharp.Native
         public ZydisDecodedOperandValue Value;
     }
 
-    [StructLayout(LayoutKind.Sequential, Size = 512)]
+    [StructLayout(LayoutKind.Sequential, Pack = 8, Size = 512)]
     public struct ZydisDecodedInstruction
     {
         public ZydisMachineMode MachineMode;
