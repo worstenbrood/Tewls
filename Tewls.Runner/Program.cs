@@ -15,7 +15,7 @@ namespace Tewls.Runner
             Console.WriteLine($"Decoded Instruction: {result.Instruction.Length}");
 
             var cd = CDecoder.Create64();
-            var r = cd.Disassemble(test2);
+            var r = cd.DecodeFull(test2);
             Console.WriteLine($"Disassembled Instruction: {r.Instruction.Text}");
 
             /*var sys = SystemInfo.GetSystemInfo();

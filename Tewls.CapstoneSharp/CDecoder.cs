@@ -68,13 +68,34 @@ namespace Tewls.CapstoneSharp
         {
         }
 
+        /// <summary>
+        /// Throws a CapstoneException with the last error code from the Capstone library. 
+        /// This method is used to handle errors that occur during disassembly.
+        /// </summary>
         private void ThrowLastError() => CapstoneException.ThrowLastError(Address);
 
-        public CDecodeResult Disassemble(byte[] code)
+        /// <summary>
+        /// Create buffer for the current decoder. This buffer will be used to store the disassembled instructions. 
+        /// The buffer will be automatically freed when it is disposed.
+        /// </summary>
+        /// <returns></returns>
+        public CapstoneBuffer CreateBuffer() => CapstoneBuffer.Create(Address);
+
+        public CDecodeResult DecodeFull(byte[] code, int index = 0, int length = 0)
         {
+            if (length == 0)
+            {
+                length = code.Length - index;
+            }
+
             nint result = new();
-            using var codePin = new PinnedArray<byte>(code);
-            var instructions = Capstone.cs_disasm(Address, codePin.Address, (uint)code.Length, 0, 0, ref result);
+   
+            // Pin buffer array
+            using var codePin = new PinnedArray<byte>(code, index);
+
+            // Disassemble the instruction at the specified index and length.
+            // If length is 0, it will disassemble until the end of the buffer.
+            var instructions = Capstone.cs_disasm(Address, codePin.Address, (uint)length, 0, 0, ref result);
             if (instructions == 0)
             {
                 ThrowLastError();
@@ -82,12 +103,10 @@ namespace Tewls.CapstoneSharp
 
             using var buffer = new CapstoneBuffer(result, instructions);
             var instruction = Marshal.PtrToStructure<cs_insn>(result);
-            if (instruction.Detail != 0)
-            {
-                var detail = Marshal.PtrToStructure<cs_detail>(instruction.Detail);
-                return new CDecodeResult(instruction, detail);
-            }
-            return new CDecodeResult(instruction, null);
+
+            return instruction.Detail != 0 ?
+                new CDecodeResult(instruction, Marshal.PtrToStructure<cs_detail>(instruction.Detail)) : 
+                new CDecodeResult(instruction, null);
         }
     }
 }
