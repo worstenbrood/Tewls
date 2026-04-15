@@ -8,6 +8,7 @@ using Tewls.Windows.Advapi;
 using Tewls.Windows.Kernel.Nt;
 using Tewls.Windows.PE;
 using Tewls.Windows.Utils;
+using Tewls.Shared;
 
 namespace Tewls.Windows.Kernel
 {
@@ -339,16 +340,23 @@ namespace Tewls.Windows.Kernel
             return ReadInt16((IntPtr)remoteBuffer);
         }
 
-        public byte[] ReadBytes(IntPtr remoteBuffer, int size)
+        /// <summary>
+        /// Generic helper for reading arrays of primitives
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="remoteBuffer"></param>
+        /// <param name="size"></param>
+        /// <returns></returns>
+        private T[] ReadArray<T>(IntPtr remoteBuffer, int size)
         {
-            using (var localBuffer = new HGlobalBuffer((IntPtr) size))
-            {
-                ReadProcessMemory(remoteBuffer, localBuffer.Buffer, localBuffer.Size);
-                var result = new byte[size];
-                Marshal.Copy(localBuffer.Buffer, result, 0, size);
-                return result;
-            }
+            T[] result = new T[size];
+            var pin = new PinnedArray<T>(result);
+
+            ReadProcessMemory(remoteBuffer, pin.Address, (nint)Marshal.SizeOf<T>() * size);
+            return result;
         }
+
+        public byte[] ReadBytes(IntPtr remoteBuffer, int size) => ReadArray<byte>(remoteBuffer, size);
 
         public RemoteBuffer WriteString(RemoteBuffer remoteBuffer, string s)
         {
@@ -366,14 +374,20 @@ namespace Tewls.Windows.Kernel
             return WriteString(remoteBuffer, s);
         }
 
-        public void WriteBytes(IntPtr remoteBuffer, byte[] bytes)
+        /// <summary>
+        /// Generic helper for writing rray of primitives
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="remoteBuffer"></param>
+        /// <param name="array"></param>
+        private void WriteArray<T>(IntPtr remoteBuffer, T[] array)
         {
-            using (var localBuffer = new HGlobalBuffer(bytes))
-            {
-                WriteProcessMemory(remoteBuffer, localBuffer.Buffer, localBuffer.Size);
-            }
+            var pin = new PinnedArray<T>(array);
+            WriteProcessMemory(remoteBuffer, pin.Address, (IntPtr)(Marshal.SizeOf<T>() * array.Length));
         }
 
+        public void WriteBytes(IntPtr remoteBuffer, byte[] bytes) => WriteArray(remoteBuffer, bytes);
+        
         public MemProtections VirtualProtectEx(IntPtr remoteBuffer, IntPtr size, MemProtections protection)
         {
             return VirtualProtectEx(Handle, remoteBuffer, size, protection);
