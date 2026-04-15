@@ -46,20 +46,30 @@ namespace Tewls.ZydisSharp.Native
         internal static extern ZyanStatus ZydisDecoderDecodeFull(ref ZydisDecoder decoder, IntPtr buffer, uint length, 
             ref ZydisDecodedInstruction instruction, IntPtr operands);
 
-        public static ZDecodeResult DecodeFull(ref ZydisDecoder decoder, byte[] buffer, int index, int length)
+        public static ZDecodeResult DecodeFull(ref ZydisDecoder decoder, byte[] buffer, int index, int byteCount)
         {
-            if (length == 0)
+            // If length is 0, use length of the buffer starting from index
+            if (byteCount == 0)
             {
-                length = buffer.Length - index;
+                byteCount = buffer.Length - index;
             }
 
+            // Initialize the instruction and operands structures
             var instruction = new ZydisDecodedInstruction();
             var operands = new ZydisDecodedOperand[ZYDIS_MAX_OPERAND_COUNT];
+
+            // Pin the buffer and operands array to get their addresses
             using var bufferPin = new PinnedArray<byte>(buffer, index);
             using var opsPin = new PinnedArray<ZydisDecodedOperand>(operands);
-            var result = ZydisDecoderDecodeFull(ref decoder, bufferPin.Address, (uint)length, ref instruction,
+
+            // Call the native function to decode the instruction
+            var result = ZydisDecoderDecodeFull(ref decoder, bufferPin.Address, (uint)byteCount, ref instruction,
                 opsPin.Address);
+
+            // Check the result and throw an exception if it failed
             result.ThrowIfFailed(nameof(ZydisDecoderDecodeFull));
+
+            // Return the decoded instruction and operands as a ZDecodeResult
             return new ZDecodeResult(instruction, operands);
         }
     }

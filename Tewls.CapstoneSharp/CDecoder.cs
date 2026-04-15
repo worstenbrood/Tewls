@@ -81,13 +81,15 @@ namespace Tewls.CapstoneSharp
         /// <returns></returns>
         public CapstoneBuffer CreateBuffer() => CapstoneBuffer.Create(Address);
 
-        public CDecodeResult DecodeFull(byte[] code, int index = 0, int length = 0)
+        public IEnumerable<CDecodeResult> Disassemble(byte[] code, int index = 0, int byteCount = 0)
         {
-            if (length == 0)
+            // If length is 0, use length of the buffer starting from index
+            if (byteCount == 0)
             {
-                length = code.Length - index;
+                byteCount = code.Length - index;
             }
 
+            // Initialize result pointer
             nint result = new();
    
             // Pin buffer array
@@ -95,18 +97,21 @@ namespace Tewls.CapstoneSharp
 
             // Disassemble the instruction at the specified index and length.
             // If length is 0, it will disassemble until the end of the buffer.
-            var instructions = Capstone.cs_disasm(Address, codePin.Address, (uint)length, 0, 0, ref result);
+            var instructions = Capstone.cs_disasm(Address, codePin.Address, (uint)byteCount, 0, 0, ref result);
             if (instructions == 0)
             {
                 ThrowLastError();
             }
 
+            // Create a CapstoneBuffer to manage the memory allocated for the disassembled instructions.
             using var buffer = new CapstoneBuffer(result, instructions);
-            var instruction = Marshal.PtrToStructure<cs_insn>(result);
-
-            return instruction.Detail != 0 ?
-                new CDecodeResult(instruction, Marshal.PtrToStructure<cs_detail>(instruction.Detail)) : 
-                new CDecodeResult(instruction, null);
+            for(int i = 0; i < instructions; i++)
+            {
+                var instruction = Marshal.PtrToStructure<cs_insn>(IntPtr.Add(result, i * Marshal.SizeOf<cs_insn>()));
+                yield return instruction.Detail != 0 ?
+                    new CDecodeResult(instruction, Marshal.PtrToStructure<cs_detail>(instruction.Detail)) :
+                    new CDecodeResult(instruction, null);
+            }
         }
     }
 }

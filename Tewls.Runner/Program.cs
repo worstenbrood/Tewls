@@ -15,9 +15,11 @@ namespace Tewls.Runner
             Console.WriteLine($"Decoded Instruction: {result.Instruction.Length}");
 
             var cd = CDecoder.Create64();
-            var r = cd.DecodeFull(test2);
-            Console.WriteLine($"Disassembled Instruction: {r.Instruction.Text}");
-
+            var r = cd.Disassemble(test2);
+            foreach (var entry in r)
+            {
+                Console.WriteLine($"Disassembled Instruction: {entry.Instruction.Text}");
+            }
             /*var sys = SystemInfo.GetSystemInfo();
             Thread.Sleep(1000);
             foreach (var info in NetGroup.Enum<GroupInfo0>())
