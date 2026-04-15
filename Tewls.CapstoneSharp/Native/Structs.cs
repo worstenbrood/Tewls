@@ -60,7 +60,7 @@ namespace Tewls.CapstoneSharp.Native
 		public cs_x86 x86;
 	}
 
-    [StructLayout(LayoutKind.Explicit)]
+    [StructLayout(LayoutKind.Explicit, Pack = 0)]
     public struct cs_insn
     {
         /// <summary>
@@ -101,7 +101,7 @@ namespace Tewls.CapstoneSharp.Native
         /// Machine bytes of this instruction, with number of bytes indicated by @size above
         /// This information is available even when CS_OPT_DETAIL = CS_OPT_OFF
         /// </summary>
-        [FieldOffset(22)]
+        [FieldOffset(24)]
         [MarshalAs(UnmanagedType.ByValArray, SizeConst = 24)]
         public byte[] Bytes;
 
@@ -109,7 +109,7 @@ namespace Tewls.CapstoneSharp.Native
         /// Ascii text of instruction mnemonic
         /// This information is available even when CS_OPT_DETAIL = CS_OPT_OFF
         /// </summary>
-        [FieldOffset(46)]
+        [FieldOffset(48)]
         [MarshalAs(UnmanagedType.ByValArray, SizeConst = Constants.CS_MNEMONIC_SIZE)]
         public char[] Mnemonic;
 
@@ -117,7 +117,7 @@ namespace Tewls.CapstoneSharp.Native
         /// Ascii text of instruction operands
         /// This information is available even when CS_OPT_DETAIL = CS_OPT_OFF
         /// </summary>
-        [FieldOffset(78)]
+        [FieldOffset(80)]
         [MarshalAs(UnmanagedType.ByValArray, SizeConst = 160)]
         public char[] OpStr;
 
@@ -126,14 +126,14 @@ namespace Tewls.CapstoneSharp.Native
         /// False: Otherwise.
         /// -- Only supported by auto-sync archs --
         /// </summary>
-        [FieldOffset(238)]
+        [FieldOffset(240)]
         public bool IsAlias;
 
         /// <summary>
         /// True: The operands are the ones of the alias instructions.
         /// False: The detail operands are from the real instruction.
         /// </summary>
-        [FieldOffset(239)]
+        [FieldOffset(241)]
         public bool UsesAliasDetails;
 
         /// <summary>
@@ -143,7 +143,7 @@ namespace Tewls.CapstoneSharp.Native
         ///
         /// False: The instruction decoded correctly and is valid.
         /// </summary>
-        [FieldOffset(240)]
+        [FieldOffset(242)]
         public bool Illegal;
 
         /// <summary>
@@ -155,7 +155,7 @@ namespace Tewls.CapstoneSharp.Native
         /// NOTE 2: when in Skipdata mode, or when detail mode is OFF, even if this pointer
         ///     is not NULL, its content is still irrelevant.
         /// </summary>
-        [FieldOffset(225)]
+        [FieldOffset(243)]
         public nint Detail;
     }
 }

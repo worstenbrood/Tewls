@@ -113,7 +113,7 @@ namespace Tewls.CapstoneSharp.Native
         /// <param name="handle">pointer to a handle returned by cs_open()</param>
         /// <returns>CS_ERR_OK on success, or other value on failure(refer to cs_err enum</returns>
         [DllImport(LibraryName, CallingConvention = CallingConvention.Cdecl)]
-        internal static extern cs_err cs_close(nint handle);
+        internal static extern cs_err cs_close(ref nint handle);
 
         /// <summary>
         /// Set option for disassembling engine at runtime
@@ -128,7 +128,7 @@ namespace Tewls.CapstoneSharp.Native
         /// Refer to cs_err enum for detailed error.</returns>
         /// </summary>
         [DllImport(LibraryName, CallingConvention = CallingConvention.Cdecl)]
-        internal static extern cs_err cs_option(nint handle, cs_opt_type type, ref uint value);
+        internal static extern cs_err cs_option(nint handle, cs_opt_type type, IntPtr value);
 
         /// <summary>
         /// Report the last error number when some API function fail.

@@ -43,8 +43,8 @@ namespace Tewls.ZydisSharp.Native
         {
             var instruction = new ZydisDecodedInstruction();
             var operands = new ZydisDecodedOperand[ZYDIS_MAX_OPERAND_COUNT];
-            using var bufferPin = new Pinned<byte[]>(buffer);
-            using var opsPin = new Pinned<ZydisDecodedOperand[]>(operands);
+            using var bufferPin = new PinnedArray<byte>(buffer);
+            using var opsPin = new PinnedArray<ZydisDecodedOperand>(operands);
             ZyanStatus.ThrowIfFailed(ZydisDecoderDecodeFull(ref decoder, bufferPin.Address, (uint)buffer.Length, ref instruction, opsPin.Address),
                 nameof(ZydisDecoderDecodeFull));
             return new DecodeResult(instruction, operands);

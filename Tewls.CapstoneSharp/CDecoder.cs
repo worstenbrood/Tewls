@@ -1,8 +1,10 @@
-﻿using Tewls.CapstoneSharp.Native;
+﻿using System.Runtime.InteropServices;
+using Tewls.CapstoneSharp.Native;
+using Tewls.Shared;
 
 namespace Tewls.CapstoneSharp
 {
-    public class CDecoder
+    public class CDecoder : NativePointer
     {
         /// <summary>
         /// Creates a new CDecoder instance with the specified architecture and mode. 
@@ -28,19 +30,35 @@ namespace Tewls.CapstoneSharp
         public static CDecoder CreateArm() => Create(cs_arch.CS_ARCH_ARM, cs_mode.CS_MODE_ARM);
         public static CDecoder CreateArm64() => Create(cs_arch.CS_ARCH_ARM64, cs_mode.CS_MODE_ARM);
 
-        /// <summary>
-        /// Handle to the native Capstone decoder instance. 
-        /// This handle is used for all subsequent calls to the Capstone API that require a decoder instance.
-        /// </summary>
-        private nint _handle;
+        protected override void Dispose(bool disposing)
+        {
+            if (Address != 0)
+            {
+                // cs_close will set the handle to 0 if it succeeds, so we don't need to set it to 0 ourselves.
+                Capstone.cs_close(ref Address);
+            }
+        }
 
         /// <summary>
         /// Constructor for the CDecoder class. This constructor is internal and should only be called by the Create method.
         /// </summary>
         /// <param name="handle"></param>
-        internal CDecoder(nint handle) 
-        { 
-            _handle = handle;
+        internal CDecoder(nint handle) : base(handle)
+        {
+        }
+
+        public cs_insn Disassemble(byte[] code)
+        {
+            nint result = new();
+            using var codePin = new PinnedArray<byte>(code);
+            var instructions = Capstone.cs_disasm(Address, codePin.Address, (uint)code.Length, 0, 0, ref result);
+            if (instructions == 0)
+            {
+                CapstoneException.ThrowLastError(Address);
+            }
+
+            using var buffer = new CapstoneBuffer(result, instructions);
+            return Marshal.PtrToStructure<cs_insn>(result);
         }
     }
 }
