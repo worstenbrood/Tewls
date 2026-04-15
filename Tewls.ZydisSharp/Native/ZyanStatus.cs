@@ -1,4 +1,4 @@
-﻿namespace Tewls.ZydisSharp
+﻿namespace Tewls.ZydisSharp.Native
 {
     public static class ZyanStatus
     {

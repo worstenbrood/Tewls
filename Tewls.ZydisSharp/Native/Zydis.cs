@@ -1,7 +1,7 @@
 ﻿using System.Runtime.InteropServices;
 using Tewls.Shared;
 
-namespace Tewls.ZydisSharp
+namespace Tewls.ZydisSharp.Native
 {
     public class Zydis
     {

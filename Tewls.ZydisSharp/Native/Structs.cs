@@ -1,6 +1,6 @@
 ﻿using System.Runtime.InteropServices;
 
-namespace Tewls.ZydisSharp
+namespace Tewls.ZydisSharp.Native
 {
     using ZydisOperandVisibility = UInt32;
     using ZydisOperandActions = UInt32;
@@ -124,7 +124,7 @@ namespace Tewls.ZydisSharp
         public byte AddressWidth;
         public byte OperandCount;
         public byte OperandCountVisible;
-        public ulong Attributes;
+        public ZydisInstructionAttributes Attributes;
         public IntPtr CpuFlags;
         public IntPtr FpuFlags;
     }
