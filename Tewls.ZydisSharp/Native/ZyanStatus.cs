@@ -1,4 +1,6 @@
-﻿namespace Tewls.ZydisSharp.Native
+﻿using System.Runtime.CompilerServices;
+
+namespace Tewls.ZydisSharp.Native
 {
     public class ZyanStatus(int value)
     {
@@ -6,7 +8,7 @@
         public bool Success => Status >= 0;
         public bool Failed => Status < 0;
 
-        public void ThrowIfFailed(string apiName)
+        public void ThrowIfFailed([CallerMemberName] string apiName = "")
         {
             if (Failed)
             {

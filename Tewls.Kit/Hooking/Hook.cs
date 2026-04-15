@@ -5,6 +5,8 @@ using System.Linq;
 using Tewls.Kit.Asm.Stubs;
 using Tewls.Kit.Utils;
 using Tewls.Windows.Kernel;
+using Tewls.ZydisSharp;
+using Tewls.ZydisSharp.Native;
 
 namespace Tewls.Kit.Hooking
 {
@@ -47,6 +49,11 @@ namespace Tewls.Kit.Hooking
         protected T Stub => Trampoline.Stub.Method;
 
         /// <summary>
+        /// Decoder
+        /// </summary>
+        protected static readonly ZDecoder Decoder = ZDecoder.Create64();
+
+        /// <summary>
         /// Install the hook
         /// </summary>
         /// <param name="process"></param>
@@ -80,13 +87,15 @@ namespace Tewls.Kit.Hooking
 
             try
             {
-                Console.WriteLine($"[+] Hooking {ModuleName}!{ProcName} at address 0x{export.Address.ToInt64():X}");   
-                
-                // Read the first 16 bytes of the original method to create the trampoline.
-                var buffer = process.ReadBytes(export.Address, 16);
+                Console.WriteLine($"[+] Hooking {ModuleName}!{ProcName} at address 0x{export.Address.ToInt64():X}");
 
+                // Read the first ZYDIS_MAX_INSTRUCTION_LENGTH bytes of the original method to create the trampoline.
+                var buffer = process.ReadBytes(export.Address, Zydis.ZYDIS_MAX_INSTRUCTION_LENGTH);
+                
+                // Decode asm
+                var instructions = Decoder.Disassemble(buffer).ToArray();
                 // Calculate the length of the instructions to overwrite, which should be at least the size of the stub.
-                var length = buffer.GetASMLength(0, stubGenerator.Size);
+                var length = instructions.Aggregate(0, (i, c) => i < stubGenerator.Size ? i + c.Instruction.Length : i);
                 if (length < stubGenerator.Size)
                 {
                     return HookResult.Empty;

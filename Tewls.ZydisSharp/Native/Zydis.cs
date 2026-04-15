@@ -7,6 +7,7 @@ namespace Tewls.ZydisSharp.Native
     {
         public const string LibraryName = "Zydis";
         public const int ZYDIS_MAX_OPERAND_COUNT = 10;
+        public const int ZYDIS_MAX_INSTRUCTION_LENGTH = 15;
 
         static Zydis()
         {
@@ -36,7 +37,7 @@ namespace Tewls.ZydisSharp.Native
         public static ZydisDecoder CreateDecoder(ZydisMachineMode machineMode, ZydisStackWidth stackWidth)
         {
             var decoder = new ZydisDecoder();
-            var result = ZydisDecoderInit(ref decoder, machineMode, stackWidth);
+            ZyanStatus result = ZydisDecoderInit(ref decoder, machineMode, stackWidth);
             result.ThrowIfFailed(nameof(ZydisDecoderInit));
             return decoder;
         }
@@ -63,14 +64,41 @@ namespace Tewls.ZydisSharp.Native
             using var opsPin = new PinnedArray<ZydisDecodedOperand>(operands);
 
             // Call the native function to decode the instruction
-            var result = ZydisDecoderDecodeFull(ref decoder, bufferPin.Address, (uint)byteCount, ref instruction,
-                opsPin.Address);
-
+            ZyanStatus result = ZydisDecoderDecodeFull(ref decoder, bufferPin.Address, (uint)byteCount, 
+                ref instruction, opsPin.Address);
+                        
             // Check the result and throw an exception if it failed
             result.ThrowIfFailed(nameof(ZydisDecoderDecodeFull));
 
             // Return the decoded instruction and operands as a ZDecodeResult
             return new ZDecodeResult(instruction, operands);
+        }
+
+        /// <summary>
+        /// Calculates the absolute address value for the given instruction operand. 
+        /// </summary>
+        /// <param name="instruction">A pointer to the ZydisDecodedInstruction struct. </param>
+        /// <param name="operand">A pointer to the ZydisDecodedOperand struct. </param>
+        /// <param name="runtimeAddress">The runtime address of the instruction.</param>
+        /// <param name="resultAddress">A pointer to the memory that receives the absolute address.</param>
+        /// <returns></returns>
+        [DllImport(LibraryName, CallingConvention = CallingConvention.Cdecl, ExactSpelling = true)]
+        private static extern ZyanStatus ZydisCalcAbsoluteAddress(ref ZydisDecodedInstruction instruction,
+                ref ZydisDecodedOperand operand, ulong runtimeAddress, out ulong resultAddress);
+
+        /// <summary>
+        /// Calculates the absolute address value for the given instruction operand. 
+        /// </summary>
+        /// <param name="instruction">A reference to the ZydisDecodedInstruction struct. </param>
+        /// <param name="operand">A reference to the ZydisDecodedOperand struct.</param>
+        /// <param name="runtimeAddress">The runtime address of the instruction.</param>
+        /// <returns>The absolute address.</returns>
+        public static ulong CalcAbsoluteAddress(ref ZydisDecodedInstruction instruction,
+            ref ZydisDecodedOperand operand, ulong runtimeAddress)
+        {
+            ZyanStatus result = ZydisCalcAbsoluteAddress(ref instruction, ref operand, runtimeAddress, out ulong address);
+            result.ThrowIfFailed(nameof(ZydisCalcAbsoluteAddress));
+            return address;
         }
     }
 }
