@@ -1,22 +1,13 @@
 ﻿using System.Runtime.InteropServices;
+using Tewls.Shared;
 
 namespace Tewls.ZydisSharp.Native
 {
-    public class ZyanStatusMarshaller : ICustomMarshaler
+    public class ZyanStatusMarshaller : MarshallerBase<ZyanStatusMarshaller>
     {
-        public void CleanUpManagedData(object ManagedObj)
-        {
-            // Its an int, so we don't need to do anything to clean it up.
-        }
+        public override int GetNativeDataSize() => Marshal.SizeOf<int>();
 
-        public void CleanUpNativeData(IntPtr pNativeData)
-        {
-            // Its an int, so we don't need to do anything to clean it up.
-        }
-
-        public int GetNativeDataSize() => Marshal.SizeOf<int>();
-
-        public IntPtr MarshalManagedToNative(object managedObj) =>
+        public override IntPtr MarshalManagedToNative(object managedObj) =>
             managedObj switch
             {
                 null => IntPtr.Zero,
@@ -24,9 +15,6 @@ namespace Tewls.ZydisSharp.Native
                 _ => throw new MarshalDirectiveException("Managed object must be of type ZyanStatus.")
             };
 
-        public object MarshalNativeToManaged(IntPtr pNativeData) => new ZyanStatus(pNativeData.ToInt32());
-
-        private static readonly Lazy<ZyanStatusMarshaller> _instance = new(() => new());
-        public static ICustomMarshaler GetInstance(string cookie) => _instance.Value;
+        public override object MarshalNativeToManaged(IntPtr pNativeData) => new ZyanStatus(pNativeData.ToInt32());
     }
 }
