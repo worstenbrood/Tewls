@@ -17,7 +17,10 @@ namespace Tewls.Runner
                 0xFF, 0xE0  // JMP RAX
             ];
             var result = decoder.DecodeFull(jumpCode);
-            Console.WriteLine($"Decoded Instruction: {result.Instruction.Length}");
+            foreach (var entry in result)
+            {
+                Console.WriteLine($"Decoded Instruction: {entry.Instruction.Length}");
+            }
 
             var cd = CDecoder.Create64();
             var r = cd.Disassemble(jumpCode);
