@@ -37,6 +37,16 @@ namespace Tewls.ZydisSharp
         }
 
         /// <summary>
+        /// Decode a single instruction
+        /// </summary>
+        /// <param name="buffer"></param>
+        /// <param name="index"></param>
+        /// <param name="length"></param>
+        /// <returns></returns>
+        public ZDecodeResult DisassembleIter(byte[] buffer, int index = 0, int length = 0) =>
+            Zydis.DecodeFull(ref _decoder, buffer, index, length);
+
+        /// <summary>
         /// Fully decodes an instruction from the given buffer. This method will decode the instruction and all of its operands, 
         /// including any implicit operands that may be present. The resulting DecodeResult will contain the decoded instruction 
         /// and its operands, as well as any relevant information about the instruction, such as whether it has rip-relative 
@@ -49,7 +59,7 @@ namespace Tewls.ZydisSharp
             var currentIndex = index;
             do
             {
-                var result = Zydis.DecodeFull(ref _decoder, buffer, currentIndex, length);
+                var result = DisassembleIter(buffer, currentIndex, length);
                 yield return result;
 
                 // Adjust index and length for the next iteration
