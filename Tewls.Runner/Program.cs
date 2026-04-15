@@ -2,7 +2,7 @@
 using Tewls.CapstoneSharp;
 using Tewls.ZydisSharp;
 
-namespace Runner
+namespace Tewls.Runner
 {
     internal class Program
     {
