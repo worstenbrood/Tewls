@@ -3,6 +3,7 @@ using System.Runtime.InteropServices;
 using Tewls.CapstoneSharp.Native;
 using Tewls.CapstoneSharp.Native.Arch;
 using Tewls.ZydisSharp;
+using Tewls.ZydisSharp.Native;
 
 namespace Runner
 {
@@ -15,7 +16,7 @@ namespace Runner
             Console.WriteLine($"Capstone Version: {Capstone.GetVersion()}");
             Console.WriteLine($"Size: {Marshal.SizeOf<cs_x86_op>()}"); 
 
-            var decoder = ZDecoder.Create(ZydisMachineMode.ZYDIS_MACHINE_MODE_LONG_64, ZydisStackWidth.ZYDIS_STACK_WIDTH_64);
+            var decoder = ZDecoder.Create64();
             byte[] test2 = { 0x44, 0x39, 0x1D, 0x76, 0x3F, 0x04, 0x00 };
             var result = decoder.DecodeFull(test2);
             Console.WriteLine($"Decoded Instruction: {result.Instruction.Length}");
