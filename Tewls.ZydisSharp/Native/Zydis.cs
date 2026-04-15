@@ -33,7 +33,8 @@ namespace Tewls.ZydisSharp.Native
         public static ZydisDecoder CreateDecoder(ZydisMachineMode machineMode, ZydisStackWidth stackWidth)
         {
             var decoder = new ZydisDecoder();
-            var r = ZydisDecoderInit(ref decoder, machineMode, stackWidth);
+            var result = ZydisDecoderInit(ref decoder, machineMode, stackWidth);
+            result.ThrowIfFailed(nameof(ZydisDecoderInit));
             return decoder;
         }
 
