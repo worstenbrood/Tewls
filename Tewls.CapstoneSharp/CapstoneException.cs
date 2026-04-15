@@ -13,7 +13,6 @@ namespace Tewls.CapstoneSharp
         public CapstoneException(cs_err err, Exception innerException) : base(Capstone.GetErrorMessage(err), innerException) { }
         public CapstoneException(cs_err err, string message, Exception innerException) :
             base($"{message} (Error({(int)err}): {Capstone.GetErrorMessage(err)})", innerException) { }
-
         public static void ThrowLastError(nint handle) => throw new CapstoneException(Capstone.cs_errno(handle));   
     } 
 }

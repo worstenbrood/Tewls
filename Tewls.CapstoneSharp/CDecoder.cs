@@ -14,7 +14,7 @@ namespace Tewls.CapstoneSharp
         /// <param name="mode">mode</param>
         /// <returns></returns>
         /// <exception cref="CapstoneException"></exception>
-        public static CDecoder Create(cs_arch arch, cs_mode mode)
+        public static CDecoder Create(cs_arch arch, cs_mode mode, bool detail = true)
         {
             nint handle = new ();
             var result = Capstone.cs_open(arch, mode, ref handle);
@@ -22,7 +22,28 @@ namespace Tewls.CapstoneSharp
             {
                 throw new CapstoneException(result);
             }
-            return new CDecoder(handle);
+
+            var decoder = new CDecoder(handle);
+            try
+            {
+                decoder.SetOption(cs_opt_type.CS_OPT_DETAIL, detail);
+                decoder.SetOption(cs_opt_type.CS_OPT_SKIPDATA, false);
+            }
+            catch
+            {
+                decoder.Dispose();
+                throw;
+            }
+            return decoder;
+        }
+
+        private void SetOption(cs_opt_type type, bool value)
+        {
+            var result = Capstone.cs_option(Address, type, value ? 1 : 0);
+            if (result != cs_err.CS_ERR_OK)
+            {
+                throw new CapstoneException(result);
+            }
         }
 
         public static CDecoder Create64() => Create(cs_arch.CS_ARCH_X86, cs_mode.CS_MODE_64);
@@ -47,18 +68,26 @@ namespace Tewls.CapstoneSharp
         {
         }
 
-        public cs_insn Disassemble(byte[] code)
+        private void ThrowLastError() => CapstoneException.ThrowLastError(Address);
+
+        public CDecodeResult Disassemble(byte[] code)
         {
             nint result = new();
             using var codePin = new PinnedArray<byte>(code);
             var instructions = Capstone.cs_disasm(Address, codePin.Address, (uint)code.Length, 0, 0, ref result);
             if (instructions == 0)
             {
-                CapstoneException.ThrowLastError(Address);
+                ThrowLastError();
             }
 
             using var buffer = new CapstoneBuffer(result, instructions);
-            return Marshal.PtrToStructure<cs_insn>(result);
+            var instruction = Marshal.PtrToStructure<cs_insn>(result);
+            if (instruction.Detail != 0)
+            {
+                var detail = Marshal.PtrToStructure<cs_detail>(instruction.Detail);
+                return new CDecodeResult(instruction, detail);
+            }
+            return new CDecodeResult(instruction, null);
         }
     }
 }

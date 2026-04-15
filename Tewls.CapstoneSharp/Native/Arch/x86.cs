@@ -1976,7 +1976,7 @@ namespace Tewls.CapstoneSharp.Native.Arch
             CS_AC_WRITE, ///< Operand reads and writes from/to memory or register.
     }
 
-    [StructLayout(LayoutKind.Sequential)]
+    [StructLayout(LayoutKind.Sequential, Pack = 8)]
     public struct x86_op_mem
     {
         /// <summary>
@@ -2005,7 +2005,7 @@ namespace Tewls.CapstoneSharp.Native.Arch
         public long Disp;
     }
 
-    [StructLayout(LayoutKind.Sequential)]
+    [StructLayout(LayoutKind.Sequential, Pack = 8)]
     public struct cs_x86_encoding
     {
         /// <summary>
@@ -2026,18 +2026,9 @@ namespace Tewls.CapstoneSharp.Native.Arch
         public byte ImmSize;
     }
 
-    /// <summary>
-    /// Instruction operand
-    /// </summary>
     [StructLayout(LayoutKind.Explicit)]
-    public struct cs_x86_op
+    public struct cs_x86_op_union
     {
-        /// <summary>
-        /// operand type
-        /// </summary>
-        [FieldOffset(0)]
-        public x86_op_type Type;
-
         /// <summary>
         /// register value for REG operand
         /// </summary>
@@ -2048,18 +2039,34 @@ namespace Tewls.CapstoneSharp.Native.Arch
         /// immediate value for IMM operand
         /// </summary>
         [FieldOffset(4)]
-		public ulong Imm;
+        public ulong Imm;
 
         /// <summary>
         /// floating-point value for FP operand
         /// </summary>
         [FieldOffset(4)]
         public x86_op_mem mem; ///< base/index/scale/disp value for MEM operand
+    }
+
+    /// <summary>
+    /// Instruction operand
+    /// </summary>
+    [StructLayout(LayoutKind.Sequential, Pack = 8)]
+    public struct cs_x86_op
+    {
+        /// <summary>
+        /// operand type
+        /// </summary>
+        public x86_op_type Type;
+
+        /// <summary>
+        /// Operand union
+        /// </summary>
+        public cs_x86_op_union Operand;
 
         /// <summary>
         /// size of this operand (in bytes).
         /// </summary>
-        [FieldOffset(28)]
         public byte size;
 
         /// <summary>
@@ -2067,23 +2074,38 @@ namespace Tewls.CapstoneSharp.Native.Arch
         /// This field is combined of cs_ac_type.
         /// NOTE: this field is irrelevant if engine is compiled in DIET mode.
         /// </summary>
-        [FieldOffset(29)]
         public cs_ac_type Access;
 
         /// <summary>
         ///  AVX broadcast type, or 0 if irrelevant
         /// </summary>
-        [FieldOffset(33)]
         public x86_avx_bcast AvxBCast;
 
         /// <summary>
         /// AVX zero opmask {z}
         /// </summary>
-        [FieldOffset(37)]
         public bool AvxZeroOpMask;
     }
 
     [StructLayout(LayoutKind.Explicit)]
+    public struct cs_flags_union
+    {
+        /// <summary>
+        /// EFLAGS updated by this instruction.
+        /// This can be formed from OR combination of X86_EFLAGS_* symbols in x86.h
+        /// </summary>  
+        [FieldOffset(0)]
+        public ulong EFlags;
+
+        /// <summary>
+        /// FPU_FLAGS updated by this instruction.
+        /// This can be formed from OR combination of X86_FPU_FLAGS_* symbols in x86.h
+        /// </summary>
+        [FieldOffset(0)]
+        public ulong FpuFlags;
+    }
+
+    [StructLayout(LayoutKind.Sequential, Pack = 8)]
     public struct cs_x86
     {
         /// <summary>
@@ -2095,7 +2117,6 @@ namespace Tewls.CapstoneSharp.Native.Arch
         /// prefix[2] indicates operand-size override (X86_PREFIX_OPSIZE)
         /// prefix[3] indicates address-size override (X86_PREFIX_ADDRSIZE)
         /// </summary>
-        [FieldOffset(0)]
         [MarshalAs(UnmanagedType.ByValArray, SizeConst = 4)]
         public byte[] Prefix;
 
@@ -2104,121 +2125,94 @@ namespace Tewls.CapstoneSharp.Native.Arch
         /// This contains VEX opcode as well.
         /// An trailing opcode byte gets value 0 when irrelevant.
         /// </summary>
-        [FieldOffset(4)]
         [MarshalAs(UnmanagedType.ByValArray, SizeConst = 4)]
         public byte[] Opcode;
 
         /// <summary>
         /// REX prefix: only a non-zero value is relevant for x86_64
         /// </summary>
-        [FieldOffset(8)]
         public byte REX;
 
         /// <summary>
         /// Address size, which can be overridden with above prefix[5].
         /// </summary>
-        [FieldOffset(9)]
         public byte AddressSize;
 
         /// <summary>
         /// ModR/M byte
         /// </summary>
-        [FieldOffset(10)]
         public byte ModRm;
 
         /// <summary>
         /// SIB value, or 0 when irrelevant.
         /// </summary>
-        [FieldOffset(11)]
         public byte Sib;
 
         /// <summary>
         /// Displacement value, valid if encoding.disp_offset != 0
         /// </summary>
-        [FieldOffset(12)]
         public long Disp;
 
         /// <summary>
         /// SIB index register, or X86_REG_INVALID when irrelevant.
         /// </summary>
-        [FieldOffset(20)]
         public x86_reg SibIndex;
 
         /// <summary>
         /// SIB scale, only applicable if sib_index is valid.
         /// </summary>
-        [FieldOffset(24)]
         public sbyte SibScale;
 
         /// <summary>
         /// SIB base register, or X86_REG_INVALID when irrelevant.
         /// </summary>
-        [FieldOffset(25)]
         public x86_reg SibBase;
 
         /// <summary>
         /// XOP Code Condition
         /// </summary>
-        [FieldOffset(29)]
         public x86_xop_cc XopCc;
 
         /// <summary>
         /// SSE Code Condition
         /// </summary>
-        [FieldOffset(33)]
         public x86_sse_cc SseCc;
-        
+
         /// <summary>
         /// AVX Code Condition
         /// </summary>
-        [FieldOffset(37)]
         public x86_avx_cc AvxCc;
 
         ///<summary>
         /// AVX Suppress all Exception
         /// </summary>
-        [FieldOffset(41)]
-        public bool AvxSae;
+        public byte AvxSae;
 
         /// <summary>
         /// AVX static rounding mode
         /// </summary>
-        [FieldOffset(42)]
         public x86_avx_rm AvxRm;
 
         /// <summary>
-        /// EFLAGS updated by this instruction.
-		/// This can be formed from OR combination of X86_EFLAGS_* symbols in x86.h
-        /// </summary>  
-        [FieldOffset(46)]
-        public ulong EFlags;
-
-        /// <summary>
-        /// FPU_FLAGS updated by this instruction.
-        /// This can be formed from OR combination of X86_FPU_FLAGS_* symbols in x86.h
+        /// eflags and fpu_flags updated by this instruction.
         /// </summary>
-        [FieldOffset(46)]
-        public ulong FpuFlags;
+        public cs_flags_union Flags;
 
         /// <summary>
         /// Number of operands of this instruction,
         /// or 0 when instruction has no operand.
         /// </summary>
-        [FieldOffset(54)]
         public byte OpCount;
 
         /// <summary>
         /// operands for this instruction.
         /// </summary>
-        [FieldOffset(55)]
         [MarshalAs(UnmanagedType.ByValArray, SizeConst = 8)]
         public cs_x86_op[] Operands;
 
         /// <summary>
         /// encoding information
         /// </summary>
-        //[FieldOffset(55 + (Marshal.SizeOf<cs_x86_op>() * 8))]
-        //cs_x86_encoding encoding;
-}
-
+        public cs_x86_encoding encoding;
+    }
 }

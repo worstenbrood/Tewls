@@ -3,64 +3,64 @@ using Tewls.CapstoneSharp.Native.Arch;
 
 namespace Tewls.CapstoneSharp.Native
 {
-    
+    [StructLayout(LayoutKind.Explicit)]
+    public struct cs_arch_union
+    {
+        /// <summary>
+        /// X86 architecture, including 16-bit, 32-bit & 64-bit mode
+        /// </summary>
+        [FieldOffset(0)]
+        public cs_x86 x86;
+    }
 
-[StructLayout(LayoutKind.Explicit)]
+    [StructLayout(LayoutKind.Sequential, Pack = 8)]
     public struct cs_detail
     {
         /// <summary>
         /// list of implicit registers read by this insn
         /// </summary>
-        [FieldOffset(0)]
         [MarshalAs(UnmanagedType.ByValArray, SizeConst = 20)]
         public ushort[] RegsRead;
 
         /// <summary>
         /// number of implicit registers read by this insn
         /// </summary>
-        [FieldOffset(32)]
         public byte RegsReadCount;
 
         /// <summary>
         /// list of implicit registers modified by this insn
         /// </summary>
-        [FieldOffset(33)]
         [MarshalAs(UnmanagedType.ByValArray, SizeConst = 47)]
         public ushort[] RegsWrite;
 
         /// <summary>
         /// number of implicit registers modified by this insn
         /// </summary>
-        [FieldOffset(49)]
         public byte RegsWriteCount;
 
         /// <summary>
         /// list of group this instruction belong to
         /// </summary>
-        [FieldOffset(50)]
         [MarshalAs(UnmanagedType.ByValArray, SizeConst = 16)]
         public byte[] Groups;
 
         /// <summary>
         /// number of groups this insn belongs to
         /// </summary>
-        [FieldOffset(66)]
         public byte GroupsCount;
 
         /// <summary>
         /// Instruction has writeback operands.
         /// </summary>
-        [FieldOffset(67)]
         public bool WriteBack;
 
         /// <summary>
-        /// X86 architecture, including 16-bit, 32-bit & 64-bit mode
+        /// Arch specific structs for each architecture, such as x86, ARM, etc...
         /// </summary>
-        [FieldOffset(68)]
-		public cs_x86 x86;
+		public cs_arch_union arch;
 	}
 
-    [StructLayout(LayoutKind.Explicit, Pack = 0)]
+    [StructLayout(LayoutKind.Sequential, Pack = 8)]
     public struct cs_insn
     {
         /// <summary>
@@ -71,7 +71,6 @@ namespace Tewls.CapstoneSharp.Native
         /// This information is available even when CS_OPT_DETAIL = CS_OPT_OFF
         /// NOTE: in Skipdata mode, "data" instruction has 0 for this id field.
         /// </summary>
-        [FieldOffset(0)]
         public uint Id;
 
         /// <summary>
@@ -80,28 +79,24 @@ namespace Tewls.CapstoneSharp.Native
         /// Otherwise to <ARCH>_INS_INVALID.
         /// -- Only supported by auto-sync archs --
         /// </summary>
-        [FieldOffset(4)]
         public ulong AliasId;
 
         /// <summary>
         /// Address (EIP) of this instruction
         /// This information is available even when CS_OPT_DETAIL = CS_OPT_OFF
         /// </summary>
-        [FieldOffset(12)]
         public ulong Address;
 
         /// <summary>
         /// Size of this instruction
         /// This information is available even when CS_OPT_DETAIL = CS_OPT_OFF
         /// </summary>
-        [FieldOffset(20)]
         public ushort Size;
 
         /// <summary>
         /// Machine bytes of this instruction, with number of bytes indicated by @size above
         /// This information is available even when CS_OPT_DETAIL = CS_OPT_OFF
         /// </summary>
-        [FieldOffset(24)]
         [MarshalAs(UnmanagedType.ByValArray, SizeConst = 24)]
         public byte[] Bytes;
 
@@ -109,7 +104,6 @@ namespace Tewls.CapstoneSharp.Native
         /// Ascii text of instruction mnemonic
         /// This information is available even when CS_OPT_DETAIL = CS_OPT_OFF
         /// </summary>
-        [FieldOffset(48)]
         [MarshalAs(UnmanagedType.ByValArray, SizeConst = Constants.CS_MNEMONIC_SIZE)]
         public char[] Mnemonic;
 
@@ -117,7 +111,6 @@ namespace Tewls.CapstoneSharp.Native
         /// Ascii text of instruction operands
         /// This information is available even when CS_OPT_DETAIL = CS_OPT_OFF
         /// </summary>
-        [FieldOffset(80)]
         [MarshalAs(UnmanagedType.ByValArray, SizeConst = 160)]
         public char[] OpStr;
 
@@ -126,15 +119,13 @@ namespace Tewls.CapstoneSharp.Native
         /// False: Otherwise.
         /// -- Only supported by auto-sync archs --
         /// </summary>
-        [FieldOffset(240)]
-        public bool IsAlias;
+        public byte IsAlias;
 
         /// <summary>
         /// True: The operands are the ones of the alias instructions.
         /// False: The detail operands are from the real instruction.
         /// </summary>
-        [FieldOffset(241)]
-        public bool UsesAliasDetails;
+        public byte UsesAliasDetails;
 
         /// <summary>
         /// True: The bytes disassemble to a valid instruction, but it is illegal by ISA definitions.
@@ -143,8 +134,7 @@ namespace Tewls.CapstoneSharp.Native
         ///
         /// False: The instruction decoded correctly and is valid.
         /// </summary>
-        [FieldOffset(242)]
-        public bool Illegal;
+        public byte Illegal;
 
         /// <summary>
         /// Pointer to cs_detail.
@@ -155,7 +145,8 @@ namespace Tewls.CapstoneSharp.Native
         /// NOTE 2: when in Skipdata mode, or when detail mode is OFF, even if this pointer
         ///     is not NULL, its content is still irrelevant.
         /// </summary>
-        [FieldOffset(243)]
         public nint Detail;
+
+        public readonly string Text => $"{new string(Mnemonic).Trim((char)0)} {new string(OpStr).Trim((char)0)}";
     }
 }

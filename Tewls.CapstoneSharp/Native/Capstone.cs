@@ -128,7 +128,7 @@ namespace Tewls.CapstoneSharp.Native
         /// Refer to cs_err enum for detailed error.</returns>
         /// </summary>
         [DllImport(LibraryName, CallingConvention = CallingConvention.Cdecl)]
-        internal static extern cs_err cs_option(nint handle, cs_opt_type type, IntPtr value);
+        internal static extern cs_err cs_option(nint handle, cs_opt_type type, nint value);
 
         /// <summary>
         /// Report the last error number when some API function fail.
