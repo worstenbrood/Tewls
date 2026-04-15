@@ -1,14 +1,16 @@
 ﻿using System;
-using System.Diagnostics;
-using System.ComponentModel;
 using System.Collections.Generic;
+using System.ComponentModel;
+using System.Diagnostics;
+using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices;
+using System.Runtime.Serialization.Formatters.Binary;
+using Tewls.Shared;
 using Tewls.Windows.Advapi;
 using Tewls.Windows.Kernel.Nt;
 using Tewls.Windows.PE;
 using Tewls.Windows.Utils;
-using Tewls.Shared;
 
 namespace Tewls.Windows.Kernel
 {
@@ -312,30 +314,18 @@ namespace Tewls.Windows.Kernel
             }
         }
 
-        public int ReadInt(IntPtr remoteBuffer)
-        {
-            using (var localBuffer = new HGlobalBuffer((IntPtr)Marshal.SizeOf(typeof(int))))
-            {
-                ReadProcessMemory(remoteBuffer, localBuffer.Buffer, localBuffer.Size);
-                return Marshal.ReadInt32(localBuffer.Buffer);
-            }
-        }
+        public int ReadInt(IntPtr remoteBuffer) =>
+            BitConverter.ToInt32(ReadArray<byte>(remoteBuffer, Marshal.SizeOf(typeof(int))), 0);
 
         public int ReadInt(uint remoteBuffer)
         {
             return ReadInt((IntPtr)remoteBuffer);
         }
 
-        public ushort ReadInt16(IntPtr remoteBuffer)
-        {
-            using (var localBuffer = new HGlobalBuffer((IntPtr)Marshal.SizeOf(typeof(short))))
-            {
-                ReadProcessMemory(remoteBuffer, localBuffer.Buffer, localBuffer.Size);
-                return (ushort) Marshal.ReadInt16(localBuffer.Buffer);
-            }
-        }
-
-        public ushort ReadInt16(uint remoteBuffer)
+        public short ReadInt16(IntPtr remoteBuffer) =>
+            BitConverter.ToInt16(ReadArray<byte>(remoteBuffer, Marshal.SizeOf(typeof(short))), 0);
+        
+        public short ReadInt16(uint remoteBuffer)
         {
             return ReadInt16((IntPtr)remoteBuffer);
         }
@@ -589,7 +579,7 @@ namespace Tewls.Windows.Kernel
                 try
                 {
                     // Read ordinal
-                    ordinal = ReadInt16(ordinalAddress);
+                    ordinal = (ushort)ReadInt16(ordinalAddress);
 
                     if (ordinal > imageExportDirectory.NumberOfFunctions)
                     {
@@ -695,7 +685,7 @@ namespace Tewls.Windows.Kernel
                     functionName = ReadStringA(baseAddress + (uint)offset, 255);
                 }
 
-                yield return new NativeExport(functionName, ordinal, (IntPtr)address);
+                yield return new NativeExport(functionName, (ushort)ordinal, (IntPtr)address);
             }
         }
 
