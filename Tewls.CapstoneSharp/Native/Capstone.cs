@@ -1,7 +1,7 @@
 ﻿using System.Runtime.InteropServices;
 using Tewls.Shared;
 
-namespace Tewls.CapstoneSharp
+namespace Tewls.CapstoneSharp.Native
 {
     public class Capstone
     {
@@ -100,7 +100,7 @@ namespace Tewls.CapstoneSharp
         /// <returns>CS_ERR_OK on success, or other value on failure (refer to cs_err enum
         ///for detailed error).</returns>
         [DllImport(LibraryName, CallingConvention = CallingConvention.Cdecl)]
-        internal static extern cs_err cs_open(cs_arch arch, cs_mode mode, ref IntPtr handle);
+        internal static extern cs_err cs_open(cs_arch arch, cs_mode mode, ref nint handle);
 
         /// <summary>
         ///  Close CS handle: MUST do to release the handle when it is not used anymore.
@@ -113,7 +113,7 @@ namespace Tewls.CapstoneSharp
         /// <param name="handle">pointer to a handle returned by cs_open()</param>
         /// <returns>CS_ERR_OK on success, or other value on failure(refer to cs_err enum</returns>
         [DllImport(LibraryName, CallingConvention = CallingConvention.Cdecl)]
-        internal static extern cs_err cs_close(IntPtr handle);
+        internal static extern cs_err cs_close(nint handle);
 
         /// <summary>
         /// Set option for disassembling engine at runtime
@@ -128,7 +128,7 @@ namespace Tewls.CapstoneSharp
         /// Refer to cs_err enum for detailed error.</returns>
         /// </summary>
         [DllImport(LibraryName, CallingConvention = CallingConvention.Cdecl)]
-        internal static extern cs_err cs_option(IntPtr handle, cs_opt_type type, ref uint value);
+        internal static extern cs_err cs_option(nint handle, cs_opt_type type, ref uint value);
 
         /// <summary>
         /// Report the last error number when some API function fail.
@@ -137,10 +137,10 @@ namespace Tewls.CapstoneSharp
         /// <param name="handle">handle returned by cs_open()</param>
         /// <returns>error code of cs_err enum type (CS_ERR_*, see above)</returns>
         [DllImport(LibraryName, CallingConvention = CallingConvention.Cdecl)]
-        internal static extern cs_err cs_errno(IntPtr handle);
+        internal static extern cs_err cs_errno(nint handle);
 
         [DllImport(LibraryName, CallingConvention = CallingConvention.Cdecl)]
-        internal static extern IntPtr cs_strerror(cs_err code);
+        internal static extern nint cs_strerror(cs_err code);
 
         /// <summary>
         /// Disassemble binary code, given the code buffer, size, address and number
@@ -166,17 +166,59 @@ namespace Tewls.CapstoneSharp
         /// <returns>the number of successfully disassembled instructions,
         /// or 0 if this function failed to disassemble the given code</returns>
         [DllImport(LibraryName, CallingConvention = CallingConvention.Cdecl)]
-        internal static extern uint cs_disasm(IntPtr handle, IntPtr code, uint code_size,
-			      ulong address, uint count, ref IntPtr insn);
+        internal static extern uint cs_disasm(nint handle, nint code, uint code_size,
+			      ulong address, uint count, ref nint insn);
 
         /// <summary>
         ///  Free memory allocated by cs_malloc() or <see cref="cs_disasm"/> (argument insn"/>)
         /// </summary>
-        /// <param name="insn">pointer returned by @insn argument in <see cref="cs_disasm"/> or cs_malloc()</param>
+        /// <param name="insn">pointer returned by @insn argument in <see cref="cs_disasm"/> or <see cref="cs_malloc"/></param>
         /// <param name="count">number of cs_insn structures returned by <see cref="cs_disasm"/>, or 1
-        /// to free memory allocated by cs_malloc().</param>
+        /// to free memory allocated by<see cref="cs_malloc"/>.</param>
         [DllImport(LibraryName, CallingConvention = CallingConvention.Cdecl)]
-        internal static extern void cs_free(ref IntPtr insn, uint count);
+        internal static extern void cs_free(ref nint insn, uint count);
+
+        /// <summary>
+        /// Allocate memory for 1 instruction to be used by cs_disasm_iter().
+        /// NOTE: when no longer in use, you can reclaim the memory allocated for
+        /// this instruction with cs_free(insn, 1)
+        /// </summary>
+        /// <param name="handle">handle returned by cs_open()</param>
+        /// <returns></returns>
+        [DllImport(LibraryName, CallingConvention = CallingConvention.Cdecl)]
+        internal static extern nint cs_malloc(nint handle);
+
+        /// <summary>
+        /// Fast API to disassemble binary code, given the code buffer, size, address
+        /// and number of instructions to be decoded.
+        /// This API puts the resulting instruction into a given cache in @insn.
+        /// See tests/test_iter.c for sample code demonstrating this API.
+        /// NOTE 1: this API will update @code, @size & @address to point to the next
+        /// instruction in the input buffer.Therefore, it is convenient to use
+        /// cs_disasm_iter() inside a loop to quickly iterate all the instructions.
+        /// While decoding one instruction at a time can also be achieved with
+        /// <see cref="cs_disasm"/>(count= 1), some benchmarks shown that cs_disasm_iter() can be 30%
+        /// faster on random input.
+        /// NOTE 2: the cache in @insn can be created with cs_malloc() API.
+        /// NOTE 3: for system with scarce memory to be dynamically allocated such as
+        /// OS kernel or firmware, this API is recommended over <see cref="cs_disasm"/>, which
+        /// allocates memory based on the number of instructions to be disassembled.
+        /// The reason is that with <see cref="cs_disasm"/>, based on limited available memory,
+        /// we have to calculate in advance how many instructions to be disassembled,
+        /// which complicates things.This is especially troublesome for the case
+        /// @count= 0, when <see cref="cs_disasm"/> runs uncontrollably (until either end of input
+        /// buffer, or when it encounters an invalid instruction).
+        /// </summary>
+        /// <param name="handle">handle returned by <see cref="cs_open"/></param>
+        /// <param name="code">buffer containing raw binary code to be disassembled</param>
+        /// <param name="size">size of above code</param>
+        /// <param name="address">address of the first insn in given raw code buffer</param>
+        /// <param name="insn">pointer to instruction to be filled in by this API.</param>
+        /// <returns>true if this API successfully decode 1 instruction,
+        /// or false otherwise. On failure, call <see cref="cs_errno"/> for error code.
+        /// </returns>
+        [DllImport(LibraryName, CallingConvention = CallingConvention.Cdecl)]
+        internal static extern bool cs_disasm_iter(nint handle, nint code, ref uint size, ref nint address, ref cs_insn insn);
 
         /// <summary>
         /// Helper method to get error message string for a given error code. This is a wrapper around cs_strerror.

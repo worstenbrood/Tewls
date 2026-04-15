@@ -1,7 +1,7 @@
 ﻿using System.Runtime.InteropServices;
-using Tewls.CapstoneSharp.Arch;
+using Tewls.CapstoneSharp.Native.Arch;
 
-namespace Tewls.CapstoneSharp
+namespace Tewls.CapstoneSharp.Native
 {
     
 
@@ -156,6 +156,6 @@ namespace Tewls.CapstoneSharp
         ///     is not NULL, its content is still irrelevant.
         /// </summary>
         [FieldOffset(225)]
-        public IntPtr Detail;
+        public nint Detail;
     }
 }

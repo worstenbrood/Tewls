@@ -1,4 +1,4 @@
-﻿namespace Tewls.CapstoneSharp
+﻿namespace Tewls.CapstoneSharp.Native
 {
     public static class Constants
     {

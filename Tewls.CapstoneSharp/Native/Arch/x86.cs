@@ -1,6 +1,6 @@
 ﻿using System.Runtime.InteropServices;
 
-namespace Tewls.CapstoneSharp.Arch
+namespace Tewls.CapstoneSharp.Native.Arch
 {
     public enum x86_reg
     {

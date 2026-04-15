@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Runtime.InteropServices;
-using Tewls.CapstoneSharp;
-using Tewls.CapstoneSharp.Arch;
+using Tewls.CapstoneSharp.Native;
+using Tewls.CapstoneSharp.Native.Arch;
 using Tewls.ZydisSharp;
 
 namespace Runner

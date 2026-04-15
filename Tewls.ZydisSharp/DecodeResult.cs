@@ -1,4 +1,6 @@
-﻿namespace Tewls.ZydisSharp
+﻿using Tewls.ZydisSharp.Native;
+
+namespace Tewls.ZydisSharp
 {
     public class DecodeResult(ZydisDecodedInstruction instruction, ZydisDecodedOperand[] operands)
     {
