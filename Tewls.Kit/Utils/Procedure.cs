@@ -1,8 +1,7 @@
 ﻿using System;
 using System.Runtime.InteropServices;
-using TewlKit.Utils;
 
-namespace TewlKit.Core
+namespace Tewls.Kit.Utils
 {
     /// <summary>
     /// 

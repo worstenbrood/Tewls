@@ -1,6 +1,7 @@
 ﻿using System;
+using Tewls.Kit.Asm;
 
-namespace TewlKit.Asm.Stubs
+namespace Tewls.Kit.Asm.Stubs
 {
     /// <summary>
     /// Indirect jump stub for 64-bit architecture. 
@@ -13,13 +14,13 @@ namespace TewlKit.Asm.Stubs
         public override int Size => 12;
 
         /// <inheritdoc />
-        public override byte[] GetBuffer(IntPtr address)
+        public override byte[] GetBuffer(nint address)
         {
             using var stub = GetWriter();
             // Opcode for MOV RAX, imm64 is 0x48B8
             stub.Write(OpCodes.MovRax);
             // Write the 64-bit address to jump to
-            stub.Write(address.ToInt64());
+            stub.Write(address);
             // Opcode for JMP RAX is 0xFFE0
             stub.Write(OpCodes.JmpEaxRax);
             // Return the generated stub as a byte array

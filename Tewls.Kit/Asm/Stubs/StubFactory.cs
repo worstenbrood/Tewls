@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace TewlKit.Asm.Stubs
+namespace Tewls.Kit.Asm.Stubs
 {
     /// <summary>
     /// Stub type enum

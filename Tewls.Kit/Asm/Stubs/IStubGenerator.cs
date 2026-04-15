@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace TewlKit.Asm
+namespace Tewls.Kit.Asm.Stubs
 {
     /// <summary>
     /// Interface for generating stubs for assembly code injection.
@@ -16,6 +16,6 @@ namespace TewlKit.Asm
         /// Get the stub bytes.
         /// </summary>
         /// <returns></returns>
-        byte[] GetBuffer(IntPtr address);
+        byte[] GetBuffer(nint address);
     }
 }

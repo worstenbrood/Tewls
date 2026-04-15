@@ -1,6 +1,7 @@
 ﻿using System;
+using Tewls.Kit.Asm;
 
-namespace TewlKit.Asm.Stubs
+namespace Tewls.Kit.Asm.Stubs
 {
     /// <summary>
     /// Relative jump stub for 32/64-bit architecture.
@@ -11,13 +12,13 @@ namespace TewlKit.Asm.Stubs
         public override int Size => 5;
 
         /// <inheritdoc />
-        public override byte[] GetBuffer(IntPtr address)
+        public override byte[] GetBuffer(nint address)
         {
             using var stub = GetWriter();
             // Opcode for JMP rel32 is 0xE9
             stub.Write(OpCodes.RelativeJump);
             // Set the jump distance
-            stub.Write(address.ToInt32());
+            stub.Write((int)address);
             // Return the generated stub as a byte array
             return stub.GetBuffer();
         }

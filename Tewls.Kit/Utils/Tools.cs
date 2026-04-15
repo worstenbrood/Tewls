@@ -4,7 +4,7 @@ using System.ComponentModel;
 using System.Diagnostics;
 using Tewls.Windows.Kernel;
 
-namespace TewlKit.Core
+namespace Tewls.Kit.Utils
 {
     /// <summary>
     /// Core Tools
@@ -115,7 +115,7 @@ namespace TewlKit.Core
         /// </summary>
         /// <param name="process"></param>
         /// <param name="method"></param>
-        public static void EnumThreads(Process process, Func<IntPtr, uint> method)
+        public static void EnumThreads(Process process, Func<nint, uint> method)
         {
             foreach (ProcessThread thread in process.Threads)
             {

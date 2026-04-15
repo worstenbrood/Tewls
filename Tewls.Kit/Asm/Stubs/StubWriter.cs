@@ -1,6 +1,6 @@
 ﻿using System.IO;
 
-namespace TewlKit.Asm.Stubs
+namespace Tewls.Kit.Asm.Stubs
 {
     /// <summary>
     /// Class for creating stub buffers. This class inherits from BinaryWriter and 

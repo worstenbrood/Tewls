@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace TewlKit.Asm.Stubs
+namespace Tewls.Kit.Asm.Stubs
 {
     /// <summary>
     /// Base class for stub generators that provides a singleton instance of the generator. 
@@ -28,6 +28,6 @@ namespace TewlKit.Asm.Stubs
         protected StubWriter GetWriter() => new(Size);
 
         /// <inheritdoc />
-        public abstract byte[] GetBuffer(IntPtr address);
+        public abstract byte[] GetBuffer(nint address);
     }
 }

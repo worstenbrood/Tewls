@@ -1,4 +1,4 @@
-﻿namespace TewlKit
+﻿namespace Tewls.Kit
 {
     /// <summary>
     /// Core Engine

@@ -1,4 +1,4 @@
-﻿namespace TewlKit.Hooking
+﻿namespace Tewls.Kit.Hooking
 {
     /// <summary>
     /// Interface for a hook. Contains the module and procedure name to hook.

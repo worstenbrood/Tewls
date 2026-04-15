@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Runtime.InteropServices;
 
-namespace TewlKit.Hooking
+namespace Tewls.Kit.Hooking
 {
     /// <summary>
     /// 
@@ -10,22 +10,22 @@ namespace TewlKit.Hooking
     /// <param name="stubAddress"></param>
     /// <param name="stubSize"></param>
     [StructLayout(LayoutKind.Sequential)]
-    public readonly struct HookResult(IntPtr originalAddress, IntPtr stubAddress, int stubSize)
+    public readonly struct HookResult(nint originalAddress, nint stubAddress, int stubSize)
     {
         /// <summary>
         /// Empty result with null addresses and zero size.
         /// </summary>
-        public static readonly HookResult Empty = new (IntPtr.Zero, IntPtr.Zero, 0);
+        public static readonly HookResult Empty = new (0, 0, 0);
 
         /// <summary>
         /// Original method address. This is the address of the original method that was hooked. 
         /// </summary>
-        public IntPtr OriginalAddress { get; } = originalAddress;
+        public nint OriginalAddress { get; } = originalAddress;
 
         /// <summary>
         /// Gets the memory address of the stub function.
         /// </summary>
-        public IntPtr StubAddress { get; } = stubAddress;
+        public nint StubAddress { get; } = stubAddress;
 
         /// <summary>
         /// Stub size

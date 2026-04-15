@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Runtime.InteropServices;
 
-namespace TewlKit.Utils
+namespace Tewls.Kit.Utils
 {
     /// <summary>
     /// GCHandled is a class that wraps a GCHandle to ensure that the object is not collected by the garbage collector 
@@ -33,7 +33,7 @@ namespace TewlKit.Utils
         /// <summary>
         /// Address of the pinned object
         /// </summary>
-        public IntPtr AddressOfPinnedObject => _handle.AddrOfPinnedObject();
+        public nint AddressOfPinnedObject => _handle.AddrOfPinnedObject();
 
         /// <summary>
         /// Disposes of the GCHandle by freeing it, allowing the garbage collector to collect the 

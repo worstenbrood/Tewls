@@ -1,8 +1,7 @@
 ﻿using System;
-using TewlKit.Core;
-using TewlKit.Utils;
+using Tewls.Kit.Utils;
 
-namespace TewlKit.Hooking
+namespace Tewls.Kit.Hooking
 {
     /// <summary>
     /// 

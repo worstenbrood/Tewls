@@ -1,5 +1,4 @@
-﻿
-namespace TewlKit.Asm
+﻿namespace Tewls.Kit.Asm
 {
     /// <summary>
     /// ASM opcodes used for generating stubs and hooks.

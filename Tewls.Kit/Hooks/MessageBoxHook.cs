@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Runtime.InteropServices;
-using TewlKit.Hooking;
+using Tewls.Kit.Hooking;
 
-namespace TewlKit.Hooks
+namespace Tewls.Kit.Hooks
 {
     /// <summary>
     /// MessageBoxA hook. For testing.
@@ -18,7 +18,7 @@ namespace TewlKit.Hooks
         /// <param name="type"></param>
         /// <returns></returns>
         [UnmanagedFunctionPointer(CallingConvention.Winapi, CharSet = CharSet.Ansi, SetLastError = true)]
-        public delegate int MessageBox(IntPtr hwnd, string text, string caption, int type);
+        public delegate int MessageBox(nint hwnd, string text, string caption, int type);
 
         /// <summary>
         /// Replacement for MessageBoxA. Modifies the caption to indicate it was hooked.
@@ -28,7 +28,7 @@ namespace TewlKit.Hooks
         /// <param name="caption"></param>
         /// <param name="type"></param>
         /// <returns></returns>
-        public int HookedMessageBox(IntPtr hwnd, string text, string caption, int type)
+        public int HookedMessageBox(nint hwnd, string text, string caption, int type)
         {
             Console.WriteLine($"MessageBoxA called with text: {text}, caption: {caption}, type: {type}");
             Console.WriteLine($"Stub: {(long)Trampoline.Stub.Address:X8}");

@@ -2,13 +2,12 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using TewlKit.Asm;
-using TewlKit.Asm.Stubs;
-using TewlKit.Utils;
+using Tewls.Kit.Asm.Stubs;
+using Tewls.Kit.Utils;
 using Tewls.Windows.Kernel;
 using Tewls.Windows.Kernel.Nt;
 
-namespace TewlKit.Hooking
+namespace Tewls.Kit.Hooking
 {
     /// <summary>
     /// Hook base class. Contains the module and procedure name, as well as the trampoline containing 
@@ -97,7 +96,7 @@ namespace TewlKit.Hooking
                 Console.WriteLine($"[+] ASM length: {length}");
 
                 // Allocate memory for the trampoline, which will contain the original method, the stub, and the replacement method.
-                var remote = process.VirtualAllocEx((IntPtr)length + stubGenerator.Size, AllocationType.Commit, MemProtections.ExecuteReadWrite);
+                var remote = process.VirtualAllocEx((nint)length + stubGenerator.Size, AllocationType.Commit, MemProtections.ExecuteReadWrite);
 
                 Console.WriteLine($"[+] Remote stub address: 0x{remote.ToInt64():X}");
                 Console.WriteLine($"[+] Distance: 0x{(ulong)export.Address.ToInt64() - (ulong)remote.ToInt64():X}");
@@ -151,13 +150,13 @@ namespace TewlKit.Hooking
             var restored = process.ReadBytes(hookResult.StubAddress, hookResult.StubSize);
 
             // Make original address writable
-            var prevProtection = process.VirtualProtectEx(hookResult.OriginalAddress, (IntPtr)hookResult.StubSize, MemProtections.ExecuteReadWrite);
+            var prevProtection = process.VirtualProtectEx(hookResult.OriginalAddress, (nint)hookResult.StubSize, MemProtections.ExecuteReadWrite);
 
             // Restore original method
             process.WriteBytes(hookResult.OriginalAddress, restored);
 
             // Restore protection
-            process.VirtualProtectEx(hookResult.OriginalAddress, (IntPtr)hookResult.StubSize, prevProtection);
+            process.VirtualProtectEx(hookResult.OriginalAddress, (nint)hookResult.StubSize, prevProtection);
 
             // Free trampoline memory
             process.VirtualFreeEx(hookResult.StubAddress);
