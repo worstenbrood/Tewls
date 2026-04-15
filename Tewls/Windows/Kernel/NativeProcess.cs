@@ -1,11 +1,9 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Diagnostics;
-using System.IO;
 using System.Linq;
+using System.Diagnostics;
+using System.ComponentModel;
+using System.Collections.Generic;
 using System.Runtime.InteropServices;
-using System.Runtime.Serialization.Formatters.Binary;
 using Tewls.Shared;
 using Tewls.Windows.Advapi;
 using Tewls.Windows.Kernel.Nt;
@@ -531,17 +529,12 @@ namespace Tewls.Windows.Kernel
             while (current != ldr.InLoadOrderModuleList.Flink);
         }
 
-        public NativeModule GetModuleWow64(string name)
-        {
-            return GetModulesWow64()
+        public NativeModule GetModuleWow64(string name) =>
+            GetModulesWow64()
                 .FirstOrDefault(module => module.Name.Equals(name, StringComparison.OrdinalIgnoreCase));
-        }
-
-        public IEnumerable<NativeModule> GetAllModules()
-        {
-            return GetModules().Skip(1).Concat(GetModulesWow64().Skip(1));
-        }
-        
+        public IEnumerable<NativeModule> GetAllModules() =>
+            GetModules().Skip(1).Concat(GetModulesWow64().Skip(1));
+                
         public IEnumerable<NativeExport> GetExports(IntPtr baseAddress)
         {  
             var pe = ReadProcessMemory<ImageDosHeader>(baseAddress);
@@ -715,11 +708,9 @@ namespace Tewls.Windows.Kernel
             return IntPtr.Zero;
         }
 
-        public bool FlushInstructionCache(IntPtr address, IntPtr size)
-        {
-            return NtDll.NtFlushInstructionCache(Handle, address, size) == NtStatus.Success;
-        }
-
+        public bool FlushInstructionCache(IntPtr address, IntPtr size) =>
+            NtDll.NtFlushInstructionCache(Handle, address, size) == NtStatus.Success;
+        
         public override string ToString()
         {
             return $"ProcessId: {ProcessId}";

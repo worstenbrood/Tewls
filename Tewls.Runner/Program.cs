@@ -1,5 +1,9 @@
 ﻿using System;
+using System.Diagnostics;
+using System.Linq;
 using Tewls.CapstoneSharp;
+using Tewls.Kit.Hooks;
+using Tewls.Windows.Kernel;
 using Tewls.ZydisSharp;
 
 namespace Tewls.Runner
@@ -9,7 +13,7 @@ namespace Tewls.Runner
         static void Main(string[] args)
         {
                       
-            var decoder = ZDecoder.Create64();
+            /*var decoder = ZDecoder.Create64();
             byte[] jumpCode =
             [
                 0x48, 0xB8, // MOV RAX, imm64
@@ -41,7 +45,7 @@ namespace Tewls.Runner
             }*/
 
             //Engine.Start();
-            /*var currentProcess = Process.GetCurrentProcess();
+            var currentProcess = Process.GetCurrentProcess();
             var nativeProcess = new NativeProcess(currentProcess.Id, ProcessAccessRights.AllAccess);
             var module = nativeProcess.GetModule("user32.dll");
             var procs = nativeProcess.GetExports(module.Address)
@@ -64,7 +68,7 @@ namespace Tewls.Runner
             }
             Console.WriteLine();
 
-            var result = hook.Trampoline.Original.Method(IntPtr.Zero, "test", "test", 0);*/
+            var result = hook.Trampoline.Original.Method(IntPtr.Zero, "test", "test", 0);
         }
     }
 }
