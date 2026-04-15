@@ -528,13 +528,16 @@ namespace Tewls.Windows.Kernel
             }
             while (current != ldr.InLoadOrderModuleList.Flink);
         }
-
+        
         public NativeModule GetModuleWow64(string name) =>
             GetModulesWow64()
                 .FirstOrDefault(module => module.Name.Equals(name, StringComparison.OrdinalIgnoreCase));
         public IEnumerable<NativeModule> GetAllModules() =>
             GetModules().Skip(1).Concat(GetModulesWow64().Skip(1));
-                
+        
+        private static readonly int ShortSize = Marshal.SizeOf(typeof(short));
+        private static readonly int IntSize = Marshal.SizeOf(typeof(int));
+
         public IEnumerable<NativeExport> GetExports(IntPtr baseAddress)
         {  
             var pe = ReadProcessMemory<ImageDosHeader>(baseAddress);
@@ -564,7 +567,7 @@ namespace Tewls.Windows.Kernel
 
             for (var index = 0; index < imageExportDirectory.NumberOfFunctions; index++)
             {
-                var ordinalIndex = index * Marshal.SizeOf(typeof(short));
+                var ordinalIndex = index * ShortSize;
 
                 // Calculate address of ordinal
                 var ordinalAddress = IntPtr.Add(ordinals, ordinalIndex);
@@ -586,7 +589,7 @@ namespace Tewls.Windows.Kernel
                 }
                
 
-                var functionIndex = ordinal * Marshal.SizeOf(typeof(int));
+                var functionIndex = ordinal * IntSize;
 
                 // Calculate address of function
                 var functionAddress = IntPtr.Add(functions, functionIndex);              
@@ -642,7 +645,7 @@ namespace Tewls.Windows.Kernel
 
             for (var index = 0; index < imageExportDirectory.NumberOfFunctions; index++)
             {
-                var ordinalIndex = index * Marshal.SizeOf(typeof(ushort));
+                var ordinalIndex = index * ShortSize;
 
                 // Calculate address of ordinal
                 var ordinalAddress = ordinals + (uint)ordinalIndex;
@@ -655,7 +658,7 @@ namespace Tewls.Windows.Kernel
                     continue;
                 }
 
-                var functionIndex = ordinal * Marshal.SizeOf(typeof(uint));
+                var functionIndex = ordinal * IntSize;
 
                 // Calculate address of function
                 var functionAddress = functions + (uint)functionIndex;
@@ -669,7 +672,7 @@ namespace Tewls.Windows.Kernel
                 string functionName = null;
                 if (index < imageExportDirectory.NumberOfNames)
                 {
-                    var nameIndex = index * Marshal.SizeOf(typeof(int));
+                    var nameIndex = index * IntSize;
 
                     // Read offset of name
                     var offset = ReadInt(names + (uint)nameIndex);
