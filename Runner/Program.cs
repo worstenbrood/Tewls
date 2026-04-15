@@ -2,7 +2,6 @@
 using System.Runtime.InteropServices;
 using Tewls.CapstoneSharp;
 using Tewls.CapstoneSharp.Native;
-using Tewls.CapstoneSharp.Native.Arch;
 using Tewls.ZydisSharp;
 using Tewls.ZydisSharp.Native;
 
@@ -15,16 +14,16 @@ namespace Runner
                       
             Console.WriteLine($"Zydis Version: {Zydis.GetVersion()}");
             Console.WriteLine($"Capstone Version: {Capstone.GetVersion()}");
-            Console.WriteLine($"Size: {Marshal.SizeOf<ushort>()}"); 
+            Console.WriteLine($"Size: {Marshal.SizeOf<bool>()}"); 
 
             var decoder = ZDecoder.Create64();
-            byte[] test2 = { 0x44, 0x39, 0x1D, 0x76, 0x3F, 0x04, 0x00 };
+            byte[] test2 = [0x44, 0x39, 0x1D, 0x76, 0x3F, 0x04, 0x00];
             var result = decoder.DecodeFull(test2);
             Console.WriteLine($"Decoded Instruction: {result.Instruction.Length}");
 
             var cd = CDecoder.Create64();
             var r = cd.Disassemble(test2);
-            Console.WriteLine($"Capstone Disassembled Instruction: {r.Mnemonic} {r.OpStr}");
+            Console.WriteLine($"Disassembled Instruction: {r.Instruction.Text}");
 
             /*var sys = SystemInfo.GetSystemInfo();
             Thread.Sleep(1000);

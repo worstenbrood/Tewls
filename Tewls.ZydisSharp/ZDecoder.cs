@@ -13,24 +13,23 @@ namespace Tewls.ZydisSharp
             new(Zydis.CreateDecoder(machineMode, stackWidth));
 
         /// <summary>
-        /// Creates a decoder for 64-bit mode with 32-bit stack width, which is the most common configuration for x86-64 code. 
-        /// This is the default configuration for x86-64 code and is compatible with most operating systems and compilers.
+        /// Standard decoder for normal 64-bit x86 code.
         /// </summary>
-        /// <returns></returns>
-        public static ZDecoder Create86_64() => Create(ZydisMachineMode.ZYDIS_MACHINE_MODE_LONG_64, ZydisStackWidth.ZYDIS_STACK_WIDTH_32);
-        
-        /// <summary>
-        /// Creates a decoder for 64-bit mode with 64-bit stack width, which is the most common configuration for x86-64 code.
-        /// This is the default configuration for x86-64 code and is compatible with most operating systems and compilers.
-        /// </summary>
-        /// <returns></returns>
-        public static ZDecoder Create64() => Create(ZydisMachineMode.ZYDIS_MACHINE_MODE_LONG_64, ZydisStackWidth.ZYDIS_STACK_WIDTH_64);
+        public static ZDecoder Create64() =>
+            Create(ZydisMachineMode.ZYDIS_MACHINE_MODE_LONG_64, ZydisStackWidth.ZYDIS_STACK_WIDTH_64);
 
         /// <summary>
-        /// Creates a decoder for 32-bit mode with 32-bit stack width, which is the most common configuration for x86 code.
+        /// Decoder for 32-bit x86 code.
         /// </summary>
-        /// <returns></returns>
-        public static ZDecoder Create32() => Create(ZydisMachineMode.ZYDIS_MACHINE_MODE_LONG_COMPAT_32, ZydisStackWidth.ZYDIS_STACK_WIDTH_32);
+        public static ZDecoder Create32() =>
+            Create(ZydisMachineMode.ZYDIS_MACHINE_MODE_LEGACY_32, ZydisStackWidth.ZYDIS_STACK_WIDTH_32);
+
+        /// <summary>
+        /// Decoder for 64-bit mode with a 32-bit stack width.
+        /// Advanced/special-case use only.
+        /// </summary>
+        public static ZDecoder Create64With32BitStack() =>
+            Create(ZydisMachineMode.ZYDIS_MACHINE_MODE_LONG_64, ZydisStackWidth.ZYDIS_STACK_WIDTH_32);
 
         internal ZDecoder(ZydisDecoder zydisDecoder)
         {
