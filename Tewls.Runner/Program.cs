@@ -16,7 +16,7 @@ namespace Tewls.Runner
                 0x55, 0x44, 0x33, 0x22, 0x11, 0x00, 0x00, 0x00, // 0x1122334455 (little-endian)
                 0xFF, 0xE0  // JMP RAX
             ];
-            var result = decoder.DecodeFull(jumpCode);
+            var result = decoder.Disassemble(jumpCode);
             foreach (var entry in result)
             {
                 Console.WriteLine($"Decoded Instruction: {entry.Instruction.Length}");
