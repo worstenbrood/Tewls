@@ -170,13 +170,13 @@ namespace Tewls.CapstoneSharp.Native
 			      ulong address, uint count, ref nint insn);
 
         /// <summary>
-        ///  Free memory allocated by cs_malloc() or <see cref="cs_disasm"/> (argument insn"/>)
+        ///  Free memory allocated by cs_malloc() or <see cref="cs_disasm"/> (argument <paramref name="insn"/>)
         /// </summary>
         /// <param name="insn">pointer returned by @insn argument in <see cref="cs_disasm"/> or <see cref="cs_malloc"/></param>
         /// <param name="count">number of cs_insn structures returned by <see cref="cs_disasm"/>, or 1
         /// to free memory allocated by<see cref="cs_malloc"/>.</param>
         [DllImport(LibraryName, CallingConvention = CallingConvention.Cdecl)]
-        internal static extern void cs_free(ref nint insn, uint count);
+        internal static extern void cs_free(nint insn, uint count);
 
         /// <summary>
         /// Allocate memory for 1 instruction to be used by cs_disasm_iter().
@@ -226,6 +226,6 @@ namespace Tewls.CapstoneSharp.Native
         /// <param name="code"><see cref="cs_err"/></param>
         /// <returns></returns>
         public static string GetErrorMessage(cs_err code) =>
-            Marshal.PtrToStringAnsi(cs_strerror(code)) ?? "Unknown error";
+            Marshal.PtrToStringAnsi(cs_strerror(code)) ?? $"Unknown error(0x{(int)code:X4})";
     }
 }
