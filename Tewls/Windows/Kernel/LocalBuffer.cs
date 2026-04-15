@@ -8,20 +8,11 @@ namespace Tewls.Windows.Kernel
     {
         public class Allocator : IMemory
         {
-            public IntPtr Alloc(IntPtr size)
-            {
-                return LocalBuffer.Alloc(size);
-            }
-
-            public void Free(IntPtr buffer)
-            {
-                LocalBuffer.Free(buffer);
-            }
-
-            public IntPtr ReAlloc(IntPtr buffer, IntPtr size)
-            {
-                return LocalBuffer.ReAlloc(buffer, size);
-            }
+            public IntPtr Alloc(IntPtr size) => LocalBuffer.Alloc(size);
+            
+            public void Free(IntPtr buffer) => LocalBuffer.Free(buffer);
+           
+            public IntPtr ReAlloc(IntPtr buffer, IntPtr size) => LocalBuffer.ReAlloc(buffer, size);
         }
 
         public static IntPtr Alloc(IntPtr size, LocalMemFlags uFlags = LocalMemFlags.Fixed)
