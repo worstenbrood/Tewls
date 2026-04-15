@@ -2,7 +2,7 @@
 
 namespace Tewls.ZydisSharp
 {
-    public class DecodeResult(ZydisDecodedInstruction instruction, ZydisDecodedOperand[] operands)
+    public class ZDecodeResult(ZydisDecodedInstruction instruction, ZydisDecodedOperand[] operands)
     {
         public ZydisDecodedInstruction Instruction { get; } = instruction;
         public ZydisDecodedOperand[] Operands { get; } = operands ?? [];

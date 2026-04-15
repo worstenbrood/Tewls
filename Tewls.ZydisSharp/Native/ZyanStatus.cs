@@ -1,16 +1,19 @@
-﻿namespace Tewls.ZydisSharp.Native
-{
-    public static class ZyanStatus
-    {
-        public static bool Success(int status) => status >= 0;
-        public static bool Failed(int status) => status < 0;
+﻿using System.Runtime.InteropServices;
 
-        public static void ThrowIfFailed(int status, string apiName)
+namespace Tewls.ZydisSharp.Native
+{
+    public class ZyanStatus(int value)
+    {
+        public int Status { get; private set; } = value;
+        public bool Success => Status >= 0;
+        public bool Failed => Status < 0;
+
+        public void ThrowIfFailed(string apiName)
         {
-            if (Failed(status))
+            if (Failed)
             {
-                throw new InvalidOperationException($"{apiName} failed: 0x{status:X8}");
+                throw new InvalidOperationException($"{apiName} failed: 0x{Status:X8}");
             }
-        }
+        } 
     }
 }

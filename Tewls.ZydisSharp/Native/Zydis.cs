@@ -27,27 +27,31 @@ namespace Tewls.ZydisSharp.Native
         }
 
         [DllImport(LibraryName, CallingConvention = CallingConvention.Cdecl)]
-        internal static extern int ZydisDecoderInit(ref ZydisDecoder decoder, ZydisMachineMode machineMode, ZydisStackWidth stackWidth);
+        [return: MarshalAs(UnmanagedType.CustomMarshaler, MarshalTypeRef = typeof(ZyanStatusMarshaller))]
+        internal static extern ZyanStatus ZydisDecoderInit(ref ZydisDecoder decoder, ZydisMachineMode machineMode, ZydisStackWidth stackWidth);
 
         public static ZydisDecoder CreateDecoder(ZydisMachineMode machineMode, ZydisStackWidth stackWidth)
         {
             var decoder = new ZydisDecoder();
-            ZyanStatus.ThrowIfFailed(ZydisDecoderInit(ref decoder, machineMode, stackWidth), nameof(ZydisDecoderInit));
+            var r = ZydisDecoderInit(ref decoder, machineMode, stackWidth);
             return decoder;
         }
 
         [DllImport(LibraryName, CallingConvention = CallingConvention.Cdecl, ExactSpelling = true)]
-        internal static extern int ZydisDecoderDecodeFull(ref ZydisDecoder decoder, IntPtr buffer, uint length, ref ZydisDecodedInstruction instruction, IntPtr operands);
+        [return: MarshalAs(UnmanagedType.CustomMarshaler, MarshalTypeRef = typeof(ZyanStatusMarshaller))]
+        internal static extern ZyanStatus ZydisDecoderDecodeFull(ref ZydisDecoder decoder, IntPtr buffer, uint length, 
+            ref ZydisDecodedInstruction instruction, IntPtr operands);
 
-        public static DecodeResult DecodeFull(ref ZydisDecoder decoder, byte[] buffer)
+        public static ZDecodeResult DecodeFull(ref ZydisDecoder decoder, byte[] buffer)
         {
             var instruction = new ZydisDecodedInstruction();
             var operands = new ZydisDecodedOperand[ZYDIS_MAX_OPERAND_COUNT];
             using var bufferPin = new PinnedArray<byte>(buffer);
             using var opsPin = new PinnedArray<ZydisDecodedOperand>(operands);
-            ZyanStatus.ThrowIfFailed(ZydisDecoderDecodeFull(ref decoder, bufferPin.Address, (uint)buffer.Length, ref instruction, opsPin.Address),
-                nameof(ZydisDecoderDecodeFull));
-            return new DecodeResult(instruction, operands);
+            var result = ZydisDecoderDecodeFull(ref decoder, bufferPin.Address, (uint)buffer.Length, ref instruction, 
+                opsPin.Address);
+            result.ThrowIfFailed(nameof(ZydisDecoderDecodeFull));
+            return new ZDecodeResult(instruction, operands);
         }
     }
 }

@@ -44,7 +44,7 @@ namespace Tewls.ZydisSharp
         /// memory or relative immediates.
         /// </summary>
         /// <param name="buffer">Buffer containing the binary instruction data.</param>
-        /// <returns><see cref="DecodeResult"/></returns>
-        public DecodeResult DecodeFull(byte[] buffer) => Zydis.DecodeFull(ref _decoder, buffer);
+        /// <returns><see cref="ZDecodeResult"/></returns>
+        public ZDecodeResult DecodeFull(byte[] buffer) => Zydis.DecodeFull(ref _decoder, buffer);
     }
 }
