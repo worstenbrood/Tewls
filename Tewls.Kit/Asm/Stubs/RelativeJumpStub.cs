@@ -1,7 +1,4 @@
-﻿using System;
-using Tewls.Kit.Asm;
-
-namespace Tewls.Kit.Asm.Stubs
+﻿namespace Tewls.Kit.Asm.Stubs
 {
     /// <summary>
     /// Relative jump stub for 32/64-bit architecture.

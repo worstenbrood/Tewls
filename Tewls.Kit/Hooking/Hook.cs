@@ -5,7 +5,6 @@ using System.Linq;
 using Tewls.Kit.Asm.Stubs;
 using Tewls.Kit.Utils;
 using Tewls.Windows.Kernel;
-using Tewls.Windows.Kernel.Nt;
 
 namespace Tewls.Kit.Hooking
 {

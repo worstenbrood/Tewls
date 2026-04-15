@@ -1,6 +1,4 @@
-﻿using System.Runtime.InteropServices;
-
-namespace Tewls.ZydisSharp.Native
+﻿namespace Tewls.ZydisSharp.Native
 {
     public class ZyanStatus(int value)
     {

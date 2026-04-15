@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace Tewls.Kit.Asm.Stubs
+﻿namespace Tewls.Kit.Asm.Stubs
 {
     /// <summary>
     /// Interface for generating stubs for assembly code injection.
