@@ -1,6 +1,5 @@
 ﻿using System.Runtime.InteropServices;
 using System.Text;
-using Tewls.Shared;
 using Tewls.ZydisSharp.Native;
 
 namespace Tewls.ZydisSharp
