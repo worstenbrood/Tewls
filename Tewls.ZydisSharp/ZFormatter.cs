@@ -29,7 +29,7 @@ namespace Tewls.ZydisSharp
         /// Constructor that initializes the formatter with the specified style.
         /// </summary>
         /// <param name="style"></param>
-        public ZFormatter(ZydisFormatterStyle style) 
+        public ZFormatter(ZydisFormatterStyle style = ZydisFormatterStyle.ZYDIS_FORMATTER_STYLE_MASM) 
         { 
             _formatter = Marshal.AllocHGlobal(FormatterSize);
             var status = Zydis.ZydisFormatterInit(_formatter, style);
