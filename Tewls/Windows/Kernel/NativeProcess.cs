@@ -16,11 +16,9 @@ namespace Tewls.Windows.Kernel
     {
         // Static
 
-        public static IntPtr OpenProcess(int processId, ProcessAccessRights desiredAccess, bool inheritHandle = true)
-        {
-            return NtDll.NtOpenProcess(processId, desiredAccess);
-        }
-
+        public static IntPtr OpenProcess(int processId, ProcessAccessRights desiredAccess, bool inheritHandle = true) =>
+             NtDll.NtOpenProcess(processId, desiredAccess);
+       
         public static void TerminateProcess(IntPtr hProcess, int uExitCode = 0)
         {
             if (!Kernel32.TerminateProcess(hProcess, (uint)uExitCode))
@@ -51,10 +49,8 @@ namespace Tewls.Windows.Kernel
             return bytesRead;
         }
 
-        public static IntPtr ReadProcessMemory(IntPtr process, IntPtr baseAddress, IntPtr buffer, uint size)
-        {
-            return ReadProcessMemory(process, baseAddress, buffer, (IntPtr) size);
-        }
+        public static IntPtr ReadProcessMemory(IntPtr process, IntPtr baseAddress, IntPtr buffer, uint size) =>
+             ReadProcessMemory(process, baseAddress, buffer, (IntPtr) size);
 
         public static IntPtr WriteProcessMemory(IntPtr process, IntPtr baseAddress, IntPtr buffer, IntPtr size)
         {
@@ -139,11 +135,8 @@ namespace Tewls.Windows.Kernel
         {
         }
 
-        public NativeToken OpenProcessToken(TokenAccess desiredAccess)
-        {
-            return new NativeToken(OpenProcessToken(Handle, desiredAccess));
-        }
-
+        public NativeToken OpenProcessToken(TokenAccess desiredAccess) => new (OpenProcessToken(Handle, desiredAccess));
+        
         public IntPtr VirtualAllocEx(IntPtr size, AllocationType allocationType, MemProtections protect, IntPtr address = default)
         {
             var result = Kernel32.VirtualAllocEx(Handle, address, size, allocationType, protect);
@@ -155,15 +148,11 @@ namespace Tewls.Windows.Kernel
             return result;
         }
 
-        public RemoteBuffer VirtualAllocExBuffer(IntPtr size, AllocationType allocationType, MemProtections protect, IntPtr address = default)
-        {
-            return new RemoteBuffer(this, VirtualAllocEx(size, allocationType, protect, address), size);
-        }
+        public RemoteBuffer VirtualAllocExBuffer(IntPtr size, AllocationType allocationType, MemProtections protect,
+            IntPtr address = default) => new RemoteBuffer(this, VirtualAllocEx(size, allocationType, protect, address), size);
 
-        public RemoteBuffer VirtualAllocExBuffer(uint size, AllocationType allocationType, MemProtections protect, IntPtr address = default)
-        {
-            return VirtualAllocExBuffer((IntPtr)size, allocationType, protect, address);
-        }
+        public RemoteBuffer VirtualAllocExBuffer(uint size, AllocationType allocationType, MemProtections protect,
+            IntPtr address = default) => VirtualAllocExBuffer((IntPtr)size, allocationType, protect, address);
 
         public MemoryBasicInformation VirtualQueryEx(IntPtr remoteBuffer)
         {
@@ -172,11 +161,9 @@ namespace Tewls.Windows.Kernel
             return info;
         }
 
-        public IntPtr ReadProcessMemory(IntPtr remoteBuffer, IntPtr localBuffer, IntPtr size)
-        {
-            return ReadProcessMemory(Handle, remoteBuffer, localBuffer, size);
-        }
-
+        public IntPtr ReadProcessMemory(IntPtr remoteBuffer, IntPtr localBuffer, IntPtr size) =>
+             ReadProcessMemory(Handle, remoteBuffer, localBuffer, size);
+        
         public RemoteBuffer ReadProcessMemory(RemoteBuffer remoteBuffer, IntPtr localBuffer, IntPtr size)
         {
             ReadProcessMemory(Handle, remoteBuffer.Buffer, localBuffer, size);
@@ -186,39 +173,29 @@ namespace Tewls.Windows.Kernel
         public TStruct ReadProcessMemory<TStruct>(IntPtr remoteBuffer, IntPtr size, bool rebase = false)
            where TStruct : class, new()
         {
-            using (var localBuffer = new NativeBuffer<TStruct>(size))
+            using var localBuffer = new NativeBuffer<TStruct>(size);
+            ReadProcessMemory(remoteBuffer, localBuffer.Buffer, size);
+            if (rebase)
             {
-                ReadProcessMemory(remoteBuffer, localBuffer.Buffer, size);
-                if (rebase)
-                {
-                    localBuffer.Rebase(remoteBuffer, localBuffer.Buffer);
-                }
-                return BufferBase.PtrToStructure<TStruct>(localBuffer.Buffer);
+                localBuffer.Rebase(remoteBuffer, localBuffer.Buffer);
             }
+            return BufferBase.PtrToStructure<TStruct>(localBuffer.Buffer);
         }
 
         public TStruct ReadProcessMemory<TStruct>(IntPtr remoteBuffer, bool rebase = false)
-            where TStruct : class, new()
-        {
-            return ReadProcessMemory<TStruct>(remoteBuffer, (IntPtr)Marshal.SizeOf(typeof(TStruct)), rebase);
-        }
-
+            where TStruct : class, new() =>
+             ReadProcessMemory<TStruct>(remoteBuffer, (IntPtr)Marshal.SizeOf(typeof(TStruct)), rebase);
+       
         public TStruct ReadProcessMemory<TStruct>(uint remoteBuffer, bool rebase = false)
-            where TStruct : class, new()
-        {
-            return ReadProcessMemory<TStruct>((IntPtr) remoteBuffer, (IntPtr) Marshal.SizeOf(typeof(TStruct)), rebase);
-        }
-
+            where TStruct : class, new() =>
+             ReadProcessMemory<TStruct>((IntPtr) remoteBuffer, rebase);
+            
         public TStruct ReadProcessMemory<TStruct>(RemoteBuffer remoteBuffer)
-            where TStruct : class, new()
-        {
-            return ReadProcessMemory<TStruct>(remoteBuffer.Buffer);
-        }
-
-        public IntPtr WriteProcessMemory(IntPtr remoteBuffer, IntPtr localBuffer, IntPtr size)
-        {
-            return WriteProcessMemory(Handle, remoteBuffer, localBuffer, size);
-        }
+            where TStruct : class, new() =>
+             ReadProcessMemory<TStruct>(remoteBuffer.Buffer);
+        
+        public IntPtr WriteProcessMemory(IntPtr remoteBuffer, IntPtr localBuffer, IntPtr size) =>
+             WriteProcessMemory(Handle, remoteBuffer, localBuffer, size);
 
         public RemoteBuffer WriteProcessMemory(RemoteBuffer remoteBuffer, IntPtr localBuffer, IntPtr size)
         {
@@ -226,22 +203,18 @@ namespace Tewls.Windows.Kernel
             return remoteBuffer;
         }
 
-        public RemoteBuffer WriteProcessMemory(RemoteBuffer remoteBuffer, IntPtr localBuffer, uint size)
-        {
-            return WriteProcessMemory(remoteBuffer, localBuffer, (IntPtr)size);
-        }
-
+        public RemoteBuffer WriteProcessMemory(RemoteBuffer remoteBuffer, IntPtr localBuffer, uint size) =>
+             WriteProcessMemory(remoteBuffer, localBuffer, (IntPtr)size);
+        
         public IntPtr WriteProcessMemory<TStruct>(TStruct structure, IntPtr remoteBuffer, bool rebase = true)
             where TStruct : class
         {
-            using (var localBuffer = new NativeBuffer<TStruct>(structure))
+            using var localBuffer = new NativeBuffer<TStruct>(structure);
+            if (rebase)
             {
-                if (rebase)
-                {
-                    localBuffer.Rebase(localBuffer.Buffer, remoteBuffer);
-                }
-                return WriteProcessMemory(remoteBuffer, localBuffer.Buffer, localBuffer.Size);
+                localBuffer.Rebase(localBuffer.Buffer, remoteBuffer);
             }
+            return WriteProcessMemory(remoteBuffer, localBuffer.Buffer, localBuffer.Size);
         }
 
         public RemoteBuffer WriteProcessMemory<TStruct>(TStruct structure, RemoteBuffer remoteBuffer)
@@ -254,24 +227,20 @@ namespace Tewls.Windows.Kernel
         public RemoteBuffer WriteProcessMemory<TStruct>(TStruct structure, bool rebase = true)
             where TStruct : class
         {
-            using (var localBuffer = new NativeBuffer<TStruct>(structure))
+            using var localBuffer = new NativeBuffer<TStruct>(structure);
+            var remoteBuffer = new RemoteBuffer(this, localBuffer.Size);
+            if (rebase)
             {
-                var remoteBuffer = new RemoteBuffer(this, localBuffer.Size);
-                if (rebase)
-                {
-                    localBuffer.Rebase(localBuffer.Buffer, remoteBuffer.Buffer);
-                }
-                return WriteProcessMemory(remoteBuffer, localBuffer.Buffer, localBuffer.Size);
+                localBuffer.Rebase(localBuffer.Buffer, remoteBuffer.Buffer);
             }
+            return WriteProcessMemory(remoteBuffer, localBuffer.Buffer, localBuffer.Size);
         }
 
         public string ReadString(IntPtr remoteBuffer, uint size, int charSize = sizeof(char))
         {
-            using (var localBuffer = new HGlobalBuffer((IntPtr) size))
-            {
-                ReadProcessMemory(remoteBuffer, localBuffer.Buffer, (IntPtr) size);
-                return Marshal.PtrToStringAuto(localBuffer.Buffer, (int) size / charSize);
-            }
+            using var localBuffer = new HGlobalBuffer((IntPtr)size);
+            ReadProcessMemory(remoteBuffer, localBuffer.Buffer, (IntPtr)size);
+            return Marshal.PtrToStringAuto(localBuffer.Buffer, (int)size / charSize);
         }
 
         public string ReadString(uint remoteBuffer, uint size, int charSize = sizeof(char)) => 
@@ -279,11 +248,9 @@ namespace Tewls.Windows.Kernel
         
         public string ReadStringA(IntPtr remoteBuffer, uint size)
         {
-            using (var localBuffer = new HGlobalBuffer((IntPtr)size))
-            {
-                ReadProcessMemory(remoteBuffer, localBuffer.Buffer, (IntPtr)size);
-                return Marshal.PtrToStringAnsi(localBuffer.Buffer);
-            }
+            using var localBuffer = new HGlobalBuffer((IntPtr)size);
+            ReadProcessMemory(remoteBuffer, localBuffer.Buffer, (IntPtr)size);
+            return Marshal.PtrToStringAnsi(localBuffer.Buffer);
         }
 
         public string ReadStringA(uint remoteBuffer, uint size) => ReadStringA((IntPtr)remoteBuffer, size);
@@ -291,22 +258,10 @@ namespace Tewls.Windows.Kernel
         public string ReadString(RemoteBuffer remoteBuffer)
         {
             var query = remoteBuffer.GetInformation();
-            using (var localBuffer = new HGlobalBuffer(query.RegionSize))
-            {
-                ReadProcessMemory(remoteBuffer, localBuffer.Buffer, localBuffer.Size);
-                return Marshal.PtrToStringAuto(localBuffer.Buffer);
-            }
+            using var localBuffer = new HGlobalBuffer(query.RegionSize);
+            ReadProcessMemory(remoteBuffer, localBuffer.Buffer, localBuffer.Size);
+            return Marshal.PtrToStringAuto(localBuffer.Buffer);
         }
-
-        public int ReadInt(IntPtr remoteBuffer) =>
-            BitConverter.ToInt32(ReadArray<byte>(remoteBuffer, Marshal.SizeOf(typeof(int))), 0);
-
-        public int ReadInt(uint remoteBuffer) => ReadInt((IntPtr)remoteBuffer);
-
-        public short ReadInt16(IntPtr remoteBuffer) =>
-            BitConverter.ToInt16(ReadArray<byte>(remoteBuffer, Marshal.SizeOf(typeof(short))), 0);
-        
-        public short ReadInt16(uint remoteBuffer) => ReadInt16((IntPtr)remoteBuffer);
 
         /// <summary>
         /// Generic helper for reading arrays of primitives
@@ -324,15 +279,23 @@ namespace Tewls.Windows.Kernel
             return result;
         }
 
+        public int ReadInt(IntPtr remoteBuffer) =>
+            BitConverter.ToInt32(ReadArray<byte>(remoteBuffer, Marshal.SizeOf(typeof(int))), 0);
+
+        public int ReadInt(uint remoteBuffer) => ReadInt((IntPtr)remoteBuffer);
+
+        public short ReadInt16(IntPtr remoteBuffer) =>
+            BitConverter.ToInt16(ReadArray<byte>(remoteBuffer, Marshal.SizeOf(typeof(short))), 0);
+        
+        public short ReadInt16(uint remoteBuffer) => ReadInt16((IntPtr)remoteBuffer);
+        
         public byte[] ReadBytes(IntPtr remoteBuffer, int size) => ReadArray<byte>(remoteBuffer, size);
 
         public RemoteBuffer WriteString(RemoteBuffer remoteBuffer, string s)
         {
-            using (var localBuffer = new HGlobalBuffer(remoteBuffer.Size))
-            {
-                NativeBuffer.lstrcpyn(localBuffer.Buffer, s);
-                return WriteProcessMemory(remoteBuffer, localBuffer.Buffer, localBuffer.Size);
-            }
+            using var localBuffer = new HGlobalBuffer(remoteBuffer.Size);
+            NativeBuffer.lstrcpyn(localBuffer.Buffer, s);
+            return WriteProcessMemory(remoteBuffer, localBuffer.Buffer, localBuffer.Size);
         }
 
         public RemoteBuffer WriteString(string s)
@@ -387,7 +350,7 @@ namespace Tewls.Windows.Kernel
         }
 
         public NativeToken CreateRemoteThread(IntPtr stackSize, IntPtr startAddress, IntPtr parameter) =>
-             new NativeToken(CreateRemoteThread(Handle, stackSize, startAddress, parameter));
+             new (CreateRemoteThread(Handle, stackSize, startAddress, parameter));
         
         private uint _processId;
 
@@ -417,34 +380,27 @@ namespace Tewls.Windows.Kernel
             }
         }
 
-        public void TerminateProcess(int exitCode = 0)
-        {
-            TerminateProcess(Handle, exitCode);
-        }
+        public void TerminateProcess(int exitCode = 0) => TerminateProcess(Handle, exitCode);
 
         public TStruct GetProcessInformation<TStruct>()
             where TStruct : class, IClass<ProcessInformationClass>, new()
         {
             var info = new TStruct();
-            using (var buffer = new HGlobalBuffer<TStruct>(info))
+            using var buffer = new HGlobalBuffer<TStruct>(info);
+            // This fails for ProcessLeapSecondInfo and ProcessPowerThrottlingState for some reason
+            var result = Kernel32.GetProcessInformation(Handle, info.GetClass(), buffer.Buffer, (uint)buffer.Size);
+            if (!result)
             {
-                // This fails for ProcessLeapSecondInfo and ProcessPowerThrottlingState for some reason
-                var result = Kernel32.GetProcessInformation(Handle, info.GetClass(), buffer.Buffer, (uint) buffer.Size);
-                if (!result)
-                {
-                    throw new Win32Exception();
-                }
-                                
-                return buffer.PtrToStructure(info);
+                throw new Win32Exception();
             }
+
+            return buffer.PtrToStructure(info);
         }
 
         public TStruct QueryProcessInformation<TStruct>()
-            where TStruct : class, IClass<Nt.ProcessInformationClass>, new()
-        {
-            return NtDll.NtQueryInformationProcess<TStruct>(Handle);
-        }
-
+            where TStruct : class, IClass<Nt.ProcessInformationClass>, new() =>
+             NtDll.NtQueryInformationProcess<TStruct>(Handle);
+        
         public IEnumerable<NativeModule> GetModules()
         {
             var pbi = QueryProcessInformation<ProcessBasicInformation>();
@@ -502,8 +458,9 @@ namespace Tewls.Windows.Kernel
         
         public NativeModule GetModuleWow64(string name) => GetModulesWow64()
                 .FirstOrDefault(module => module.Name.Equals(name, StringComparison.OrdinalIgnoreCase));
+
         public IEnumerable<NativeModule> GetAllModules() => GetModules()
-            .Skip(1).Concat(GetModulesWow64().Skip(1));
+                .Skip(1).Concat(GetModulesWow64().Skip(1));
         
         private static readonly int ShortSize = Marshal.SizeOf(typeof(short));
         private static readonly int IntSize = Marshal.SizeOf(typeof(int));
@@ -683,15 +640,9 @@ namespace Tewls.Windows.Kernel
 
         public bool FlushInstructionCache(IntPtr address, IntPtr size) =>
             NtDll.NtFlushInstructionCache(Handle, address, size) == NtStatus.Success;
-        
-        public override string ToString()
-        {
-            return $"ProcessId: {ProcessId}";
-        }
 
-        public override int GetHashCode()
-        {
-            return (int)ProcessId;
-        }
+        public override string ToString() => $"ProcessId: {ProcessId}";
+
+        public override int GetHashCode() => (int)ProcessId;
     }
 }
