@@ -124,4 +124,32 @@ namespace Tewls.ZydisSharp.Native
         public IntPtr CpuFlags;
         public IntPtr FpuFlags;
     }
+
+    [StructLayout(LayoutKind.Sequential, Pack = 8)]
+    public struct ZydisFormatterContext
+    {
+        /**
+         * A pointer to the `ZydisDecodedInstruction` struct.
+         */
+        public IntPtr Instruction;
+        /**
+         * A pointer to the first `ZydisDecodedOperand` struct of the instruction.
+         */
+        public IntPtr Operands;
+        /**
+         * A pointer to the `ZydisDecodedOperand` struct.
+         */
+        public IntPtr Operand;
+        /**
+         * The runtime address of the instruction.
+         */
+        public ulong RuntimeAddress;
+        /**
+         * A pointer to user-defined data.
+         *
+         * This is the value that was previously passed as the `user_data` argument to 
+         * @ref ZydisFormatterFormatInstruction or @ref ZydisFormatterTokenizeOperand.
+         */
+        public IntPtr UserData;
+    }
 }

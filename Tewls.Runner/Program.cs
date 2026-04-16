@@ -5,6 +5,7 @@ using Tewls.CapstoneSharp;
 using Tewls.Kit.Hooks;
 using Tewls.Windows.Kernel;
 using Tewls.ZydisSharp;
+using Tewls.ZydisSharp.Native;
 
 namespace Tewls.Runner
 {
@@ -12,7 +13,7 @@ namespace Tewls.Runner
     {
         static void Main(string[] args)
         {
-                      
+
             /*var decoder = ZDecoder.Create64();
             byte[] jumpCode =
             [
@@ -45,6 +46,7 @@ namespace Tewls.Runner
             }*/
 
             //Engine.Start();
+
             var currentProcess = Process.GetCurrentProcess();
             var nativeProcess = new NativeProcess(currentProcess.Id, ProcessAccessRights.AllAccess);
             var module = nativeProcess.GetModule("user32.dll");
