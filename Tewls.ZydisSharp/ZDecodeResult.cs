@@ -7,13 +7,7 @@ namespace Tewls.ZydisSharp
         public ZydisDecodedInstruction Instruction = instruction;
         public ZydisDecodedOperand[] Operands = operands ?? [];
 
-        public string FormatInstruction(ZydisFormatterStyle style = ZydisFormatterStyle.ZYDIS_FORMATTER_STYLE_MASM, ulong runtimeAddress = 0)
-        {
-            using var formatter = new ZFormatter(style);
-            return formatter.FormatInstruction(this, runtimeAddress);
-        }
-
-        public bool HasRipRelativeMemory(ZydisRegister ripRegister = ZydisRegister.ZYDIS_REGISTER_RIP)
+        public bool HasRipRelativeMemory()
         {
             int count = Math.Min((int)Instruction.OperandCount, Operands.Length);
 
@@ -21,7 +15,7 @@ namespace Tewls.ZydisSharp
             {
                 var op = Operands[i];
                 if (op.Type == ZydisOperandType.ZYDIS_OPERAND_TYPE_MEMORY &&
-                    op.Value.Mem.Base == ripRegister)
+                    op.Value.Mem.Base == ZydisRegister.ZYDIS_REGISTER_RIP)
                 {
                     return true;
                 }
@@ -54,36 +48,39 @@ namespace Tewls.ZydisSharp
         /// <summary>
         /// 
         /// </summary>
-        /// <param name="ripRegister"></param>
         /// <returns></returns>
-        public bool NeedsRelocation(ZydisRegister ripRegister)
+        public bool NeedsRelocation
         {
-            int count = Math.Min((int)Instruction.OperandCount, Operands.Length);
-
-            for (int i = 0; i < count; i++)
+            get
             {
-                var op = Operands[i];
-                if (op.Type == ZydisOperandType.ZYDIS_OPERAND_TYPE_MEMORY &&
-                    op.Value.Mem.Base == ripRegister)
+                int count = Math.Min((int)Instruction.OperandCount, Operands.Length);
+
+                for (int i = 0; i < count; i++)
                 {
-                    return true;
+                    var op = Operands[i];
+                    if (op.Type == ZydisOperandType.ZYDIS_OPERAND_TYPE_MEMORY &&
+                        op.Value.Mem.Base == ZydisRegister.ZYDIS_REGISTER_RIP)
+                    {
+                        return true;
+                    }
+
+                    if (op.Type == ZydisOperandType.ZYDIS_OPERAND_TYPE_IMMEDIATE &&
+                        op.Value.Imm.IsRelative != 0)
+                    {
+                        return true;
+                    }
                 }
 
-                if (op.Type == ZydisOperandType.ZYDIS_OPERAND_TYPE_IMMEDIATE &&
-                    op.Value.Imm.IsRelative != 0)
-                {
-                    return true;
-                }
+                return false;
             }
-
-            return false;
         }
 
         public bool TryGetAbsoluteTarget(ulong instructionAddress, out ulong target)
         {
             target = 0;
+            int count = Math.Min((int)Instruction.OperandCount, Operands.Length);
 
-            for (int i = 0; i < Instruction.OperandCount; i++)
+            for (int i = 0; i < count; i++)
             {
                 ref var op = ref Operands[i];
 
