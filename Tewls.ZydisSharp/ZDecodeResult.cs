@@ -13,7 +13,7 @@ namespace Tewls.ZydisSharp
             return formatter.FormatInstruction(this, runtimeAddress);
         }
 
-        public bool HasRipRelativeMemory(ZydisRegister ripRegister)
+        public bool HasRipRelativeMemory(ZydisRegister ripRegister = ZydisRegister.ZYDIS_REGISTER_RIP)
         {
             int count = Math.Min((int)Instruction.OperandCount, Operands.Length);
 

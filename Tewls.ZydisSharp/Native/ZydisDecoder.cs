@@ -50,10 +50,8 @@ namespace Tewls.ZydisSharp.Native
 
     public enum ZydisRegister : uint
     {
-        ZYDIS_REGISTER_NONE = 0,
-
-        // Alleen toevoegen als ge ze effectief nodig hebt in managed code:
-        ZYDIS_REGISTER_IP = 297, // voorbeeld: niet hardcoden zonder uw eigen build te checken
+        ZYDIS_REGISTER_NONE = 0,      
+        ZYDIS_REGISTER_IP = 297, 
         ZYDIS_REGISTER_EIP = 298,
         ZYDIS_REGISTER_RIP = 299,
     }
