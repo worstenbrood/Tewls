@@ -5,8 +5,6 @@ namespace Tewls.ZydisSharp.Native
     using ZydisElementSize = UInt32;
     using ZydisElementType = UInt32;
     using ZydisOperandActions = UInt32;
-    using ZydisOperandEncoding = UInt32;
-    using ZydisOperandVisibility = UInt32;
 
     public enum ZydisMachineMode : uint
     {
