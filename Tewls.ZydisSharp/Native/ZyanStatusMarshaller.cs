@@ -15,6 +15,6 @@ namespace Tewls.ZydisSharp.Native
                 _ => throw new MarshalDirectiveException("Managed object must be of type ZyanStatus.")
             };
 
-        public override object MarshalNativeToManaged(IntPtr pNativeData) => new ZyanStatus(pNativeData.ToInt32());
+        public override object MarshalNativeToManaged(IntPtr pNativeData) => new ZyanStatus((uint)pNativeData);
     }
 }

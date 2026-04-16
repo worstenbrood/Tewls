@@ -2,9 +2,9 @@
 
 namespace Tewls.ZydisSharp.Native
 {
-    public class ZyanStatus(int value)
+    public class ZyanStatus(uint value)
     {
-        public int Status { get; private set; } = value;
+        public uint Status { get; private set; } = value;
         public bool Success => Status >= 0;
         public bool Failed => Status < 0;
 
