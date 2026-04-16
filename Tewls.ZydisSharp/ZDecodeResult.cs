@@ -7,6 +7,12 @@ namespace Tewls.ZydisSharp
         public ZydisDecodedInstruction Instruction = instruction;
         public ZydisDecodedOperand[] Operands = operands ?? [];
 
+        public string FormatInstruction(ZydisFormatterStyle style = ZydisFormatterStyle.ZYDIS_FORMATTER_STYLE_MASM, ulong runtimeAddress = 0)
+        {
+            using var formatter = new ZFormatter(style);
+            return formatter.FormatInstruction(this, runtimeAddress);
+        }
+
         public bool HasRipRelativeMemory(ZydisRegister ripRegister)
         {
             int count = Math.Min((int)Instruction.OperandCount, Operands.Length);

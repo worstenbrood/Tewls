@@ -117,6 +117,8 @@ namespace Tewls.ZydisSharp.Native
 
         [DllImport(LibraryName, CallingConvention = CallingConvention.Cdecl, ExactSpelling = true)]
         [return: MarshalAs(UnmanagedType.CustomMarshaler, MarshalTypeRef = typeof(ZyanStatusMarshaller))]
-        internal static extern ZyanStatus ZydisFormatterFormatInstruction(IntPtr formatter, ref ZydisDecodedInstruction instruction, IntPtr buffer, uint length, ulong runtimeAddress);
+        internal static extern ZyanStatus ZydisFormatterFormatInstruction(IntPtr formatter, 
+            ref ZydisDecodedInstruction instruction, ZydisDecodedOperand[] operands, byte operandCount, IntPtr buffer, uint length, ulong runtimeAddress,
+            IntPtr userData);
     }
 }
