@@ -88,7 +88,8 @@ namespace Tewls.ZydisSharp.Native
         /// <param name="resultAddress">A pointer to the memory that receives the absolute address.</param>
         /// <returns></returns>
         [DllImport(LibraryName, CallingConvention = CallingConvention.Cdecl, ExactSpelling = true)]
-        private static extern ZyanStatus ZydisCalcAbsoluteAddress(ref ZydisDecodedInstruction instruction,
+        [return: MarshalAs(UnmanagedType.CustomMarshaler, MarshalTypeRef = typeof(ZyanStatusMarshaller))]
+        internal static extern ZyanStatus ZydisCalcAbsoluteAddress(ref ZydisDecodedInstruction instruction,
                 ref ZydisDecodedOperand operand, ulong runtimeAddress, out ulong resultAddress);
 
         /// <summary>
@@ -105,5 +106,9 @@ namespace Tewls.ZydisSharp.Native
             result.ThrowIfFailed(nameof(ZydisCalcAbsoluteAddress));
             return address;
         }
+
+        [DllImport(LibraryName, CallingConvention = CallingConvention.Cdecl, ExactSpelling = true)]
+        [return: MarshalAs(UnmanagedType.CustomMarshaler, MarshalTypeRef = typeof(ZyanStatusMarshaller))]
+        internal static extern ZyanStatus ZydisFormatterInit(IntPtr formatter, ZydisFormatterStyle style);
     }
 }

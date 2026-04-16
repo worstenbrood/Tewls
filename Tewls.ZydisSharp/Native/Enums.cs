@@ -116,4 +116,13 @@
         ZYDIS_ATTRIB_HAS_REX2 = 1UL << 46,
         ZYDIS_ATTRIB_HAS_EEVEX = 1UL << 47,
     }
+
+    public enum ZydisFormatterStyle : uint
+    {
+        ZYDIS_FORMATTER_STYLE_INTEL = 0,
+        ZYDIS_FORMATTER_STYLE_ATT = 1,
+        ZYDIS_FORMATTER_STYLE_MASM = 2,
+        ZYDIS_FORMATTER_STYLE_GAS = 3,
+        ZYDIS_FORMATTER_STYLE_NASM = 4,
+    }
 }

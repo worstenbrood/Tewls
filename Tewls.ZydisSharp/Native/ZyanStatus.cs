@@ -30,7 +30,7 @@ namespace Tewls.ZydisSharp.Native
         {
             if (Failed)
             {
-                throw new InvalidOperationException($"{apiName} failed: {Status.ToString("G")}");
+                throw new InvalidOperationException($"{apiName} failed: {Status:G}");
             }
         } 
     }
