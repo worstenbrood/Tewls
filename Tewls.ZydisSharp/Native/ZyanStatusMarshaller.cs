@@ -11,7 +11,7 @@ namespace Tewls.ZydisSharp.Native
             managedObj switch
             {
                 null => IntPtr.Zero,
-                ZyanStatus zyanStatus => new IntPtr(zyanStatus.Status),
+                ZyanStatus zyanStatus => new IntPtr((int)zyanStatus.Status),
                 _ => throw new MarshalDirectiveException("Managed object must be of type ZyanStatus.")
             };
 

@@ -43,7 +43,7 @@ namespace Tewls.ZydisSharp
         /// <param name="index"></param>
         /// <param name="length"></param>
         /// <returns></returns>
-        public ZDecodeResult DisassembleIter(byte[] buffer, int index = 0, int length = 0) =>
+        public ZDecodeResult? DisassembleIter(byte[] buffer, int index = 0, int length = 0) =>
             Zydis.DecodeFull(ref _decoder, buffer, index, length);
 
         /// <summary>
@@ -60,6 +60,13 @@ namespace Tewls.ZydisSharp
             do
             {
                 var result = DisassembleIter(buffer, currentIndex, length);
+                // No more data
+                if (result == null)
+                {
+                    yield break;
+                }
+
+                // Return the decoded instruction
                 yield return result;
 
                 // Adjust index and length for the next iteration
