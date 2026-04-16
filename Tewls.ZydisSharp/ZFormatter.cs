@@ -35,7 +35,7 @@ namespace Tewls.ZydisSharp
             if (status.Failed)
             {
                 Marshal.FreeHGlobal(_formatter);
-                status.ThrowIfFailed(nameof(Zydis.ZydisFormatterInit));
+                status.Throw(nameof(Zydis.ZydisFormatterInit));
             }
         }
 

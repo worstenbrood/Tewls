@@ -26,11 +26,14 @@ namespace Tewls.ZydisSharp.Native
         public bool Success => (((uint)Status) & 0x80000000u) == 0;
         public bool Failed => (((uint)Status) & 0x80000000u) != 0;
 
+        public void Throw([CallerMemberName] string apiName = "") =>
+            throw new InvalidOperationException($"{apiName} failed: 0x{(uint)Status:X8}");
+
         public void ThrowIfFailed([CallerMemberName] string apiName = "")
         {
             if (Failed)
             {
-                throw new InvalidOperationException($"{apiName} failed: {Status:G}");
+                Throw(apiName);
             }
         } 
     }
