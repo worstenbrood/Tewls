@@ -64,7 +64,7 @@ namespace Tewls.ZydisSharp.Native
             using var opsPin = new PinnedArray<ZydisDecodedOperand>(operands);
 
             // Call the native function to decode the instruction
-            ZyanStatus result = ZydisDecoderDecodeFull(ref decoder, bufferPin.Address, (uint)byteCount, 
+            ZyanStatus result = ZydisDecoderDecodeFull(ref decoder, bufferPin.Address, (uint)byteCount,
                 ref instruction, opsPin.Address);
 
             if (result.Status != ZyanStatusFlags.ZYDIS_STATUS_NO_MORE_DATA)
@@ -118,7 +118,7 @@ namespace Tewls.ZydisSharp.Native
         [DllImport(LibraryName, CallingConvention = CallingConvention.Cdecl, ExactSpelling = true)]
         [return: MarshalAs(UnmanagedType.CustomMarshaler, MarshalTypeRef = typeof(ZyanStatusMarshaller))]
         internal static extern ZyanStatus ZydisFormatterFormatInstruction(IntPtr formatter, 
-            ref ZydisDecodedInstruction instruction, ZydisDecodedOperand[] operands, byte operandCount, IntPtr buffer, uint length, ulong runtimeAddress,
+            ref ZydisDecodedInstruction instruction, ZydisDecodedOperand[] operands, byte operandCount, byte[] buffer, uint length, ulong runtimeAddress,
             IntPtr userData);
     }
 }

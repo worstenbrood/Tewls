@@ -61,11 +61,13 @@ namespace Tewls.ZydisSharp
         public string FormatInstruction(ZDecodeResult result, ulong runtimeAddress = 0)
         {
             var buffer = new byte[BufferSize];
-            using var bufferPin = new PinnedArray<byte>(buffer);
-         
+                     
+            // Format instruction
             var status = Zydis.ZydisFormatterFormatInstruction(_formatter, ref result.Instruction, result.Operands, 
-                result.Instruction.OperandCountVisible, bufferPin.Address, (uint)buffer.Length, runtimeAddress, IntPtr.Zero);
+                result.Instruction.OperandCountVisible, buffer, (uint)buffer.Length, runtimeAddress, IntPtr.Zero);
             status.ThrowIfFailed(nameof(Zydis.ZydisFormatterFormatInstruction));
+
+            // Return ascii string from the buffer
             return Encoding.ASCII.GetString(buffer);
         }
 
