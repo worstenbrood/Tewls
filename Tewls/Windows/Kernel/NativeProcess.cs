@@ -274,11 +274,9 @@ namespace Tewls.Windows.Kernel
             }
         }
 
-        public string ReadString(uint remoteBuffer, uint size, int charSize = sizeof(char))
-        {
-            return ReadString((IntPtr) remoteBuffer, size, charSize);
-        }
-
+        public string ReadString(uint remoteBuffer, uint size, int charSize = sizeof(char)) => 
+            ReadString((IntPtr) remoteBuffer, size, charSize);
+        
         public string ReadStringA(IntPtr remoteBuffer, uint size)
         {
             using (var localBuffer = new HGlobalBuffer((IntPtr)size))
@@ -288,10 +286,7 @@ namespace Tewls.Windows.Kernel
             }
         }
 
-        public string ReadStringA(uint remoteBuffer, uint size)
-        {
-            return ReadStringA((IntPtr)remoteBuffer, size);
-        }
+        public string ReadStringA(uint remoteBuffer, uint size) => ReadStringA((IntPtr)remoteBuffer, size);
 
         public string ReadString(RemoteBuffer remoteBuffer)
         {
@@ -303,30 +298,15 @@ namespace Tewls.Windows.Kernel
             }
         }
 
-        public IntPtr ReadIntPtr(IntPtr remoteBuffer)
-        {
-            using (var localBuffer = new HGlobalBuffer((IntPtr) Marshal.SizeOf(typeof(IntPtr))))
-            {
-                ReadProcessMemory(remoteBuffer, localBuffer.Buffer, localBuffer.Size);
-                return Marshal.ReadIntPtr(localBuffer.Buffer);
-            }
-        }
-
         public int ReadInt(IntPtr remoteBuffer) =>
             BitConverter.ToInt32(ReadArray<byte>(remoteBuffer, Marshal.SizeOf(typeof(int))), 0);
 
-        public int ReadInt(uint remoteBuffer)
-        {
-            return ReadInt((IntPtr)remoteBuffer);
-        }
+        public int ReadInt(uint remoteBuffer) => ReadInt((IntPtr)remoteBuffer);
 
         public short ReadInt16(IntPtr remoteBuffer) =>
             BitConverter.ToInt16(ReadArray<byte>(remoteBuffer, Marshal.SizeOf(typeof(short))), 0);
         
-        public short ReadInt16(uint remoteBuffer)
-        {
-            return ReadInt16((IntPtr)remoteBuffer);
-        }
+        public short ReadInt16(uint remoteBuffer) => ReadInt16((IntPtr)remoteBuffer);
 
         /// <summary>
         /// Generic helper for reading arrays of primitives
@@ -376,16 +356,12 @@ namespace Tewls.Windows.Kernel
 
         public void WriteBytes(IntPtr remoteBuffer, byte[] bytes) => WriteArray(remoteBuffer, bytes);
         
-        public MemProtections VirtualProtectEx(IntPtr remoteBuffer, IntPtr size, MemProtections protection)
-        {
-            return VirtualProtectEx(Handle, remoteBuffer, size, protection);
-        }
-
-        public MemProtections VirtualProtectEx(RemoteBuffer remoteBuffer, IntPtr size, MemProtections protection)
-        {
-            return VirtualProtectEx(remoteBuffer.Buffer, size, protection);
-        }
-
+        public MemProtections VirtualProtectEx(IntPtr remoteBuffer, IntPtr size, MemProtections protection) =>
+            VirtualProtectEx(Handle, remoteBuffer, size, protection);
+        
+        public MemProtections VirtualProtectEx(RemoteBuffer remoteBuffer, IntPtr size, MemProtections protection) =>
+            VirtualProtectEx(remoteBuffer.Buffer, size, protection);
+        
         public MemProtections VirtualProtectEx(RemoteBuffer remoteBuffer, MemProtections protection)
         {
             var query = VirtualQueryEx(remoteBuffer.Buffer);
@@ -410,11 +386,9 @@ namespace Tewls.Windows.Kernel
             }
         }
 
-        public NativeToken CreateRemoteThread(IntPtr stackSize, IntPtr startAddress, IntPtr parameter)
-        {
-            return new NativeToken(CreateRemoteThread(Handle, stackSize, startAddress, parameter));
-        }
-
+        public NativeToken CreateRemoteThread(IntPtr stackSize, IntPtr startAddress, IntPtr parameter) =>
+             new NativeToken(CreateRemoteThread(Handle, stackSize, startAddress, parameter));
+        
         private uint _processId;
 
         public uint ProcessId => _processId > 0 ? _processId : _processId = GetProcessId();
@@ -492,12 +466,9 @@ namespace Tewls.Windows.Kernel
             while (current != ldr.InLoadOrderModuleList.Flink);
         }
 
-        public NativeModule GetModule(string name)
-        {
-            return GetModules()
+        public NativeModule GetModule(string name) => GetModules()
                 .FirstOrDefault(module => module.Name.Equals(name, StringComparison.OrdinalIgnoreCase));
-        }
-
+        
         public IEnumerable<NativeModule> GetModulesWow64()
         {
             if (!IsWow64Process())
@@ -529,11 +500,10 @@ namespace Tewls.Windows.Kernel
             while (current != ldr.InLoadOrderModuleList.Flink);
         }
         
-        public NativeModule GetModuleWow64(string name) =>
-            GetModulesWow64()
+        public NativeModule GetModuleWow64(string name) => GetModulesWow64()
                 .FirstOrDefault(module => module.Name.Equals(name, StringComparison.OrdinalIgnoreCase));
-        public IEnumerable<NativeModule> GetAllModules() =>
-            GetModules().Skip(1).Concat(GetModulesWow64().Skip(1));
+        public IEnumerable<NativeModule> GetAllModules() => GetModules()
+            .Skip(1).Concat(GetModulesWow64().Skip(1));
         
         private static readonly int ShortSize = Marshal.SizeOf(typeof(short));
         private static readonly int IntSize = Marshal.SizeOf(typeof(int));
