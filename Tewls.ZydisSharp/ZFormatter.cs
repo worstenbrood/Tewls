@@ -74,9 +74,6 @@ namespace Tewls.ZydisSharp
         /// Dispose method to free the allocated memory for the formatter. 
         /// This should be called when the formatter is no longer needed to avoid memory leaks.
         /// </summary>
-        public void Dispose()
-        {
-            Marshal.FreeHGlobal(_formatter);
-        }
+        public void Dispose() => Marshal.FreeHGlobal(_formatter);
     }
 }
