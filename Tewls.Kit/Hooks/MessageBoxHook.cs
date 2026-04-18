@@ -30,11 +30,11 @@ namespace Tewls.Kit.Hooks
         /// <returns></returns>
         public int HookedMessageBox(nint hwnd, string text, string caption, int type)
         {
-            Console.WriteLine($"MessageBoxA called with text: {text}, caption: {caption}, type: {type}");
-            Console.WriteLine($"Stub: {(long)Trampoline.Stub.Address:X8}");
-            
+            Console.WriteLine($"[DEBUG] MessageBoxA called with text: {text}, caption: {caption}, type: {type}");
+            Console.WriteLine($"[DEBUG] Stub: {(long)Trampoline.Stub.Address:X8}");          
+
             //return 0;
-            return Stub(hwnd, text, "HOOKED: " + caption, type);
+            return Stub(hwnd, text, "[DEBUG] HOOKED: " + caption, type);
         }
 
         /// <inheritdoc/>

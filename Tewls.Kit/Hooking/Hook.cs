@@ -52,6 +52,7 @@ namespace Tewls.Kit.Hooking
         /// Decoder
         /// </summary>
         protected static readonly ZDecoder Decoder = ZDecoder.Create64();
+        protected static readonly ZFormatter Formatter = new();
 
         /// <summary>
         /// Install the hook
@@ -64,6 +65,8 @@ namespace Tewls.Kit.Hooking
         public HookResult Install(NativeProcess process, NativeModule module, IList<NativeExport> exports,
             IStubGenerator stubGenerator)
         {
+            Formatter.SetProperty(ZydisFormatterProperty.ZYDIS_FORMATTER_PROP_DETAILED_PREFIXES, new(1));
+
             // Check module name
             if (!module.Name.Equals(ModuleName, StringComparison.OrdinalIgnoreCase))
             {
@@ -82,33 +85,47 @@ namespace Tewls.Kit.Hooking
             // Change protection
             var prevProtection = process.VirtualProtectEx(mbi.BaseAddress, mbi.RegionSize, MemProtections.ExecuteReadWrite);
             process.FlushInstructionCache(mbi.BaseAddress, mbi.RegionSize);
-
-            Console.WriteLine($"[+] Protection: {prevProtection}");
+#if DEBUG
+            Console.WriteLine($"[DEBUG] Protection: {prevProtection}");
+#endif
 
             try
             {
-                Console.WriteLine($"[+] Hooking {ModuleName}!{ProcName} at address 0x{export.Address.ToInt64():X}");
+                Console.WriteLine($"[DEBUG] Hooking {ModuleName}!{ProcName} at address 0x{export.Address.ToInt64():X}");
 
                 // Read the first ZYDIS_MAX_INSTRUCTION_LENGTH bytes of the original method to create the trampoline.
                 var buffer = process.ReadBytes(export.Address, Zydis.ZYDIS_MAX_INSTRUCTION_LENGTH);
-                
+
                 // Decode asm
                 var instructions = Decoder.Disassemble(buffer).ToArray();
+#if DEBUG
+                var offset = 0;
+                foreach (var instruction in instructions)
+                {
+                    var instructionAddress = (ulong)(export.Address.ToInt64() + offset);
+                    var absAddress = instruction.TryGetAbsoluteTarget(instructionAddress, out var target) ? target : 0;
+                    Console.WriteLine($"[DEBUG] {instructionAddress:X8}: {Formatter.FormatInstruction(instruction, instructionAddress)} ({target:X8})");
+                    offset += instruction.Instruction.Length;
+                }
+#endif
+
                 // Calculate the length of the instructions to overwrite, which should be at least the size of the stub.
                 var length = instructions.Aggregate(0, (i, c) => i < stubGenerator.Size ? i + c.Instruction.Length : i);
                 if (length < stubGenerator.Size)
                 {
                     return HookResult.Empty;
                 }
-
-                Console.WriteLine($"[+] ASM length: {length}");
+#if DEBUG
+                Console.WriteLine($"[DEBUG] ASM length: {length}");
+#endif
 
                 // Allocate memory for the trampoline, which will contain the original method, the stub, and the replacement method.
                 var remote = process.VirtualAllocEx((nint)length + stubGenerator.Size, AllocationType.Commit, MemProtections.ExecuteReadWrite);
 
-                Console.WriteLine($"[+] Remote stub address: 0x{remote.ToInt64():X}");
-                Console.WriteLine($"[+] Distance: 0x{(ulong)export.Address.ToInt64() - (ulong)remote.ToInt64():X}");
-
+#if DEBUG
+                Console.WriteLine($"[DEBUG] Remote stub address: 0x{remote.ToInt64():X}");
+                Console.WriteLine($"[DEBUG] Distance: 0x{(ulong)export.Address.ToInt64() - (ulong)remote.ToInt64():X}");
+#endif
                 // Set trampoline.
                 Trampoline = new Trampoline<T>(export.Address, remote, Replacement);
 
@@ -118,7 +135,7 @@ namespace Tewls.Kit.Hooking
                 // Write the stub to the trampoline, which will jump original method.
                 var stub = stubGenerator.GetBuffer(export.Address + length);
                 process.WriteBytes(remote + length, stub);
-                
+
                 // Write the jump to the replacement method to the original method.
                 var jump = stubGenerator.GetBuffer(Trampoline.Replacement.Address);
                 process.WriteBytes(export.Address, jump);
