@@ -198,7 +198,14 @@ namespace Tewls.Kit.Asm
 
         private void CopyInstructions(ulong source, ulong destination, List<ZDecodeResult> list)
         {
+            var buffer = new byte[list.Count * Zydis.ZYDIS_MAX_INSTRUCTION_LENGTH];
+            /*
             
+            ulong length = (ulong)buffer.Length;
+            var result = Zydis.ZydisEncoderEncodeInstructionAbsolute(ref _request, buffer, ref length, destination);
+            result.ThrowIfFailed(nameof(Zydis.ZydisEncoderEncodeInstructionAbsolute));
+            Array.Resize(ref buffer, (int)length);
+            return buffer;*/
         }
 
         /// <summary>
