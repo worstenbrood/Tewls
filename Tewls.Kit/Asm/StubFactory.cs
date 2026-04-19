@@ -81,7 +81,7 @@ namespace Tewls.Kit.Asm
         /// <param name="mbi"></param>
         /// <returns></returns>
         private static long GetNextPositive(long currentPositive, MemoryBasicInformation mbi) =>
-            mbi == null ? 
+            mbi == null ?
             currentPositive + SystemInfo.PageSize :
             mbi.BaseAddress.ToInt64() + mbi.RegionSize.ToInt64();
 
@@ -98,7 +98,10 @@ namespace Tewls.Kit.Asm
 
             long baseToUse = mbi.Type switch
             {
+                // Use allocation base for images to avoid skipping large regions that may be reserved
+                // for the image but not yet committed.
                 MemType.Image => mbi.AllocationBase.ToInt64(),
+                // Use the end of the region for mapped and private memory to skip past it.
                 _ => mbi.BaseAddress.ToInt64()
             };
 
@@ -133,6 +136,9 @@ namespace Tewls.Kit.Asm
             {
                 if (currentPositive < max)
                 {
+                    // Allocate in the positive direction first, then negative.
+                    // This is because it's more common to find free memory after the base address than before it,
+                    // especially if the base address is near the lower end of the address space.
                     IntPtr allocated = TryAllocate(new IntPtr(currentPositive), alignedSize, out var mbi);
                     if (allocated != IntPtr.Zero)
                     {
@@ -143,6 +149,7 @@ namespace Tewls.Kit.Asm
 
                 if (currentNegative > min)
                 {
+                    // Allocate in the negative direction if positive allocation fails or if the positive address is out of range.
                     IntPtr allocated = TryAllocate(new IntPtr(currentNegative), alignedSize, out var mbi);
                     if (allocated != IntPtr.Zero)
                     {
