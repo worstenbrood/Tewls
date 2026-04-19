@@ -14,8 +14,11 @@ namespace Tewls.ZydisSharp
             for (int i = 0; i < count; i++)
             {
                 var op = Operands[i];
+
                 if (op.Type == ZydisOperandType.ZYDIS_OPERAND_TYPE_MEMORY &&
-                    op.Value.Mem.Base == ZydisRegister.ZYDIS_REGISTER_RIP)
+                    (op.Value.Mem.Base == ZydisRegister.ZYDIS_REGISTER_RIP ||
+                    op.Value.Mem.Index == ZydisRegister.ZYDIS_REGISTER_EIP ||
+                    op.Value.Mem.Index == ZydisRegister.ZYDIS_REGISTER_IP))
                 {
                     return true;
                 }
@@ -35,8 +38,11 @@ namespace Tewls.ZydisSharp
             for (int i = 0; i < count; i++)
             {
                 var op = Operands[i];
-                if (op.Type == ZydisOperandType.ZYDIS_OPERAND_TYPE_IMMEDIATE &&
-                    op.Value.Imm.IsRelative != 0)
+
+                if (op.Type == ZydisOperandType.ZYDIS_OPERAND_TYPE_MEMORY &&
+                    (op.Value.Mem.Base == ZydisRegister.ZYDIS_REGISTER_RIP ||
+                    op.Value.Mem.Index == ZydisRegister.ZYDIS_REGISTER_EIP ||
+                    op.Value.Mem.Index == ZydisRegister.ZYDIS_REGISTER_IP))
                 {
                     return true;
                 }
@@ -58,8 +64,11 @@ namespace Tewls.ZydisSharp
                 for (int i = 0; i < count; i++)
                 {
                     var op = Operands[i];
+
                     if (op.Type == ZydisOperandType.ZYDIS_OPERAND_TYPE_MEMORY &&
-                        op.Value.Mem.Base == ZydisRegister.ZYDIS_REGISTER_RIP)
+                        (op.Value.Mem.Base == ZydisRegister.ZYDIS_REGISTER_RIP ||
+                        op.Value.Mem.Index == ZydisRegister.ZYDIS_REGISTER_EIP ||
+                        op.Value.Mem.Index == ZydisRegister.ZYDIS_REGISTER_IP))
                     {
                         return true;
                     }
@@ -85,7 +94,9 @@ namespace Tewls.ZydisSharp
                 ref var op = ref Operands[i];
 
                 if (op.Type == ZydisOperandType.ZYDIS_OPERAND_TYPE_MEMORY &&
-                    op.Value.Mem.Base == ZydisRegister.ZYDIS_REGISTER_IP)
+                    (op.Value.Mem.Base == ZydisRegister.ZYDIS_REGISTER_RIP || 
+                    op.Value.Mem.Index == ZydisRegister.ZYDIS_REGISTER_EIP ||
+                    op.Value.Mem.Index == ZydisRegister.ZYDIS_REGISTER_IP))
                 {
                     target = Zydis.CalcAbsoluteAddress(ref Instruction, ref op, instructionAddress);
                     return true;

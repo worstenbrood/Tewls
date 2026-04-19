@@ -2,9 +2,10 @@
 
 namespace Tewls.ZydisSharp.Native
 {
-    using ZydisElementSize = UInt32;
+    using ZydisElementSize = UInt16;
     using ZydisElementType = UInt32;
-    using ZydisOperandActions = UInt32;
+    using ZydisOperandActions = Byte;
+    using ZydisOperandAttributes = Byte;
 
     public enum ZydisMachineMode : uint
     {
@@ -51,6 +52,8 @@ namespace Tewls.ZydisSharp.Native
     public enum ZydisRegister : uint
     {
         ZYDIS_REGISTER_NONE,
+
+        // General purpose registers  8-bit
         ZYDIS_REGISTER_AL,
         ZYDIS_REGISTER_CL,
         ZYDIS_REGISTER_DL,
@@ -71,6 +74,24 @@ namespace Tewls.ZydisSharp.Native
         ZYDIS_REGISTER_R13B,
         ZYDIS_REGISTER_R14B,
         ZYDIS_REGISTER_R15B,
+        ZYDIS_REGISTER_R16B,
+        ZYDIS_REGISTER_R17B,
+        ZYDIS_REGISTER_R18B,
+        ZYDIS_REGISTER_R19B,
+        ZYDIS_REGISTER_R20B,
+        ZYDIS_REGISTER_R21B,
+        ZYDIS_REGISTER_R22B,
+        ZYDIS_REGISTER_R23B,
+        ZYDIS_REGISTER_R24B,
+        ZYDIS_REGISTER_R25B,
+        ZYDIS_REGISTER_R26B,
+        ZYDIS_REGISTER_R27B,
+        ZYDIS_REGISTER_R28B,
+        ZYDIS_REGISTER_R29B,
+        ZYDIS_REGISTER_R30B,
+        ZYDIS_REGISTER_R31B,
+
+        // General purpose registers 16-bit
         ZYDIS_REGISTER_AX,
         ZYDIS_REGISTER_CX,
         ZYDIS_REGISTER_DX,
@@ -87,6 +108,24 @@ namespace Tewls.ZydisSharp.Native
         ZYDIS_REGISTER_R13W,
         ZYDIS_REGISTER_R14W,
         ZYDIS_REGISTER_R15W,
+        ZYDIS_REGISTER_R16W,
+        ZYDIS_REGISTER_R17W,
+        ZYDIS_REGISTER_R18W,
+        ZYDIS_REGISTER_R19W,
+        ZYDIS_REGISTER_R20W,
+        ZYDIS_REGISTER_R21W,
+        ZYDIS_REGISTER_R22W,
+        ZYDIS_REGISTER_R23W,
+        ZYDIS_REGISTER_R24W,
+        ZYDIS_REGISTER_R25W,
+        ZYDIS_REGISTER_R26W,
+        ZYDIS_REGISTER_R27W,
+        ZYDIS_REGISTER_R28W,
+        ZYDIS_REGISTER_R29W,
+        ZYDIS_REGISTER_R30W,
+        ZYDIS_REGISTER_R31W,
+
+        // General purpose registers 32-bit
         ZYDIS_REGISTER_EAX,
         ZYDIS_REGISTER_ECX,
         ZYDIS_REGISTER_EDX,
@@ -103,6 +142,24 @@ namespace Tewls.ZydisSharp.Native
         ZYDIS_REGISTER_R13D,
         ZYDIS_REGISTER_R14D,
         ZYDIS_REGISTER_R15D,
+        ZYDIS_REGISTER_R16D,
+        ZYDIS_REGISTER_R17D,
+        ZYDIS_REGISTER_R18D,
+        ZYDIS_REGISTER_R19D,
+        ZYDIS_REGISTER_R20D,
+        ZYDIS_REGISTER_R21D,
+        ZYDIS_REGISTER_R22D,
+        ZYDIS_REGISTER_R23D,
+        ZYDIS_REGISTER_R24D,
+        ZYDIS_REGISTER_R25D,
+        ZYDIS_REGISTER_R26D,
+        ZYDIS_REGISTER_R27D,
+        ZYDIS_REGISTER_R28D,
+        ZYDIS_REGISTER_R29D,
+        ZYDIS_REGISTER_R30D,
+        ZYDIS_REGISTER_R31D,
+
+        // General purpose registers 64-bit
         ZYDIS_REGISTER_RAX,
         ZYDIS_REGISTER_RCX,
         ZYDIS_REGISTER_RDX,
@@ -119,6 +176,24 @@ namespace Tewls.ZydisSharp.Native
         ZYDIS_REGISTER_R13,
         ZYDIS_REGISTER_R14,
         ZYDIS_REGISTER_R15,
+        ZYDIS_REGISTER_R16,
+        ZYDIS_REGISTER_R17,
+        ZYDIS_REGISTER_R18,
+        ZYDIS_REGISTER_R19,
+        ZYDIS_REGISTER_R20,
+        ZYDIS_REGISTER_R21,
+        ZYDIS_REGISTER_R22,
+        ZYDIS_REGISTER_R23,
+        ZYDIS_REGISTER_R24,
+        ZYDIS_REGISTER_R25,
+        ZYDIS_REGISTER_R26,
+        ZYDIS_REGISTER_R27,
+        ZYDIS_REGISTER_R28,
+        ZYDIS_REGISTER_R29,
+        ZYDIS_REGISTER_R30,
+        ZYDIS_REGISTER_R31,
+
+        // Floating point legacy registers
         ZYDIS_REGISTER_ST0,
         ZYDIS_REGISTER_ST1,
         ZYDIS_REGISTER_ST2,
@@ -130,6 +205,8 @@ namespace Tewls.ZydisSharp.Native
         ZYDIS_REGISTER_X87CONTROL,
         ZYDIS_REGISTER_X87STATUS,
         ZYDIS_REGISTER_X87TAG,
+
+        // Floating point multimedia registers
         ZYDIS_REGISTER_MM0,
         ZYDIS_REGISTER_MM1,
         ZYDIS_REGISTER_MM2,
@@ -138,6 +215,8 @@ namespace Tewls.ZydisSharp.Native
         ZYDIS_REGISTER_MM5,
         ZYDIS_REGISTER_MM6,
         ZYDIS_REGISTER_MM7,
+
+        // Floating point vector registers 128-bit
         ZYDIS_REGISTER_XMM0,
         ZYDIS_REGISTER_XMM1,
         ZYDIS_REGISTER_XMM2,
@@ -170,6 +249,8 @@ namespace Tewls.ZydisSharp.Native
         ZYDIS_REGISTER_XMM29,
         ZYDIS_REGISTER_XMM30,
         ZYDIS_REGISTER_XMM31,
+
+        // Floating point vector registers 256-bit
         ZYDIS_REGISTER_YMM0,
         ZYDIS_REGISTER_YMM1,
         ZYDIS_REGISTER_YMM2,
@@ -202,6 +283,8 @@ namespace Tewls.ZydisSharp.Native
         ZYDIS_REGISTER_YMM29,
         ZYDIS_REGISTER_YMM30,
         ZYDIS_REGISTER_YMM31,
+
+        // Floating point vector registers 512-bit
         ZYDIS_REGISTER_ZMM0,
         ZYDIS_REGISTER_ZMM1,
         ZYDIS_REGISTER_ZMM2,
@@ -234,6 +317,8 @@ namespace Tewls.ZydisSharp.Native
         ZYDIS_REGISTER_ZMM29,
         ZYDIS_REGISTER_ZMM30,
         ZYDIS_REGISTER_ZMM31,
+
+        // Matrix registers
         ZYDIS_REGISTER_TMM0,
         ZYDIS_REGISTER_TMM1,
         ZYDIS_REGISTER_TMM2,
@@ -242,22 +327,32 @@ namespace Tewls.ZydisSharp.Native
         ZYDIS_REGISTER_TMM5,
         ZYDIS_REGISTER_TMM6,
         ZYDIS_REGISTER_TMM7,
+
+        // Flags registers
         ZYDIS_REGISTER_FLAGS,
         ZYDIS_REGISTER_EFLAGS,
         ZYDIS_REGISTER_RFLAGS,
+
+        // Instruction-pointer registers
         ZYDIS_REGISTER_IP,
         ZYDIS_REGISTER_EIP,
         ZYDIS_REGISTER_RIP,
+
+        // Segment registers
         ZYDIS_REGISTER_ES,
         ZYDIS_REGISTER_CS,
         ZYDIS_REGISTER_SS,
         ZYDIS_REGISTER_DS,
         ZYDIS_REGISTER_FS,
         ZYDIS_REGISTER_GS,
+
+        // Table registers
         ZYDIS_REGISTER_GDTR,
         ZYDIS_REGISTER_LDTR,
         ZYDIS_REGISTER_IDTR,
         ZYDIS_REGISTER_TR,
+
+        // Test registers
         ZYDIS_REGISTER_TR0,
         ZYDIS_REGISTER_TR1,
         ZYDIS_REGISTER_TR2,
@@ -266,6 +361,8 @@ namespace Tewls.ZydisSharp.Native
         ZYDIS_REGISTER_TR5,
         ZYDIS_REGISTER_TR6,
         ZYDIS_REGISTER_TR7,
+
+        // Control registers
         ZYDIS_REGISTER_CR0,
         ZYDIS_REGISTER_CR1,
         ZYDIS_REGISTER_CR2,
@@ -282,6 +379,8 @@ namespace Tewls.ZydisSharp.Native
         ZYDIS_REGISTER_CR13,
         ZYDIS_REGISTER_CR14,
         ZYDIS_REGISTER_CR15,
+
+        // Debug registers
         ZYDIS_REGISTER_DR0,
         ZYDIS_REGISTER_DR1,
         ZYDIS_REGISTER_DR2,
@@ -298,6 +397,8 @@ namespace Tewls.ZydisSharp.Native
         ZYDIS_REGISTER_DR13,
         ZYDIS_REGISTER_DR14,
         ZYDIS_REGISTER_DR15,
+
+        // Mask registers
         ZYDIS_REGISTER_K0,
         ZYDIS_REGISTER_K1,
         ZYDIS_REGISTER_K2,
@@ -306,17 +407,26 @@ namespace Tewls.ZydisSharp.Native
         ZYDIS_REGISTER_K5,
         ZYDIS_REGISTER_K6,
         ZYDIS_REGISTER_K7,
+
+        // Bound registers
         ZYDIS_REGISTER_BND0,
         ZYDIS_REGISTER_BND1,
         ZYDIS_REGISTER_BND2,
         ZYDIS_REGISTER_BND3,
         ZYDIS_REGISTER_BNDCFG,
         ZYDIS_REGISTER_BNDSTATUS,
+
+        // Uncategorized
         ZYDIS_REGISTER_MXCSR,
         ZYDIS_REGISTER_PKRU,
         ZYDIS_REGISTER_XCR0,
         ZYDIS_REGISTER_UIF,
-        ZYDIS_REGISTER_MAX_VALUE
+        ZYDIS_REGISTER_IA32_KERNEL_GS_BASE,
+
+        /**
+         * Maximum value of this enum.
+         */
+        ZYDIS_REGISTER_MAX_VALUE = ZYDIS_REGISTER_IA32_KERNEL_GS_BASE,
     }
     public enum ZydisMemoryOperandType : uint
     {
@@ -384,7 +494,6 @@ namespace Tewls.ZydisSharp.Native
         ZYDIS_ATTRIB_HAS_EEVEX = 1UL << 47,
     }
 
-
     [StructLayout(LayoutKind.Sequential, Pack = 8)]
     public struct ZydisDecoder
     {
@@ -414,10 +523,11 @@ namespace Tewls.ZydisSharp.Native
         public ZydisDecodedOperandMemDisp Disp;
     }
 
-    [StructLayout(LayoutKind.Sequential, Pack = 8)]
+    [StructLayout(LayoutKind.Explicit, Pack = 8)]
     public struct ZydisDecodedOperandImmValue
     {
-        public ulong U;
+        [FieldOffset(0)] public long U;
+        [FieldOffset(0)] public long S;
     }
 
     [StructLayout(LayoutKind.Sequential, Pack = 8)]
@@ -427,22 +537,10 @@ namespace Tewls.ZydisSharp.Native
         public byte IsAddress;
         public byte IsRelative;
 
-        private byte _pad0;
-        private byte _pad1;
-        private byte _pad2;
-        private byte _pad3;
-        private byte _pad4;
-
         public ZydisDecodedOperandImmValue Value;
-        public byte Offset;
-        public byte Size;
 
-        private byte _pad5;
-        private byte _pad6;
-        private byte _pad7;
-        private byte _pad8;
-        private byte _pad9;
-        private byte _pad10;
+        public ushort Offset;
+        public ushort Size;
     }
 
     [StructLayout(LayoutKind.Sequential, Pack = 8)]
@@ -458,7 +556,7 @@ namespace Tewls.ZydisSharp.Native
         public uint Offset;    // ZyanU32
     }
 
-    [StructLayout(LayoutKind.Explicit)]
+    [StructLayout(LayoutKind.Explicit, Pack = 8)]
     public struct ZydisDecodedOperandValue
     {
         [FieldOffset(0)] public ZydisDecodedOperandReg Reg;
@@ -478,12 +576,12 @@ namespace Tewls.ZydisSharp.Native
         public ZydisElementType ElementType;
         public ZydisElementSize ElementSize;
         public ushort ElementCount;
-        public byte Attributes;
+        public ZydisOperandAttributes Attributes;
         public ZydisOperandType Type;
         public ZydisDecodedOperandValue Value;
     }
 
-    [StructLayout(LayoutKind.Sequential, Pack = 8, Size = 512)]
+    [StructLayout(LayoutKind.Sequential, Pack = 8, Size = 1024)]
     public struct ZydisDecodedInstruction
     {
         public ZydisMachineMode MachineMode;
