@@ -48,7 +48,7 @@ namespace Tewls.Windows.Kernel
         public short ProcessorLevel;
         public short ProcessorRevision;
         
-        public static SystemInfo GetSystemInfo()
+        public static SystemInfo Get()
         {
             var info = new SystemInfo();
             Kernel32.GetSystemInfo(info);
@@ -120,7 +120,7 @@ namespace Tewls.Windows.Kernel
         public short PartitionId;
         public TPointer RegionSize;
         public AllocationType State;
-        public AllocationType Protect;
+        public MemProtections Protect;
         public MemType Type;
     };
 
