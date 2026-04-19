@@ -1,11 +1,33 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using Tewls.ZydisSharp.Native;
 
 namespace Tewls.ZydisSharp
 {
     public class ZEncoder
     {
+        private ZydisEncoderRequest _request;
 
+        internal ZEncoder(ref ZydisEncoderRequest request)
+        {
+            _request = request;
+        }
+
+        public static ZEncoder Create(ZDecodeResult decodeResult)
+        {
+            var request = new ZydisEncoderRequest();
+            var result = Zydis.ZydisEncoderDecodedInstructionToEncoderRequest(ref decodeResult.Instruction, decodeResult.Operands,
+                decodeResult.Instruction.OperandCountVisible, ref request);
+            result.ThrowIfFailed(nameof(Zydis.ZydisEncoderDecodedInstructionToEncoderRequest));
+            return new ZEncoder(ref request);
+        }
+
+        public byte[] Encode()
+        {
+            byte[] buffer = new byte[Zydis.ZYDIS_MAX_INSTRUCTION_LENGTH];
+            ulong length = (ulong)buffer.Length;
+            var result = Zydis.ZydisEncoderEncodeInstruction(ref _request, buffer, ref length);
+            result.ThrowIfFailed(nameof(Zydis.ZydisEncoderEncodeInstruction));
+            Array.Resize(ref buffer, (int)length);
+            return buffer;
+        }
     }
 }

@@ -1,6 +1,6 @@
 ﻿namespace Tewls.ZydisSharp.Native
 {
-    public enum ZydisMnemonic_
+    public enum ZydisMnemonic
     {
         ZYDIS_MNEMONIC_INVALID,
         ZYDIS_MNEMONIC_AAA,

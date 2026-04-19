@@ -111,5 +111,7 @@ namespace Tewls.ZydisSharp
             }
             return false;
         }
+
+
     }
 }

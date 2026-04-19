@@ -7,6 +7,7 @@ namespace Tewls.ZydisSharp.Native
     {
         public const string LibraryName = "Zydis";
         public const int ZYDIS_MAX_OPERAND_COUNT = 10;
+        public const int ZYDIS_ENCODER_MAX_OPERANDS = 5;
         public const int ZYDIS_MAX_INSTRUCTION_LENGTH = 15;
 
         static Zydis()
@@ -120,5 +121,13 @@ namespace Tewls.ZydisSharp.Native
         internal static extern ZyanStatus ZydisFormatterFormatInstruction(IntPtr formatter, 
             ref ZydisDecodedInstruction instruction, ZydisDecodedOperand[] operands, byte operandCount, byte[] buffer, uint length, ulong runtimeAddress,
             IntPtr userData);
+
+        [DllImport(LibraryName, CallingConvention = CallingConvention.Cdecl, ExactSpelling = true)]
+        [return: MarshalAs(UnmanagedType.CustomMarshaler, MarshalTypeRef = typeof(ZyanStatusMarshaller))]
+        internal static extern ZyanStatus ZydisEncoderDecodedInstructionToEncoderRequest(ref ZydisDecodedInstruction instruction, ZydisDecodedOperand[] operands, byte operand_count_visible, ref ZydisEncoderRequest request);
+
+        [DllImport(LibraryName, CallingConvention = CallingConvention.Cdecl, ExactSpelling = true)]
+        [return: MarshalAs(UnmanagedType.CustomMarshaler, MarshalTypeRef = typeof(ZyanStatusMarshaller))]
+        internal static extern ZyanStatus ZydisEncoderEncodeInstruction(ref ZydisEncoderRequest request, byte[] buffer, ref ulong length);
     }
 }

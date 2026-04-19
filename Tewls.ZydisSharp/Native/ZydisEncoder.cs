@@ -1,5 +1,8 @@
-﻿namespace Tewls.ZydisSharp.Native
+﻿using System.Runtime.InteropServices;
+
+namespace Tewls.ZydisSharp.Native
 {
+    using ZydisDefaultFlagsValue = Byte;
     public enum ZydisOpcodeMap
     {
         ZYDIS_OPCODE_MAP_DEFAULT,
@@ -95,17 +98,179 @@
         ZYDIS_ENCODABLE_ENCODING_MAX_VALUE = (ZYDIS_ENCODABLE_ENCODING_MVEX | (ZYDIS_ENCODABLE_ENCODING_MVEX - 1)),
     }
 
+    public enum ZydisBranchType
+    {
+        ZYDIS_BRANCH_TYPE_NONE,
+        ZYDIS_BRANCH_TYPE_SHORT,
+        ZYDIS_BRANCH_TYPE_NEAR,
+        ZYDIS_BRANCH_TYPE_FAR,
+        ZYDIS_BRANCH_TYPE_ABSOLUTE,
+        ZYDIS_BRANCH_TYPE_MAX_VALUE = ZYDIS_BRANCH_TYPE_ABSOLUTE,
+    }
+
+    public enum ZydisBranchWidth
+    {
+        ZYDIS_BRANCH_WIDTH_NONE,
+        ZYDIS_BRANCH_WIDTH_8,
+        ZYDIS_BRANCH_WIDTH_16,
+        ZYDIS_BRANCH_WIDTH_32,
+        ZYDIS_BRANCH_WIDTH_64,
+        ZYDIS_BRANCH_WIDTH_MAX_VALUE = ZYDIS_BRANCH_WIDTH_64,
+    }
+
+    public enum ZydisAddressSizeHint
+    {
+        ZYDIS_ADDRESS_SIZE_HINT_NONE,
+        ZYDIS_ADDRESS_SIZE_HINT_16,
+        ZYDIS_ADDRESS_SIZE_HINT_32,
+        ZYDIS_ADDRESS_SIZE_HINT_64,
+        ZYDIS_ADDRESS_SIZE_HINT_MAX_VALUE = ZYDIS_ADDRESS_SIZE_HINT_64,
+    }
+    public enum ZydisOperandSizeHint
+    {
+        ZYDIS_OPERAND_SIZE_HINT_NONE,
+        ZYDIS_OPERAND_SIZE_HINT_8,
+        ZYDIS_OPERAND_SIZE_HINT_16,
+        ZYDIS_OPERAND_SIZE_HINT_32,
+        ZYDIS_OPERAND_SIZE_HINT_64,
+        ZYDIS_OPERAND_SIZE_HINT_MAX_VALUE = ZYDIS_OPERAND_SIZE_HINT_64,
+    }
+
+    public enum ZydisBroadcastMode
+    {
+        ZYDIS_BROADCAST_MODE_NONE,
+        ZYDIS_BROADCAST_MODE_1_TO_2,
+        ZYDIS_BROADCAST_MODE_1_TO_4,
+        ZYDIS_BROADCAST_MODE_1_TO_8,
+        ZYDIS_BROADCAST_MODE_1_TO_16,
+        ZYDIS_BROADCAST_MODE_1_TO_32,
+        ZYDIS_BROADCAST_MODE_1_TO_64,
+        ZYDIS_BROADCAST_MODE_2_TO_4,
+        ZYDIS_BROADCAST_MODE_2_TO_8,
+        ZYDIS_BROADCAST_MODE_2_TO_16,
+        ZYDIS_BROADCAST_MODE_4_TO_8,
+        ZYDIS_BROADCAST_MODE_4_TO_16,
+        ZYDIS_BROADCAST_MODE_8_TO_16,
+        ZYDIS_BROADCAST_MODE_MAX_VALUE = ZYDIS_BROADCAST_MODE_8_TO_16,
+    }
+
+    public enum ZydisRoundingMode
+    {
+        ZYDIS_ROUNDING_MODE_NONE,
+        ZYDIS_ROUNDING_MODE_RN,
+        ZYDIS_ROUNDING_MODE_RD,
+        ZYDIS_ROUNDING_MODE_RU,
+        ZYDIS_ROUNDING_MODE_RZ,
+
+        ZYDIS_ROUNDING_MODE_MAX_VALUE = ZYDIS_ROUNDING_MODE_RZ,
+    }
+
+    public enum ZydisConversionMode
+    {
+        ZYDIS_CONVERSION_MODE_NONE,
+        ZYDIS_CONVERSION_MODE_FLOAT16,
+        ZYDIS_CONVERSION_MODE_SINT8,
+        ZYDIS_CONVERSION_MODE_UINT8,
+        ZYDIS_CONVERSION_MODE_SINT16,
+        ZYDIS_CONVERSION_MODE_UINT16,
+        ZYDIS_CONVERSION_MODE_MAX_VALUE = ZYDIS_CONVERSION_MODE_UINT16,
+    }
+
+    public enum ZydisSwizzleMode
+    {
+        ZYDIS_SWIZZLE_MODE_NONE,
+        ZYDIS_SWIZZLE_MODE_DCBA,
+        ZYDIS_SWIZZLE_MODE_CDAB,
+        ZYDIS_SWIZZLE_MODE_BADC,
+        ZYDIS_SWIZZLE_MODE_DACB,
+        ZYDIS_SWIZZLE_MODE_AAAA,
+        ZYDIS_SWIZZLE_MODE_BBBB,
+        ZYDIS_SWIZZLE_MODE_CCCC,
+        ZYDIS_SWIZZLE_MODE_DDDD,
+        ZYDIS_SWIZZLE_MODE_MAX_VALUE = ZYDIS_SWIZZLE_MODE_DDDD,
+    }
+
+    [StructLayout(LayoutKind.Sequential, Pack = 8)]
+    public struct ZydisEncoderOperandReg
+    {
+        public ZydisRegister Value;
+        public byte Is4;
+    }
+
+    [StructLayout(LayoutKind.Sequential, Pack = 8)]
+    public struct ZydisEncoderOperandMem
+    {
+        public ZydisRegister Base;
+        public ZydisRegister Index;
+        public byte Scale;
+        public long Displacement;
+        public ushort Size;
+    }
+
+    [StructLayout(LayoutKind.Explicit, Pack = 8)]
+    public struct ZydisEncoderOperandImm
+    {
+        [FieldOffset(0)]
+        public ulong U;
+        [FieldOffset(0)]
+        public long S;
+    }
+
+    [StructLayout(LayoutKind.Sequential, Pack = 8)]
+    public struct ZydisEncoderOperandPtr
+    {
+        public ushort Segment;
+        public uint Offset;
+    }
+
+    [StructLayout(LayoutKind.Sequential, Pack = 8)]
+    public struct ZydisEncoderOperand
+    {
+        public ZydisOperandType Type;
+        public ZydisEncoderOperandReg Reg;
+        public ZydisEncoderOperandMem Mem;
+        public ZydisEncoderOperandPtr Ptr;
+        public ZydisEncoderOperandImm Imm;
+    }
+
+    [StructLayout(LayoutKind.Sequential, Pack = 8)]
+    public struct ZydisEncoderRequestEvexFeatures
+    {
+        public ZydisBroadcastMode Broadcast;
+        public ZydisRoundingMode Rounding;
+        public byte Sae;
+        public byte ZeroingMask;
+        public byte NoFlags;
+        public ZydisDefaultFlagsValue DefaultFlags;
+    }
+
+    [StructLayout(LayoutKind.Sequential, Pack = 8)]
+    public struct ZydisEncoderRequestMvexFeatures
+    {
+        public ZydisBroadcastMode Broadcast;
+        public ZydisConversionMode Conversion;
+        public ZydisRoundingMode Rounding;
+        public ZydisSwizzleMode Swizzle;
+        public byte Sae;
+        public byte EvictionHint;
+    }
+
+    [StructLayout(LayoutKind.Sequential, Pack = 8)]
     public struct ZydisEncoderRequest
     {
         public ZydisMachineMode MachineMode;
         public ZydisEncodableEncoding AllowedEncodings;
-        ZydisMnemonic mnemonic;
-        ZydisInstructionAttributes prefixes;
-        ZydisBranchType branch_type;
-        ZydisBranchWidth branch_width;
-        ZydisAddressSizeHint address_size_hint;
-        ZydisOperandSizeHint operand_size_hint;
-        ZyanU8 operand_count;
-        ZydisEncoderOperand operands[ZYDIS_ENCODER_MAX_OPERANDS];
+        public ZydisMnemonic Mnemonic;
+        public ZydisInstructionAttributes Prefixes;
+        public ZydisBranchType BranchType;
+        public ZydisBranchWidth BranchWidth;
+        public ZydisAddressSizeHint AddressSizeHint;
+        public ZydisOperandSizeHint OperandSizeHint;
+        public byte OperandCount;
+        [MarshalAs(UnmanagedType.ByValArray, SizeConst = Zydis.ZYDIS_ENCODER_MAX_OPERANDS)]
+        public ZydisEncoderOperand[] Operands;
+        public ZydisEncoderRequestEvexFeatures Evex;
+        public ZydisEncoderRequestMvexFeatures Mvex;
     }
+}
 
