@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Tewls.Kit.Asm;
 using Tewls.Kit.Asm.Stubs;
 using Tewls.Kit.Utils;
 using Tewls.Windows.Kernel;
@@ -53,6 +54,7 @@ namespace Tewls.Kit.Hooking
         /// </summary>
         protected static readonly ZDecoder Decoder = ZDecoder.Create64();
         protected static readonly ZFormatter Formatter = new();
+
 
         /// <summary>
         /// Install the hook
@@ -118,13 +120,13 @@ namespace Tewls.Kit.Hooking
 #if DEBUG
                 Console.WriteLine($"[DEBUG] ASM length: {length}");
 #endif
+                var stubFactory = new StubFactory(process);
 
-                // Allocate memory for the trampoline, which will contain the original method, the stub, and the replacement method.
-                var remote = process.VirtualAllocEx((nint)length + stubGenerator.Size, AllocationType.Commit, MemProtections.ExecuteReadWrite);
+                var remote = stubFactory.AllocateRelativeAddress(export.Address, length + stubGenerator.Size);
 
 #if DEBUG
                 Console.WriteLine($"[DEBUG] Remote stub address: 0x{remote.ToInt64():X}");
-                Console.WriteLine($"[DEBUG] Distance: 0x{(ulong)export.Address.ToInt64() - (ulong)remote.ToInt64():X}");
+                Console.WriteLine($"[DEBUG] Distance: 0x{remote.ToInt64() - export.Address.ToInt64():X}");
 #endif
                 // Set trampoline.
                 Trampoline = new Trampoline<T>(export.Address, remote, Replacement);
