@@ -83,5 +83,29 @@
         ZYDIS_OPERAND_VISIBILITY_MAX_VALUE,
         ZYDIS_OPERAND_VISIBILITY_REQUIRED_BITS
     }
-}
+    public enum ZydisEncodableEncoding : uint
+    {
+        ZYDIS_ENCODABLE_ENCODING_DEFAULT = 0x00000000,
+        ZYDIS_ENCODABLE_ENCODING_LEGACY = 0x00000001,
+        ZYDIS_ENCODABLE_ENCODING_3DNOW = 0x00000002,
+        ZYDIS_ENCODABLE_ENCODING_XOP = 0x00000004,
+        ZYDIS_ENCODABLE_ENCODING_VEX = 0x00000008,
+        ZYDIS_ENCODABLE_ENCODING_EVEX = 0x00000010,
+        ZYDIS_ENCODABLE_ENCODING_MVEX = 0x00000020,
+        ZYDIS_ENCODABLE_ENCODING_MAX_VALUE = (ZYDIS_ENCODABLE_ENCODING_MVEX | (ZYDIS_ENCODABLE_ENCODING_MVEX - 1)),
+    }
+
+    public struct ZydisEncoderRequest
+    {
+        public ZydisMachineMode MachineMode;
+        public ZydisEncodableEncoding AllowedEncodings;
+        ZydisMnemonic mnemonic;
+        ZydisInstructionAttributes prefixes;
+        ZydisBranchType branch_type;
+        ZydisBranchWidth branch_width;
+        ZydisAddressSizeHint address_size_hint;
+        ZydisOperandSizeHint operand_size_hint;
+        ZyanU8 operand_count;
+        ZydisEncoderOperand operands[ZYDIS_ENCODER_MAX_OPERANDS];
+    }
 
