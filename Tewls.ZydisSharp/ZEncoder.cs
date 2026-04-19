@@ -29,5 +29,15 @@ namespace Tewls.ZydisSharp
             Array.Resize(ref buffer, (int)length);
             return buffer;
         }
+
+        public byte[] EncodeAbsolute(ulong address)
+        {
+            byte[] buffer = new byte[Zydis.ZYDIS_MAX_INSTRUCTION_LENGTH];
+            ulong length = (ulong)buffer.Length;
+            var result = Zydis.ZydisEncoderEncodeInstructionAbsolute(ref _request, buffer, ref length, address);
+            result.ThrowIfFailed(nameof(Zydis.ZydisEncoderEncodeInstructionAbsolute));
+            Array.Resize(ref buffer, (int)length);
+            return buffer;
+        }
     }
 }

@@ -74,7 +74,7 @@ namespace Tewls.ZydisSharp.Native
                 result.ThrowIfFailed(nameof(ZydisDecoderDecodeFull));
                 
                 // Return the decoded instruction and operands as a ZDecodeResult
-                return new ZDecodeResult(instruction, operands);
+                return new ZDecodeResult(ref instruction, operands);
             }
 
             return null;
@@ -129,5 +129,10 @@ namespace Tewls.ZydisSharp.Native
         [DllImport(LibraryName, CallingConvention = CallingConvention.Cdecl, ExactSpelling = true)]
         [return: MarshalAs(UnmanagedType.CustomMarshaler, MarshalTypeRef = typeof(ZyanStatusMarshaller))]
         internal static extern ZyanStatus ZydisEncoderEncodeInstruction(ref ZydisEncoderRequest request, byte[] buffer, ref ulong length);
+
+        [DllImport(LibraryName, CallingConvention = CallingConvention.Cdecl, ExactSpelling = true)]
+        [return: MarshalAs(UnmanagedType.CustomMarshaler, MarshalTypeRef = typeof(ZyanStatusMarshaller))]
+        internal static extern ZyanStatus ZydisEncoderEncodeInstructionAbsolute(ref ZydisEncoderRequest request, byte[] buffer,
+            ref ulong length, ulong runtime_address);
     }
 }

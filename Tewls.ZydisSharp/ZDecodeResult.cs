@@ -2,7 +2,7 @@
 
 namespace Tewls.ZydisSharp
 {
-    public class ZDecodeResult(ZydisDecodedInstruction instruction, ZydisDecodedOperand[] operands)
+    public class ZDecodeResult(ref ZydisDecodedInstruction instruction, ZydisDecodedOperand[] operands)
     {
         public ZydisDecodedInstruction Instruction = instruction;
         public ZydisDecodedOperand[] Operands = operands ?? [];
@@ -112,11 +112,7 @@ namespace Tewls.ZydisSharp
             return false;
         }
 
-        public byte[] Encode()
-        {
-            return ZEncoder
-                .Create(this)
-                .Encode();
-        }
+        public byte[] Encode() => ZEncoder.Create(this).Encode();
+        public byte[] EncodeAbsolute(ulong address) => ZEncoder.Create(this).EncodeAbsolute(address);
     }
 }
