@@ -6,11 +6,17 @@ namespace Tewls.ZydisSharp
     {
         private ZydisEncoderRequest _request;
 
-        internal ZEncoder(ref ZydisEncoderRequest request)
+        public ZEncoder(ref ZydisEncoderRequest request)
         {
             _request = request;
         }
 
+        /// <summary>
+        /// Create a new encoder request based on a decoded instruction. 
+        /// This is useful for re-encoding instructions after modifying them.
+        /// </summary>
+        /// <param name="decodeResult"></param>
+        /// <returns></returns>
         public static ZEncoder Create(ZDecodeResult decodeResult)
         {
             var request = new ZydisEncoderRequest();
@@ -20,6 +26,10 @@ namespace Tewls.ZydisSharp
             return new ZEncoder(ref request);
         }
 
+        /// <summary>
+        /// Encode request into a byte array. The request must be properly initialized before calling this method.
+        /// </summary>
+        /// <returns></returns>
         public byte[] Encode()
         {
             byte[] buffer = new byte[Zydis.ZYDIS_MAX_INSTRUCTION_LENGTH];
@@ -30,6 +40,12 @@ namespace Tewls.ZydisSharp
             return buffer;
         }
 
+        /// <summary>
+        /// Encode request into a byte array, using the provided runtime address for relative operand encoding. 
+        /// The request must be properly initialized before calling this method.
+        /// </summary>
+        /// <param name="address"></param>
+        /// <returns></returns>
         public byte[] EncodeAbsolute(ulong address)
         {
             byte[] buffer = new byte[Zydis.ZYDIS_MAX_INSTRUCTION_LENGTH];
