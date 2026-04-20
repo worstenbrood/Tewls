@@ -42,6 +42,37 @@ namespace Tewls.ZydisSharp
         }
 
         /// <summary>
+        /// Set absolute addresses
+        /// </summary>
+        /// <param name="absoluteAddress"></param>
+        /// <returns></returns>
+        public bool SetAbsoluteAddress(ulong absoluteAddress)
+        {
+            int count = Math.Min((int)Request.OperandCount, Request.Operands.Length);
+
+            for (int i = 0; i < count; i++)
+            {
+                ref var op = ref Request.Operands[i];
+
+                if (op.Type == ZydisOperandType.ZYDIS_OPERAND_TYPE_MEMORY &&
+                    (op.Mem.Base == ZydisRegister.ZYDIS_REGISTER_RIP ||
+                    op.Mem.Base == ZydisRegister.ZYDIS_REGISTER_EIP ||
+                    op.Mem.Base == ZydisRegister.ZYDIS_REGISTER_IP))
+                {
+                    op.Mem.Displacement = unchecked((long)absoluteAddress);
+                    return true;
+                }
+
+                if (op.Type == ZydisOperandType.ZYDIS_OPERAND_TYPE_IMMEDIATE)
+                {
+                    op.Imm.U = absoluteAddress;
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        /// <summary>
         /// Encode request into a byte array, using the provided runtime address for relative operand encoding. 
         /// The request must be properly initialized before calling this method.
         /// </summary>
