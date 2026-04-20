@@ -42,11 +42,12 @@ namespace Tewls.ZydisSharp
         }
 
         /// <summary>
-        /// Set absolute addresses
+        /// Set absolute addresses for all relative operands in the request.
+        /// This is useful for encoding instructions with RIP-relative addressing or immediate operands that represent addresses.
         /// </summary>
         /// <param name="absoluteAddress"></param>
         /// <returns></returns>
-        public bool SetAbsoluteAddress(ulong absoluteAddress)
+        public ZEncoder SetAbsoluteAddress(ulong absoluteAddress)
         {
             int count = Math.Min((int)Request.OperandCount, Request.Operands.Length);
 
@@ -60,16 +61,14 @@ namespace Tewls.ZydisSharp
                     op.Mem.Base == ZydisRegister.ZYDIS_REGISTER_IP))
                 {
                     op.Mem.Displacement = unchecked((long)absoluteAddress);
-                    return true;
                 }
 
                 if (op.Type == ZydisOperandType.ZYDIS_OPERAND_TYPE_IMMEDIATE)
                 {
                     op.Imm.U = absoluteAddress;
-                    return true;
                 }
             }
-            return false;
+            return this;
         }
 
         /// <summary>
