@@ -1,7 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics;
-using System.Linq;
 using Tewls.Kit.Asm.Stubs;
 using Tewls.Windows.Kernel;
 using Tewls.ZydisSharp;
@@ -40,16 +38,20 @@ namespace Tewls.Kit.Asm
             return length;
         }
 
-        private void CopyInstructions(ulong source, ulong destination, List<ZDecodeResult> list)
+        private static byte[] CopyInstructions(List<ZDecodeResult> instructions, IntPtr source, IntPtr destination)
         {
-            var buffer = new byte[list.Count * Zydis.ZYDIS_MAX_INSTRUCTION_LENGTH];
-            /*
-            
-            ulong length = (ulong)buffer.Length;
-            var result = Zydis.ZydisEncoderEncodeInstructionAbsolute(ref _request, buffer, ref length, destination);
-            result.ThrowIfFailed(nameof(Zydis.ZydisEncoderEncodeInstructionAbsolute));
-            Array.Resize(ref buffer, (int)length);
-            return buffer;*/
+            var sourceAddress = (ulong)source.ToInt64();
+            var destinationAddress = (ulong)destination.ToInt64();
+            var buffer = new List<byte>();
+            uint sourceIndex = 0;
+
+            foreach (var result in instructions)
+            {
+                buffer.AddRange(result.CopyInstruction(sourceAddress + sourceIndex, destinationAddress + (uint)buffer.Count));
+                sourceIndex += result.Instruction.Length;
+            }
+
+            return [.. buffer];
         }
 
         /// <summary>
@@ -84,7 +86,7 @@ namespace Tewls.Kit.Asm
                     var absAddress = instruction.TryGetAbsoluteTarget(instructionAddress, out var target) ? target : 0;
                     Console.WriteLine($"[DEBUG] {instructionAddress:X8}: {Formatter.FormatInstruction(instruction, instructionAddress)} ({target:X8})");
                     offset += instruction.Instruction.Length;
-                }
+                }           
 
                 Console.WriteLine($"[DEBUG] ASM length: {length}");
 #endif
@@ -96,8 +98,10 @@ namespace Tewls.Kit.Asm
                 Console.WriteLine($"[DEBUG] Distance: 0x{remote.ToInt64() - sourceAddress.ToInt64():X}");
 #endif
 
+                var copy = CopyInstructions(instructions, sourceAddress, remote);
+
                 // Write the original method to the trampoline.
-                _process.WriteBytes(remote, [.. buffer.Take(length)]);
+                _process.WriteBytes(remote, copy);
 
                 // Write the stub to the trampoline, which will jump original method.
                 var stub = stubGenerator.GetBuffer(sourceAddress + length);

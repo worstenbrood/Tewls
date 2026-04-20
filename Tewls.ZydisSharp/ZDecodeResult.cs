@@ -36,22 +36,11 @@ namespace Tewls.ZydisSharp
         }
 
         public byte[] Encode() => ZEncoder.Create(this).Encode();
-        
+
         public byte[] EncodeAbsolute(ulong address) => ZEncoder.Create(this).EncodeAbsolute(address);
 
-        public byte[] CopyInstruction(ulong source, ulong destination)
-        {
-            if (!TryGetAbsoluteTarget(source, out var target))
-            {
-                return Encode();
-            }
-            else
-            {
-                return ZEncoder
-                    .Create(this)
-                    .SetAbsoluteAddress(target)
-                    .EncodeAbsolute(destination);
-            }
-        }
+        public byte[] CopyInstruction(ulong source, ulong destination) =>
+            !TryGetAbsoluteTarget(source, out var target) ? Encode() :
+                ZEncoder.Create(this).SetAbsoluteAddress(target).EncodeAbsolute(destination);
     }
 }
