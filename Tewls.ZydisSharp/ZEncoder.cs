@@ -50,16 +50,22 @@ namespace Tewls.ZydisSharp
         public byte[] EncodeAbsolute(ulong address)
         {
             byte[] buffer = new byte[Zydis.ZYDIS_MAX_INSTRUCTION_LENGTH];
-            IntPtr length = new (buffer.Length);
+            IntPtr length = new(buffer.Length);
             var result = Zydis.ZydisEncoderEncodeInstructionAbsolute(ref _request, buffer, ref length, address);
             result.ThrowIfFailed(nameof(Zydis.ZydisEncoderEncodeInstructionAbsolute));
             Array.Resize(ref buffer, length.ToInt32());
             return buffer;
         }
 
+        /// <summary>
+        /// Fill a buffer with nops. This is useful for padding instructions or filling gaps in code.
+        /// </summary>
+        /// <param name="buffer"></param>
+        /// <param name="index"></param>
+        /// <param name="length"></param>
         public static void NopFill(byte[] buffer, int index = 0, int length = 0)
         {
-            if (length == 0)
+            if (length == 0 || length > buffer.Length - index)
             {
                 length = buffer.Length - index;
             }
