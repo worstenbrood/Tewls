@@ -96,7 +96,7 @@ namespace Tewls.ZydisSharp.Native
         [return: MarshalAs(UnmanagedType.CustomMarshaler, MarshalTypeRef = typeof(ZyanStatusMarshaller))]
         internal static extern ZyanStatus ZydisCalcAbsoluteAddress(ref ZydisDecodedInstruction instruction,
                 ref ZydisDecodedOperand operand, ulong runtimeAddress, out ulong resultAddress);
-
+               
         /// <summary>
         /// Calculates the absolute address value for the given instruction operand. 
         /// </summary>
@@ -109,6 +109,20 @@ namespace Tewls.ZydisSharp.Native
         {
             ZyanStatus result = ZydisCalcAbsoluteAddress(ref instruction, ref operand, runtimeAddress, out ulong address);
             result.ThrowIfFailed(nameof(ZydisCalcAbsoluteAddress));
+            return address;
+        }
+
+        [DllImport(LibraryName, CallingConvention = CallingConvention.Cdecl, ExactSpelling = true)]
+        [return: MarshalAs(UnmanagedType.CustomMarshaler, MarshalTypeRef = typeof(ZyanStatusMarshaller))]
+        internal static extern ZyanStatus ZydisCalcAbsoluteAddressEx(ref ZydisDecodedInstruction instruction,
+           ref ZydisDecodedOperand operand, ulong runtimeAddress, ref ZydisRegisterContext registerContext,
+           out ulong resultAddress);
+
+        public static ulong CalcAbsoluteAddressEx(ref ZydisDecodedInstruction instruction,
+            ref ZydisDecodedOperand operand, ulong runtimeAddress, ref ZydisRegisterContext registerContext)
+        {
+            ZyanStatus result = ZydisCalcAbsoluteAddressEx(ref instruction, ref operand, runtimeAddress, ref registerContext, out ulong address);
+            result.ThrowIfFailed(nameof(ZydisCalcAbsoluteAddressEx));
             return address;
         }
 

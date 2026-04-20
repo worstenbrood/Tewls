@@ -272,5 +272,12 @@ namespace Tewls.ZydisSharp.Native
         public ZydisEncoderRequestEvexFeatures Evex;
         public ZydisEncoderRequestMvexFeatures Mvex;
     }
+
+    [StructLayout(LayoutKind.Sequential, Pack = 8)]
+    public struct ZydisRegisterContext
+    {
+        [MarshalAs(UnmanagedType.ByValArray, SizeConst = (int)ZydisRegister.ZYDIS_REGISTER_MAX_VALUE + 1)]
+        public ulong[] Values;
+    }
 }
 
