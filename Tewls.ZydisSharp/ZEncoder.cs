@@ -49,7 +49,7 @@ namespace Tewls.ZydisSharp
         /// <returns></returns>
         public ZEncoder SetAbsoluteAddress(ulong absoluteAddress)
         {
-            int count = Math.Min((int)Request.OperandCount, Request.Operands.Length);
+            int count = Math.Min(Request.OperandCount, Request.Operands.Length);
 
             for (int i = 0; i < count; i++)
             {

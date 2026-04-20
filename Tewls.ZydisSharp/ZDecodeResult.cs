@@ -10,7 +10,7 @@ namespace Tewls.ZydisSharp
         public bool TryGetAbsoluteTarget(ulong instructionAddress, out ulong target)
         {
             target = 0;
-            int count = Math.Min((int)Instruction.OperandCount, Operands.Length);
+            int count = Math.Min(Instruction.OperandCount, Operands.Length);
 
             for (int i = 0; i < count; i++)
             {

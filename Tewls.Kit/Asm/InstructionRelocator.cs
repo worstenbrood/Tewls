@@ -6,14 +6,33 @@ using Tewls.ZydisSharp.Native;
 
 namespace Tewls.Kit.Asm
 {
+    /// <summary>
+    /// Instrcution relocator
+    /// </summary>
     public class InstructionRelocator
     {
         public static readonly ZDecoder Decoder = ZDecoder.Create64();
         public static readonly ZFormatter Formatter = new();
 
+        /// <summary>
+        /// Source address of the instructions to be relocated. 
+        /// This is the address of the original method that we want to hook.
+        /// </summary>
         public readonly IntPtr SourceAddress;
+
+        /// <summary>
+        /// Buffer 
+        /// </summary>
         public readonly byte[] Buffer;
+
+        /// <summary>
+        /// Decoded instructions of <see cref="Buffer"/>
+        /// </summary>
         public readonly List<ZDecodeResult> Instructions;
+
+        /// <summary>
+        /// Total instruction length
+        /// </summary>
         public readonly int Length;
 
         private int GetStubSize(int requiredSize)
@@ -33,6 +52,15 @@ namespace Tewls.Kit.Asm
             return length;
         }
 
+        /// <summary>
+        /// Constructor for the instruction relocator. 
+        /// It disassembles the instructions at the source address and calculates the total length of the 
+        /// instructions to be relocated, which should be at least the size of the stub. 
+        /// The instructions are stored in a list for later use when copying to the destination.
+        /// </summary>
+        /// <param name="sourceAddress"></param>
+        /// <param name="buffer"></param>
+        /// <param name="requiredSize"></param>
         public InstructionRelocator(IntPtr sourceAddress, byte[] buffer, int requiredSize)
         {
             SourceAddress = sourceAddress;
@@ -42,6 +70,9 @@ namespace Tewls.Kit.Asm
             Formatter.SetProperty(ZydisFormatterProperty.ZYDIS_FORMATTER_PROP_DETAILED_PREFIXES, new(1));
         }
 
+        /// <summary>
+        /// Print the original instructions
+        /// </summary>
         public void Print()
         {
             var offset = 0;
@@ -49,8 +80,7 @@ namespace Tewls.Kit.Asm
             foreach (var instruction in Instructions)
             {
                 var instructionAddress = source + (uint)offset;
-                instruction.TryGetAbsoluteTarget(instructionAddress, out var target);
-                Console.WriteLine($"[DEBUG] {instructionAddress:X8}: {Formatter.FormatInstruction(instruction, instructionAddress)} ({target:X8})");
+                Console.WriteLine($"[DEBUG] {instructionAddress:X}: {Formatter.FormatInstruction(instruction, instructionAddress)}");
                 offset += instruction.Instruction.Length;
             }
         }
