@@ -48,7 +48,7 @@ namespace Tewls.ZydisSharp.Native
         ZYDIS_OPERAND_TYPE_POINTER = 3,
         ZYDIS_OPERAND_TYPE_IMMEDIATE = 4,
     }
-        
+
     public enum ZydisMemoryOperandType : uint
     {
         ZYDIS_MEMOP_TYPE_INVALID = 0,

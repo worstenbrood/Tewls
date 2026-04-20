@@ -37,6 +37,17 @@ namespace Tewls.ZydisSharp
         }
 
         /// <summary>
+        /// Enable decoder mode
+        /// </summary>
+        /// <param name="mode"></param>
+        /// <param name="enabled"></param>
+        public void EnableMode(ZydisDecoderMode mode, bool enabled)
+        {
+            var result = Zydis.ZydisDecoderEnableMode(ref _decoder, mode, (byte)(enabled ? 1 : 0));
+            result.ThrowIfFailed(nameof(Zydis.ZydisDecoderEnableMode));
+        }
+
+        /// <summary>
         /// Decode a single instruction
         /// </summary>
         /// <param name="buffer"></param>
