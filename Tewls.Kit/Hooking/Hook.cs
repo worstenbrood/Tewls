@@ -1,5 +1,4 @@
-﻿using IlDasm_CSharp;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using Tewls.Kit.Asm;
@@ -7,7 +6,6 @@ using Tewls.Kit.Asm.Stubs;
 using Tewls.Kit.Utils;
 using Tewls.Windows.Kernel;
 using Tewls.ZydisSharp;
-using Tewls.ZydisSharp.Native;
 
 namespace Tewls.Kit.Hooking
 {
