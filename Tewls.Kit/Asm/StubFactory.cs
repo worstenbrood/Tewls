@@ -1,57 +1,20 @@
 ﻿using System;
-using System.Collections.Generic;
 using Tewls.Kit.Asm.Stubs;
 using Tewls.Windows.Kernel;
-using Tewls.ZydisSharp;
 using Tewls.ZydisSharp.Native;
 
 namespace Tewls.Kit.Asm
 {
     public class StubFactory
     {
-        protected static readonly ZDecoder Decoder = ZDecoder.Create64();
-        protected static readonly ZFormatter Formatter = new();
+        
         private readonly NativeProcess _process;
-        private readonly StubAllocator _allocator;
+        private readonly Allocator _allocator;
 
         public StubFactory(NativeProcess process)
         {
             _process = process;
-            _allocator = new StubAllocator(process);
-            Formatter.SetProperty(ZydisFormatterProperty.ZYDIS_FORMATTER_PROP_DETAILED_PREFIXES, new(1));
-        }
-        
-        private static int GetStubSize(byte[]buffer, IStubGenerator stubGenerator, List<ZDecodeResult> result)
-        {
-            var length = 0;
-            while (length < stubGenerator.Size)
-            {
-                var instruction = Decoder.DisassembleInstruction(buffer, length);
-                if (instruction == null)
-                {
-                    break;
-                }
-                
-                result?.Add(instruction);
-                length += instruction.Instruction.Length;
-            }
-            return length;
-        }
-
-        private static byte[] CopyInstructions(List<ZDecodeResult> instructions, IntPtr source, IntPtr destination)
-        {
-            var sourceAddress = (ulong)source.ToInt64();
-            var destinationAddress = (ulong)destination.ToInt64();
-            var buffer = new List<byte>();
-            uint sourceIndex = 0;
-
-            foreach (var result in instructions)
-            {
-                buffer.AddRange(result.CopyInstruction(sourceAddress + sourceIndex, destinationAddress + (uint)buffer.Count));
-                sourceIndex += result.Instruction.Length;
-            }
-
-            return [.. buffer];
+            _allocator = new Allocator(process);
         }
 
         /// <summary>
@@ -74,38 +37,28 @@ namespace Tewls.Kit.Asm
             try
             {
                 // Read the first ZYDIS_MAX_INSTRUCTION_LENGTH bytes of the original method to create the trampoline.
-                var buffer = _process.ReadBytes(sourceAddress, Zydis.ZYDIS_MAX_INSTRUCTION_LENGTH);
-                var instructions = new List<ZDecodeResult>();
-                var length = GetStubSize(buffer, stubGenerator, instructions);
-
+                var copier = new Copier(_process, sourceAddress, Zydis.ZYDIS_MAX_INSTRUCTION_LENGTH, stubGenerator);
+                
 #if DEBUG
-                var offset = 0;
-                foreach (var instruction in instructions)
-                {
-                    var instructionAddress = (ulong)(sourceAddress.ToInt64() + offset);
-                    var absAddress = instruction.TryGetAbsoluteTarget(instructionAddress, out var target) ? target : 0;
-                    Console.WriteLine($"[DEBUG] {instructionAddress:X8}: {Formatter.FormatInstruction(instruction, instructionAddress)} ({target:X8})");
-                    offset += instruction.Instruction.Length;
-                }           
-
-                Console.WriteLine($"[DEBUG] ASM length: {length}");
+                copier.Print();
+                Console.WriteLine($"[DEBUG] ASM length: {copier.Length}");
 #endif
 
-                var remote = _allocator.AllocateRelativeAddress(sourceAddress, length + stubGenerator.Size);
+                var remote = _allocator.AllocateRelativeAddress(sourceAddress, copier.Length + stubGenerator.Size);
 
 #if DEBUG
                 Console.WriteLine($"[DEBUG] Remote stub address: 0x{remote.ToInt64():X}");
                 Console.WriteLine($"[DEBUG] Distance: 0x{remote.ToInt64() - sourceAddress.ToInt64():X}");
 #endif
 
-                var copy = CopyInstructions(instructions, sourceAddress, remote);
+                var copy = copier.Copy(remote);
 
                 // Write the original method to the trampoline.
                 _process.WriteBytes(remote, copy);
 
                 // Write the stub to the trampoline, which will jump original method.
-                var stub = stubGenerator.GetBuffer(sourceAddress + length);
-                _process.WriteBytes(remote + length, stub);
+                var stub = stubGenerator.GetBuffer(sourceAddress + copier.Length);
+                _process.WriteBytes(remote + copier.Length, stub);
 
                 return remote;
             }
