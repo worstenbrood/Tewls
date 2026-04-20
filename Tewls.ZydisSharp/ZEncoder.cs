@@ -5,11 +5,11 @@ namespace Tewls.ZydisSharp
 {
     public class ZEncoder
     {
-        private ZydisEncoderRequest _request;
+        public ZydisEncoderRequest Request;
 
         public ZEncoder(ref ZydisEncoderRequest request)
         {
-            _request = request;
+            Request = request;
         }
 
         /// <summary>
@@ -35,7 +35,7 @@ namespace Tewls.ZydisSharp
         {
             byte[] buffer = new byte[Zydis.ZYDIS_MAX_INSTRUCTION_LENGTH];
             ulong length = (ulong)buffer.Length;
-            var result = Zydis.ZydisEncoderEncodeInstruction(ref _request, buffer, ref length);
+            var result = Zydis.ZydisEncoderEncodeInstruction(ref Request, buffer, ref length);
             result.ThrowIfFailed(nameof(Zydis.ZydisEncoderEncodeInstruction));
             Array.Resize(ref buffer, (int)length);
             return buffer;
@@ -51,7 +51,7 @@ namespace Tewls.ZydisSharp
         {
             byte[] buffer = new byte[Zydis.ZYDIS_MAX_INSTRUCTION_LENGTH];
             IntPtr length = new(buffer.Length);
-            var result = Zydis.ZydisEncoderEncodeInstructionAbsolute(ref _request, buffer, ref length, address);
+            var result = Zydis.ZydisEncoderEncodeInstructionAbsolute(ref Request, buffer, ref length, address);
             result.ThrowIfFailed(nameof(Zydis.ZydisEncoderEncodeInstructionAbsolute));
             Array.Resize(ref buffer, length.ToInt32());
             return buffer;
