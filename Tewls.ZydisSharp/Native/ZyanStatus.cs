@@ -20,6 +20,25 @@ namespace Tewls.ZydisSharp.Native
         ZYDIS_STATUS_INVALID_MASK = 0x8020000B,
         ZYDIS_STATUS_SKIP_TOKEN = 0x8020000C,
         ZYDIS_STATUS_IMPOSSIBLE_INSTRUCTION = 0x8020000D,
+        ZYAN_STATUS_SUCCESS = 0x80100000,
+        ZYAN_STATUS_FAILED = 0x80100001,
+        ZYAN_STATUS_TRUE = 0x80100002,
+        ZYAN_STATUS_FALSE = 0x80100003,
+        ZYAN_STATUS_INVALID_ARGUMENT = 0x80100004,
+        ZYAN_STATUS_INVALID_OPERATION = 0x80100005,
+        ZYAN_STATUS_ACCESS_DENIED = 0x80100006,
+        ZYAN_STATUS_NOT_FOUND = 0x80100007,
+        ZYAN_STATUS_OUT_OF_RANGE = 0x80100008,
+        ZYAN_STATUS_INSUFFICIENT_BUFFER_SIZE = 0x80100009,
+        ZYAN_STATUS_NOT_ENOUGH_MEMORY = 0x8010000A,
+        ZYAN_STATUS_BAD_SYSTEMCALL = 0x8010000B,
+        ZYAN_STATUS_OUT_OF_RESOURCES = 0x8010000C,
+        ZYAN_STATUS_MISSING_DEPENDENCY = 0x8010000D,
+        ZYAN_STATUS_ARG_NOT_UNDERSTOOD = 0x80300000,
+        ZYAN_STATUS_TOO_FEW_ARGS = 0x80300001,
+        ZYAN_STATUS_TOO_MANY_ARGS = 0x80300002,
+        ZYAN_STATUS_ARG_MISSES_VALUE = 0x80300003,
+        ZYAN_STATUS_REQUIRED_ARG_MISSING = 0x80300004
     }
 
     public class ZyanStatus(uint value)
@@ -29,7 +48,7 @@ namespace Tewls.ZydisSharp.Native
         public bool Failed => (((uint)Status) & 0x80000000u) != 0;
 
         public void Throw([CallerMemberName] string apiName = "") =>
-            throw new InvalidOperationException($"{apiName} failed: 0x{(uint)Status:X8}");
+            throw new InvalidOperationException($"{apiName} failed: {Status}");
 
         public void ThrowIfFailed([CallerMemberName] string apiName = "")
         {
@@ -37,7 +56,7 @@ namespace Tewls.ZydisSharp.Native
             {
                 Throw(apiName);
             }
-        } 
+        }
     }
 
     public class ZyanStatusMarshaller : MarshallerBase<ZyanStatusMarshaller>

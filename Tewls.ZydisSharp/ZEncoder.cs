@@ -1,4 +1,5 @@
-﻿using Tewls.ZydisSharp.Native;
+﻿using Tewls.Shared;
+using Tewls.ZydisSharp.Native;
 
 namespace Tewls.ZydisSharp
 {
@@ -49,11 +50,23 @@ namespace Tewls.ZydisSharp
         public byte[] EncodeAbsolute(ulong address)
         {
             byte[] buffer = new byte[Zydis.ZYDIS_MAX_INSTRUCTION_LENGTH];
-            ulong length = (ulong)buffer.Length;
+            IntPtr length = new (buffer.Length);
             var result = Zydis.ZydisEncoderEncodeInstructionAbsolute(ref _request, buffer, ref length, address);
             result.ThrowIfFailed(nameof(Zydis.ZydisEncoderEncodeInstructionAbsolute));
-            Array.Resize(ref buffer, (int)length);
+            Array.Resize(ref buffer, length.ToInt32());
             return buffer;
+        }
+
+        public static void NopFill(byte[] buffer, int index = 0, int length = 0)
+        {
+            if (length == 0)
+            {
+                length = buffer.Length - index;
+            }
+
+            using var bufferPin = new PinnedArray<byte>(buffer, index);
+            var result = Zydis.ZydisEncoderNopFill(bufferPin.Address, new IntPtr(length));
+            result.ThrowIfFailed(nameof(Zydis.ZydisEncoderNopFill));
         }
     }
 }
