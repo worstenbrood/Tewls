@@ -8,7 +8,7 @@ namespace Tewls.Kit.Asm
     /// It provides methods to allocate memory at a specific address or relative to a base address.
     /// </summary>
     /// <param name="process"></param>
-    public class Allocator(NativeProcess process)
+    public class StubAllocator(NativeProcess process)
     {
         /// <summary>
         /// <see cref="SystemInfo"/>

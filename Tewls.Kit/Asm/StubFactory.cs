@@ -9,12 +9,12 @@ namespace Tewls.Kit.Asm
     {
         
         private readonly NativeProcess _process;
-        private readonly Allocator _allocator;
+        private readonly StubAllocator _allocator;
 
         public StubFactory(NativeProcess process)
         {
             _process = process;
-            _allocator = new Allocator(process);
+            _allocator = new StubAllocator(process);
         }
 
         /// <summary>
@@ -36,29 +36,34 @@ namespace Tewls.Kit.Asm
 
             try
             {
+                var buffer = _process.ReadBytes(sourceAddress, Zydis.ZYDIS_MAX_INSTRUCTION_LENGTH);
                 // Read the first ZYDIS_MAX_INSTRUCTION_LENGTH bytes of the original method to create the trampoline.
-                var copier = new Copier(_process, sourceAddress, Zydis.ZYDIS_MAX_INSTRUCTION_LENGTH, stubGenerator);
-                
-#if DEBUG
-                copier.Print();
-                Console.WriteLine($"[DEBUG] ASM length: {copier.Length}");
-#endif
+                var relocator = new InstructionRelocator(sourceAddress, buffer, stubGenerator.Size);
 
-                var remote = _allocator.AllocateRelativeAddress(sourceAddress, copier.Length + stubGenerator.Size);
+#if DEBUG
+                relocator.Print();
+                Console.WriteLine($"[DEBUG] ASM length: {relocator.Length}");
+#endif          
+                // We should allocate before reading the original method. Based on where we are able to allocate memory,
+                // we can decide which kind of jump we're going to using the stub.
+                // If we can allocate memory within 2GB, we can use a relative jump, which is smaller and faster.
+                // This does mean we need to allocate a fixed buffer for the stub, which is the size of the original
+                // method + the size of the stub.
+                var remote = _allocator.AllocateRelativeAddress(sourceAddress, relocator.Length + stubGenerator.Size);
 
 #if DEBUG
                 Console.WriteLine($"[DEBUG] Remote stub address: 0x{remote.ToInt64():X}");
                 Console.WriteLine($"[DEBUG] Distance: 0x{remote.ToInt64() - sourceAddress.ToInt64():X}");
 #endif
 
-                var copy = copier.Copy(remote);
+                var copy = relocator.Copy(remote);
 
                 // Write the original method to the trampoline.
                 _process.WriteBytes(remote, copy);
 
                 // Write the stub to the trampoline, which will jump original method.
-                var stub = stubGenerator.GetBuffer(sourceAddress + copier.Length);
-                _process.WriteBytes(remote + copier.Length, stub);
+                var stub = stubGenerator.GetBuffer(sourceAddress + copy.Length);
+                _process.WriteBytes(remote + copy.Length, stub);
 
                 return remote;
             }

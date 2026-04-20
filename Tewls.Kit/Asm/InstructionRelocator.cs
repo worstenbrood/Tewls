@@ -1,14 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using Tewls.Kit.Asm.Stubs;
-using Tewls.Windows.Kernel;
 using Tewls.ZydisSharp;
 using Tewls.ZydisSharp.Native;
 
 namespace Tewls.Kit.Asm
 {
-    public class Copier
+    public class InstructionRelocator
     {
         public static readonly ZDecoder Decoder = ZDecoder.Create64();
         public static readonly ZFormatter Formatter = new();
@@ -18,10 +16,10 @@ namespace Tewls.Kit.Asm
         public readonly List<ZDecodeResult> Instructions;
         public readonly int Length;
 
-        private int GetStubSize(IStubGenerator stubGenerator)
+        private int GetStubSize(int requiredSize)
         {
             var length = 0;
-            while (length < stubGenerator.Size)
+            while (length < requiredSize)
             {
                 var instruction = Decoder.DisassembleInstruction(Buffer, length);
                 if (instruction == null)
@@ -35,12 +33,12 @@ namespace Tewls.Kit.Asm
             return length;
         }
 
-        public Copier(NativeProcess process, IntPtr sourceAddress, int size, IStubGenerator stubGenerator)
+        public InstructionRelocator(IntPtr sourceAddress, byte[] buffer, int requiredSize)
         {
             SourceAddress = sourceAddress;
-            Buffer = process.ReadBytes(sourceAddress, size);
-            Instructions = new();
-            Length = GetStubSize(stubGenerator);
+            Buffer = buffer;
+            Instructions = [];
+            Length = GetStubSize(requiredSize);
             Formatter.SetProperty(ZydisFormatterProperty.ZYDIS_FORMATTER_PROP_DETAILED_PREFIXES, new(1));
         }
 
@@ -51,7 +49,7 @@ namespace Tewls.Kit.Asm
             foreach (var instruction in Instructions)
             {
                 var instructionAddress = source + (uint)offset;
-                var absAddress = instruction.TryGetAbsoluteTarget(instructionAddress, out var target) ? target : 0;
+                instruction.TryGetAbsoluteTarget(instructionAddress, out var target);
                 Console.WriteLine($"[DEBUG] {instructionAddress:X8}: {Formatter.FormatInstruction(instruction, instructionAddress)} ({target:X8})");
                 offset += instruction.Instruction.Length;
             }
@@ -71,7 +69,8 @@ namespace Tewls.Kit.Asm
 
             foreach (var result in Instructions)
             {
-                if (!result.TryGetAbsoluteTarget(sourceAddress + (uint)sourceIndex, out var target))
+                var currentAddress = sourceAddress + (uint)sourceIndex;
+                if (!result.TryGetAbsoluteTarget(currentAddress, out var target))
                 {
                     // Copy raw
                     buffer.AddRange(Buffer.Skip(sourceIndex).Take(result.Instruction.Length));
@@ -79,9 +78,7 @@ namespace Tewls.Kit.Asm
                 else
                 {
                     // Adjust address
-                    buffer.AddRange(ZEncoder.Create(result)
-                        .SetAbsoluteAddress(target)
-                        .EncodeAbsolute(destinationAddress + (uint)buffer.Count));
+                    buffer.AddRange(result.EncodeAbsolute(currentAddress, destinationAddress + (uint)buffer.Count));
                 }
                 sourceIndex += result.Instruction.Length;
             }
